@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model lambda="1.540562E-10">
+<layers>
+<layer name="GaAs substrate">
+<d>
+<fitvalue enable="0" expected="0.0" max="1.0E-7" min="0.0"/>
+</d>
+<p>
+<fitvalue enable="0" expected="0.0" max="1.0" min="0.0"/>
+</p>
+<r>
+<fitvalue enable="0" expected="0.0" max="1.0" min="0.0"/>
+</r>
+<mat name="Gallium arsenide (400)" poisson="0.311" xy="5.65368E-10" z="1.41342E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="1.80714778993516E-28">
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+<mat name="Gallium arsenide (400)" poisson="0.311" xy="5.65368E-10" z="1.41342E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="1.80714778993516e-28">
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+</layer>
+</layers>
+<sum>
+<fitvalue enable="1" expected="-30.0" max="5.0" min="-30.0"/>
+</sum>
+<prod>
+<fitvalue enable="1" expected="60.0" max="80.0" min="40.0"/>
+</prod>
+<stddev>
+<fitvalue enable="0" expected="0.0" max="1.7453292519943296E-4" min="0.0"/>
+</stddev>
+<offset>
+<fitvalue enable="1" expected="0.0" max="8.726646259971648E-4" min="-8.726646259971648E-4"/>
+</offset>
+</model>

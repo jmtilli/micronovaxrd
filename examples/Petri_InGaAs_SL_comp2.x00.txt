@@ -1,0 +1,31 @@
+Layers-tiedosto on virheellinen, t‰ss‰ oikea rakenne:
+
+GaAs, 18.5 nm
+GaNAs, 102.3 nm, typpe‰ 0.009
+GaAs, 18.5 nm
+InGaAs, indiumpitoisuus 0.2623, paksuus 7.1 nm
+GaAs, 18.5 nm
+GaNAs, 102.3 nm, typpe‰ 0.009
+GaAs, 18.5 nm
+InGaAs, indiumpitoisuus 0.2623, paksuus 7.1 nm
+GaAs, 18.5 nm
+GaNAs, 102.3 nm, typpe‰ 0.009
+GaAs, 18.5 nm
+InGaAs, indiumpitoisuus 0.2623, paksuus 7.1 nm
+GaAs, 18.5 nm
+GaNAs, 102.3 nm, typpe‰ 0.009
+GaAs, 18.5 nm
+InGaAs, indiumpitoisuus 0.2623, paksuus 7.1 nm
+GaAs-substraatti
+
+
+
+GID_SL:‰‰n:
+period=4
+t=185 code=GaAs
+t=1023 code=GaAs code2=GaN_cubic x2=0.009 da/a=-0.017157
+t=185 code=GaAs
+t=71 code=GaAs code2=InAs x2=0.2623 da/a=a
+end period
+
+(t‰ss‰ da/a piti laskea k‰sin, toivottavasti meni oikein -- tarkista!)

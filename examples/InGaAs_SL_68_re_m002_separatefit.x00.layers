@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model lambda="1.540562E-10">
+<layers>
+<layer name="GaAs">
+<d>
+<fitvalue enable="1" expected="1.75026E-8" max="2.0128E-8" min="1.4877000000000001E-8"/>
+</d>
+<p>
+<fitvalue enable="0" expected="0.0" max="1.0" min="0.0"/>
+</p>
+<r>
+<fitvalue enable="0" expected="0.0" max="1.0" min="0.0"/>
+</r>
+<mat name="Gallium arsenide (400)" poisson="0.3117" xy="5.6532E-10" z="1.4133E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="1.80668754600768E-28">
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+<mat name="Gallium arsenide (400)" poisson="0.3117" xy="5.6532E-10" z="1.4133E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="1.80668754600768E-28">
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+</layer>
+<layer name="InGaAs">
+<d>
+<fitvalue enable="1" expected="7.48489E-9" max="8.6E-9" min="6.4E-9"/>
+</d>
+<p>
+<fitvalue enable="1" expected="0.256091" max="0.3" min="0.21"/>
+</p>
+<r>
+<fitvalue enable="0" expected="0.0" max="1.0" min="0.0"/>
+</r>
+<mat name="Gallium arsenide (400)" poisson="0.3117" xy="5.6532E-10" z="1.4133E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="1.80668754600768E-28">
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+<mat name="Indium arsenide (400)" poisson="0.352" xy="6.0584E-10" z="1.5146E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="2.22368789256704E-28">
+<atom Z="49" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="49" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="49" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="49" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+</layer>
+<layer name="GaAs">
+<d>
+<fitvalue enable="1" expected="1.75026E-8" max="2.0128E-8" min="1.4877000000000001E-8"/>
+</d>
+<p>
+<fitvalue enable="0" expected="0.0" max="1.0" min="0.0"/>
+</p>
+<r>
+<fitvalue enable="0" expected="0.0" max="1.0" min="0.0"/>
+</r>
+<mat name="Gallium arsenide (400)" poisson="0.3117" xy="5.6532E-10" z="1.4133E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="1.80668754600768E-28">
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+<mat name="Gallium arsenide (400)" poisson="0.3117" xy="5.6532E-10" z="1.4133E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="1.80668754600768E-28">
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+</layer>
+<layer name="InGaAs">
+<d>
+<fitvalue enable="1" expected="7.48489E-9" max="8.6E-9" min="6.4E-9"/>
+</d>
+<p>
+<fitvalue enable="1" expected="0.256091" max="0.3" min="0.21"/>
+</p>
+<r>
+<fitvalue enable="0" expected="0.0" max="1.0" min="0.0"/>
+</r>
+<mat name="Gallium arsenide (400)" poisson="0.3117" xy="5.6532E-10" z="1.4133E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="1.80668754600768E-28">
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+<mat name="Indium arsenide (400)" poisson="0.352" xy="6.0584E-10" z="1.5146E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="2.22368789256704E-28">
+<atom Z="49" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="49" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="49" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="49" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+</layer>
+<layer name="GaAs">
+<d>
+<fitvalue enable="1" expected="1.75026E-8" max="2.0128E-8" min="1.4877000000000001E-8"/>
+</d>
+<p>
+<fitvalue enable="0" expected="0.0" max="1.0" min="0.0"/>
+</p>
+<r>
+<fitvalue enable="0" expected="0.0" max="1.0" min="0.0"/>
+</r>
+<mat name="Gallium arsenide (400)" poisson="0.3117" xy="5.6532E-10" z="1.4133E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="1.80668754600768E-28">
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+<mat name="Gallium arsenide (400)" poisson="0.3117" xy="5.6532E-10" z="1.4133E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="1.80668754600768E-28">
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+</layer>
+<layer name="InGaAs">
+<d>
+<fitvalue enable="1" expected="7.48489E-9" max="8.6E-9" min="6.4E-9"/>
+</d>
+<p>
+<fitvalue enable="1" expected="0.256091" max="0.3" min="0.21"/>
+</p>
+<r>
+<fitvalue enable="0" expected="0.0" max="1.0" min="0.0"/>
+</r>
+<mat name="Gallium arsenide (400)" poisson="0.3117" xy="5.6532E-10" z="1.4133E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="1.80668754600768E-28">
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+<mat name="Indium arsenide (400)" poisson="0.352" xy="6.0584E-10" z="1.5146E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="2.22368789256704E-28">
+<atom Z="49" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="49" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="49" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="49" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+</layer>
+<layer name="GaAs substrate">
+<d>
+<fitvalue enable="0" expected="0.0" max="1.0E-7" min="0.0"/>
+</d>
+<p>
+<fitvalue enable="0" expected="0.0" max="1.0" min="0.0"/>
+</p>
+<r>
+<fitvalue enable="0" expected="0.0" max="1.0" min="0.0"/>
+</r>
+<mat name="Gallium arsenide (400)" poisson="0.3117" xy="5.6532E-10" z="1.4133E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="1.80668754600768E-28">
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+<mat name="Gallium arsenide (400)" poisson="0.3117" xy="5.6532E-10" z="1.4133E-10">
+<comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+<refl h="4" k="0" l="0"/>
+<unitcell V="1.80668754600768E-28">
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.0" z="0.0"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.0" y="0.5" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.0" z="0.5"/>
+</atom>
+<atom Z="31" occupation="1.0">
+<pos x="0.5" y="0.5" z="0.0"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.25" z="0.75"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.25" y="0.75" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.25" z="0.25"/>
+</atom>
+<atom Z="33" occupation="1.0">
+<pos x="0.75" y="0.75" z="0.75"/>
+</atom>
+</unitcell>
+</mat>
+</layer>
+</layers>
+<sum>
+<fitvalue enable="1" expected="-7.694521639198143" max="-7.693003999999995" min="-57.19999999999999"/>
+</sum>
+<prod>
+<fitvalue enable="1" expected="56.7715" max="60.0" min="53.0"/>
+</prod>
+<stddev>
+<fitvalue enable="0" expected="0.0" max="1.7453292519943296E-4" min="0.0"/>
+</stddev>
+<offset>
+<fitvalue enable="1" expected="-4.0238914970579665E-5" max="1.7453292519943296E-4" min="-1.7453292519943296E-4"/>
+</offset>
+</model>

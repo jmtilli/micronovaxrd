@@ -1,0 +1,185 @@
+<project name="XRD" default="jar" basedir=".">
+    <description>
+      XRD project build file
+    </description>
+  <!-- set global properties for this build -->
+  <!-- we can't use location here since it appears not to work in include names -->
+  <property name="src" value="javasrc"/>
+  <!--<property name="build" location="build"/>-->
+  <!--<property name="dist"  location="dist"/>-->
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <!-- <mkdir dir="${build}"/> -->
+  </target>
+
+  <path id="classpath">
+    <!--<pathelement path="${classpath}"/>-->
+    <pathelement location="jfreechart-1.0.1.jar"/>
+  </path>
+
+  <patternset id="shellscripts">
+      <include name="run.sh"/>
+      <include name="run.bat"/>
+  </patternset>
+
+  <patternset id="examples">
+      <include name="examples/"/>
+  </patternset>
+
+  <patternset id="libdeps">
+      <include name="jfreechart-1.0.1.jar"/>
+      <include name="lib/jcommon-1.0.0.jar"/>
+  </patternset>
+
+  <patternset id="srcdoc">
+  </patternset>
+
+  <patternset id="doc">
+      <include name="README-1st.txt"/>
+      <include name="README.txt"/>
+  </patternset>
+
+  <patternset id="src">
+      <include name="${src}/**/*.java"/>
+  </patternset>
+
+  <patternset id="srcaux">
+      <include name="${src}/*.png"/>
+  </patternset>
+
+  <patternset id="build">
+      <include name="build.xml"/>
+  </patternset>
+
+  <patternset id="xrdlab">
+      <include name="xrdlab/"/>
+  </patternset>
+
+  <patternset id="matlabfiles">
+      <include name="*.m"/>
+
+      <!-- Matlab databases -->
+      <include name="B_table2.txt"/>
+      <include name="atomic_weights.txt"/>
+      <include name="fp1_table.txt"/>
+      <include name="fp2_table.txt"/>
+      <include name="fp_wavelength.txt"/>
+      <include name="sf_table.txt"/>
+  </patternset>
+
+  <patternset id="javadb">
+      <!-- java databases -->
+      <include name="matdb.xml"/>
+      <include name="atomic_B.txt"/>
+      <include name="atomic_masses.txt"/>
+      <include name="atomic_sf.txt"/>
+      <include name="atomic_symbols.txt"/>
+      <include name="henke/"/>
+  </patternset>
+
+  <patternset id="javaaux">
+      <include name="default.layers"/>
+  </patternset>
+
+  <target name="compile" depends="init" description="compile the source " >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <!-- <javac srcdir="${src}" destdir="${build}"/> -->
+    <!-- <javac srcdir="." destdir="." /> -->
+    <javac srcdir="${src}" debug="on" source="1.5">
+        <classpath refid="classpath"/>
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile" description="jar">
+      <jar destfile="xrd.jar">
+          <fileset dir="${src}">
+              <!--<include name="**/*.class"/>-->
+              <include name="**/*.class"/>
+              <include name="*.png"/>
+          </fileset>
+          <manifest>
+              <!--<attribute name="Built-By" value="${user.name}"/>-->
+              <attribute name="Class-Path" value="jfreechart-1.0.1.jar"/>
+              <attribute name="Main-Class" value="fi.micronova.tkk.xray.XRDApp"/>
+          </manifest>
+      </jar>
+  </target>
+
+  <target name="bindist" depends="jar" description="make distfile">
+      <zip destfile="xrd-bin.zip">
+          <zipfileset dir="." prefix="xrd-bin">
+              <patternset refid="javadb" />
+              <patternset refid="javaaux" />
+              <patternset refid="matlabfiles" />
+              <patternset refid="examples" />
+              <patternset refid="libdeps" />
+              <patternset refid="doc" />
+              <patternset refid="shellscripts" />
+              <patternset>
+                  <include name="xrd.jar" />
+              </patternset>
+          </zipfileset>
+          <zipfileset dir="${src}/jmatlink" prefix="xrd-bin">
+              <include name="JMatLink.dll" />
+              <include name="nativelib/" />
+          </zipfileset>
+      </zip>
+  </target>
+
+  <target name="xrdlab" depends="jar" description="make xrdlab distfile">
+      <zip destfile="xrdlab.zip">
+          <!--<zipfileset dir="." prefix="xrdlab">-->
+          <zipfileset dir=".">
+              <patternset refid="xrdlab" />
+          </zipfileset>
+      </zip>
+  </target>
+
+  <target name="srcdist" depends="jar" description="make distfile">
+      <zip destfile="xrd-src.zip">
+          <zipfileset dir="." prefix="xrd-src">
+              <patternset refid="javadb" />
+              <patternset refid="javaaux" />
+              <patternset refid="examples" />
+              <patternset refid="doc" />
+              <patternset refid="matlabfiles" />
+              <patternset refid="libdeps" />
+              <patternset refid="shellscripts" />
+
+              <patternset refid="xrdlab" />
+
+              <patternset refid="src" />
+              <patternset refid="srcaux" />
+              <patternset refid="srcdoc" />
+              <patternset refid="build" />
+          </zipfileset>
+      </zip>
+  </target>
+  <target name="dist" depends="srcdist,bindist,xrdlab" description="make distfiles" />
+
+  <target name="clean" description="clean up" >
+    <delete>
+        <fileset dir="${src}" includes="**/*.class"/>
+    </delete>
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <!-- <delete dir="${build}"/> -->
+    <!-- <delete dir="${dist}"/> -->
+  </target>
+
+  <target name="distclean" depends="clean" description="clean up distributions" >
+    <delete>
+        <fileset dir=".">
+            <include name="xrd-src.zip" />
+            <include name="xrd-bin.zip" />
+            <include name="xrdlab.zip" />
+            <include name="xrd.jar" />
+        </fileset>
+    </delete>
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <!-- <delete dir="${build}"/> -->
+    <!-- <delete dir="${dist}"/> -->
+  </target>
+</project>
