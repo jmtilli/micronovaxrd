@@ -59,6 +59,25 @@
       </unitcell>
     </mat>
 
+    <mat name="Gallium nitride, cubic (200)" xy='4.5034e-10' z='2.25170e-10' poisson='0.33'>
+      <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+      <refl h='2' k='0' l='0' />
+
+      <unitcell V="9.13317060993040e-29">
+          <atom Z="31" occupation="1">
+              <pos x="0.00" y="0.00" z="0.00" />
+              <pos x="0.00" y="0.50" z="0.50" />
+              <pos x="0.50" y="0.00" z="0.50" />
+              <pos x="0.50" y="0.50" z="0.00" />
+          </atom>
+          <atom Z="7" occupation="1">
+              <pos x="0.25" y="0.25" z="0.75" />
+              <pos x="0.25" y="0.75" z="0.25" />
+              <pos x="0.75" y="0.25" z="0.25" />
+              <pos x="0.75" y="0.75" z="0.75" />
+          </atom>
+      </unitcell>
+    </mat>
     <mat name="Gallium nitride, cubic (400)" xy='4.5034e-10' z='1.12585e-10' poisson='0.33'>
       <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
       <refl h='4' k='0' l='0' />
@@ -79,6 +98,25 @@
       </unitcell>
     </mat>
 
+    <mat name="Gallium arsenide (200)" xy='5.65368e-10' z='2.82684e-10' poisson='0.311'>
+      <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+      <refl h='2' k='0' l='0' />
+
+      <unitcell V="1.80714778993516e-28">
+          <atom Z="31" occupation="1">
+              <pos x="0.00" y="0.00" z="0.00" />
+              <pos x="0.00" y="0.50" z="0.50" />
+              <pos x="0.50" y="0.00" z="0.50" />
+              <pos x="0.50" y="0.50" z="0.00" />
+          </atom>
+          <atom Z="33" occupation="1">
+              <pos x="0.25" y="0.25" z="0.75" />
+              <pos x="0.25" y="0.75" z="0.25" />
+              <pos x="0.75" y="0.25" z="0.25" />
+              <pos x="0.75" y="0.75" z="0.75" />
+          </atom>
+      </unitcell>
+    </mat>
     <mat name="Gallium arsenide (400)" xy='5.65368e-10' z='1.41342e-10' poisson='0.311'>
       <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
       <refl h='4' k='0' l='0' />
@@ -99,6 +137,25 @@
       </unitcell>
     </mat>
 
+    <mat name="Aluminium arsenide (200)" xy='5.6618e-10' z='2.83090e-10' poisson='0.3240'>
+      <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+      <refl h='2' k='0' l='0' />
+
+      <unitcell V="1.81494543261032e-28">
+          <atom Z="13" occupation="1">
+              <pos x="0.00" y="0.00" z="0.00" />
+              <pos x="0.00" y="0.50" z="0.50" />
+              <pos x="0.50" y="0.00" z="0.50" />
+              <pos x="0.50" y="0.50" z="0.00" />
+          </atom>
+          <atom Z="33" occupation="1">
+              <pos x="0.25" y="0.25" z="0.75" />
+              <pos x="0.25" y="0.75" z="0.25" />
+              <pos x="0.75" y="0.25" z="0.25" />
+              <pos x="0.75" y="0.75" z="0.75" />
+          </atom>
+      </unitcell>
+    </mat>
     <mat name="Aluminium arsenide (400)" xy='5.6618e-10' z='1.41545e-10' poisson='0.3240'>
       <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
       <refl h='4' k='0' l='0' />
@@ -119,6 +176,101 @@
       </unitcell>
     </mat>
 
+    <mat name="Indium antimonide (200)" xy='6.479e-10' z='3.2395e-10' poisson='0.35'>
+      <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+      <refl h='2' k='0' l='0' />
+
+      <unitcell V="2.71971840239000e-28">
+          <atom Z="49" occupation="1">
+              <pos x="0.00" y="0.00" z="0.00" />
+              <pos x="0.00" y="0.50" z="0.50" />
+              <pos x="0.50" y="0.00" z="0.50" />
+              <pos x="0.50" y="0.50" z="0.00" />
+          </atom>
+          <atom Z="51" occupation="1">
+              <pos x="0.25" y="0.25" z="0.75" />
+              <pos x="0.25" y="0.75" z="0.25" />
+              <pos x="0.75" y="0.25" z="0.25" />
+              <pos x="0.75" y="0.75" z="0.75" />
+          </atom>
+      </unitcell>
+    </mat>
+    <mat name="Indium antimonide (400)" xy='6.479e-10' z='1.61975e-10' poisson='0.35'>
+      <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+      <refl h='4' k='0' l='0' />
+
+      <unitcell V="2.71971840239000e-28">
+          <atom Z="49" occupation="1">
+              <pos x="0.00" y="0.00" z="0.00" />
+              <pos x="0.00" y="0.50" z="0.50" />
+              <pos x="0.50" y="0.00" z="0.50" />
+              <pos x="0.50" y="0.50" z="0.00" />
+          </atom>
+          <atom Z="51" occupation="1">
+              <pos x="0.25" y="0.25" z="0.75" />
+              <pos x="0.25" y="0.75" z="0.25" />
+              <pos x="0.75" y="0.25" z="0.25" />
+              <pos x="0.75" y="0.75" z="0.75" />
+          </atom>
+      </unitcell>
+    </mat>
+    <mat name="Aluminium antimonide (200)" xy='6.1355e-10' z='3.06775e-10' poisson='0.35'>
+      <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+      <refl h='2' k='0' l='0' />
+
+      <unitcell V="2.30966972313875e-28">
+          <atom Z="13" occupation="1">
+              <pos x="0.00" y="0.00" z="0.00" />
+              <pos x="0.00" y="0.50" z="0.50" />
+              <pos x="0.50" y="0.00" z="0.50" />
+              <pos x="0.50" y="0.50" z="0.00" />
+          </atom>
+          <atom Z="51" occupation="1">
+              <pos x="0.25" y="0.25" z="0.75" />
+              <pos x="0.25" y="0.75" z="0.25" />
+              <pos x="0.75" y="0.25" z="0.25" />
+              <pos x="0.75" y="0.75" z="0.75" />
+          </atom>
+      </unitcell>
+    </mat>
+    <mat name="Aluminium antimonide (400)" xy='6.1355e-10' z='1.533875e-10' poisson='0.35'>
+      <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+      <refl h='4' k='0' l='0' />
+
+      <unitcell V="2.30966972313875e-28">
+          <atom Z="13" occupation="1">
+              <pos x="0.00" y="0.00" z="0.00" />
+              <pos x="0.00" y="0.50" z="0.50" />
+              <pos x="0.50" y="0.00" z="0.50" />
+              <pos x="0.50" y="0.50" z="0.00" />
+          </atom>
+          <atom Z="51" occupation="1">
+              <pos x="0.25" y="0.25" z="0.75" />
+              <pos x="0.25" y="0.75" z="0.25" />
+              <pos x="0.75" y="0.25" z="0.25" />
+              <pos x="0.75" y="0.75" z="0.75" />
+          </atom>
+      </unitcell>
+    </mat>
+    <mat name="Indium arsenide (200)" xy='6.0584e-10' z='3.0292e-10' poisson='0.3520'>
+      <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+      <refl h='2' k='0' l='0' />
+
+      <unitcell V="2.22368789256704e-28">
+          <atom Z="49" occupation="1">
+              <pos x="0.00" y="0.00" z="0.00" />
+              <pos x="0.00" y="0.50" z="0.50" />
+              <pos x="0.50" y="0.00" z="0.50" />
+              <pos x="0.50" y="0.50" z="0.00" />
+          </atom>
+          <atom Z="33" occupation="1">
+              <pos x="0.25" y="0.25" z="0.75" />
+              <pos x="0.25" y="0.75" z="0.25" />
+              <pos x="0.75" y="0.25" z="0.25" />
+              <pos x="0.75" y="0.75" z="0.75" />
+          </atom>
+      </unitcell>
+    </mat>
     <mat name="Indium arsenide (400)" xy='6.0584e-10' z='1.5146e-10' poisson='0.3520'>
       <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
       <refl h='4' k='0' l='0' />
@@ -139,6 +291,25 @@
       </unitcell>
     </mat>
 
+    <mat name="Gallium phosphide (200)" xy='5.4505e-10' z='2.725250e-10' poisson='0.3070'>
+      <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+      <refl h='2' k='0' l='0' />
+
+      <unitcell V="1.61923182837625e-28">
+          <atom Z="31" occupation="1">
+              <pos x="0.00" y="0.00" z="0.00" />
+              <pos x="0.00" y="0.50" z="0.50" />
+              <pos x="0.50" y="0.00" z="0.50" />
+              <pos x="0.50" y="0.50" z="0.00" />
+          </atom>
+          <atom Z="15" occupation="1">
+              <pos x="0.25" y="0.25" z="0.75" />
+              <pos x="0.25" y="0.75" z="0.25" />
+              <pos x="0.75" y="0.25" z="0.25" />
+              <pos x="0.75" y="0.75" z="0.75" />
+          </atom>
+      </unitcell>
+    </mat>
     <mat name="Gallium phosphide (400)" xy='5.4505e-10' z='1.362625e-10' poisson='0.3070'>
       <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
       <refl h='4' k='0' l='0' />
@@ -159,6 +330,25 @@
       </unitcell>
     </mat>
 
+    <mat name="Aluminium phosphide (200)" xy='5.4580e-10' z='2.7290e-10' poisson='0.3330'>
+      <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+      <refl h='2' k='0' l='0' />
+
+      <unitcell V="1.62592531912000e-28">
+          <atom Z="13" occupation="1">
+              <pos x="0.00" y="0.00" z="0.00" />
+              <pos x="0.00" y="0.50" z="0.50" />
+              <pos x="0.50" y="0.00" z="0.50" />
+              <pos x="0.50" y="0.50" z="0.00" />
+          </atom>
+          <atom Z="15" occupation="1">
+              <pos x="0.25" y="0.25" z="0.75" />
+              <pos x="0.25" y="0.75" z="0.25" />
+              <pos x="0.75" y="0.25" z="0.25" />
+              <pos x="0.75" y="0.75" z="0.75" />
+          </atom>
+      </unitcell>
+    </mat>
     <mat name="Aluminium phosphide (400)" xy='5.4580e-10' z='1.3645e-10' poisson='0.3330'>
       <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
       <refl h='4' k='0' l='0' />
@@ -179,6 +369,25 @@
       </unitcell>
     </mat>
 
+    <mat name="Indium phosphide (200)" xy='5.8687e-10' z='2.934350e-10' poisson='0.3600'>
+      <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
+      <refl h='2' k='0' l='0' />
+
+      <unitcell V="2.02127650848703e-28">
+          <atom Z="49" occupation="1">
+              <pos x="0.00" y="0.00" z="0.00" />
+              <pos x="0.00" y="0.50" z="0.50" />
+              <pos x="0.50" y="0.00" z="0.50" />
+              <pos x="0.50" y="0.50" z="0.00" />
+          </atom>
+          <atom Z="15" occupation="1">
+              <pos x="0.25" y="0.25" z="0.75" />
+              <pos x="0.25" y="0.75" z="0.25" />
+              <pos x="0.75" y="0.25" z="0.25" />
+              <pos x="0.75" y="0.75" z="0.75" />
+          </atom>
+      </unitcell>
+    </mat>
     <mat name="Indium phosphide (400)" xy='5.8687e-10' z='1.467175e-10' poisson='0.3600'>
       <comment>Two face-centered cubic lattices, one for group III and one for group V atoms</comment>
       <refl h='4' k='0' l='0' />

@@ -18,6 +18,7 @@
   <path id="classpath">
     <!--<pathelement path="${classpath}"/>-->
     <pathelement location="jfreechart-1.0.1.jar"/>
+    <pathelement location="uncommons-maths-1.2.3.jar"/>
   </path>
 
   <patternset id="shellscripts">
@@ -31,6 +32,7 @@
 
   <patternset id="libdeps">
       <include name="jfreechart-1.0.1.jar"/>
+      <include name="uncommons-maths-1.2.3.jar"/>
       <include name="lib/jcommon-1.0.0.jar"/>
   </patternset>
 
@@ -102,7 +104,7 @@
           </fileset>
           <manifest>
               <!--<attribute name="Built-By" value="${user.name}"/>-->
-              <attribute name="Class-Path" value="jfreechart-1.0.1.jar"/>
+              <attribute name="Class-Path" value="jfreechart-1.0.1.jar uncommons-maths-1.2.3.jar"/>
               <attribute name="Main-Class" value="fi.micronova.tkk.xray.XRDApp"/>
           </manifest>
       </jar>

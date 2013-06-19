@@ -3,6 +3,8 @@ import java.util.*;
 import java.io.*;
 import fi.micronova.tkk.xray.xrdmodel.*;
 import fi.micronova.tkk.xray.octif.*;
+import org.uncommons.maths.random.PoissonGenerator;
+import org.uncommons.maths.number.NumberGenerator;
 
 
 
@@ -46,21 +48,24 @@ public class GraphData {
         this(alpha_0, meas, simul, false);
     }
 
+    private class FieldNumberGenerator implements NumberGenerator<Double> {
+        double mean;
+        public Double nextValue() {
+            return mean;
+        };
+    }
     /** Adds noise to the measured data.
      *
      * @param photon linear intensity of a photon
      */
     public GraphData addNoise(double photon) {
-        Random gen = new Random();
         GraphData lin = convertToLinear();
+        FieldNumberGenerator mean = new FieldNumberGenerator();
+        PoissonGenerator gen = new PoissonGenerator(mean, new Random());
         for(int i=0; i<lin.meas.length; i++) {
-            /* we should use a Poisson-distributed variable but Java doesn't seem
-             * to offer such a random number generator */
             lin.meas[i] /= photon;
-            lin.meas[i] += gen.nextGaussian()*Math.sqrt(lin.meas[i]);
-            if(lin.meas[i] <= 0)
-                lin.meas[i] = 0;
-            lin.meas[i] = (int)lin.meas[i];
+            mean.mean = lin.meas[i];
+            lin.meas[i] = gen.nextValue();
             lin.meas[i] *= photon;
         }
         return lin;
