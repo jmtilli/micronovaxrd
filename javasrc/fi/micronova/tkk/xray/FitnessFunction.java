@@ -18,6 +18,7 @@ public enum FitnessFunction {
     CGA("CGA","CGA",false),
     */
     relchi2("relchi2fitnessfunction","Mixed relative / chi-squared"),
+    chi2("chi2fitnessfunction","chi-squared"),
     logfitness("logfitnessfunction","p-norm in logarithmic space");
 
     /** Octave name */
