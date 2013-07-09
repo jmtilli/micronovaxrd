@@ -38,4 +38,13 @@ public class Miller {
     public Miller neg() {
         return new Miller(-h, -k, -l);
     }
+    public String toString()
+    {
+      if (   h < 10 && k < 10 && l < 10
+          && h >= 0 && k >= 0 && l >= 0)
+      {
+        return "(" + h + "" + k + "" + l + ")";
+      }
+      return "(" + h + " " + k + " " + l + ")";
+    }
 }
