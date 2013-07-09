@@ -330,7 +330,7 @@ public class Fitter {
                         oct.execute("medianfitness = fitDE_median_fitness(g_ctx)");
                         bestfit = oct.getMatrix("bestfitness")[0][0];
                         medianfit = oct.getMatrix("medianfitness")[0][0];
-                        msg = "iteration = "+(round+1) + ", bestfit = " + String.format(Locale.US,"%.6g",bestfit) + ", medianfit = "+String.format(Locale.US,"%.6g",medianfit);
+                        msg = "iteration = "+(round+1) + ", bestfit = " + String.format(Locale.US,"%.7g",bestfit) + ", medianfit = "+String.format(Locale.US,"%.7g",medianfit);
                     } else {
                         throw new RuntimeException("Not yet supported");
                         /*
