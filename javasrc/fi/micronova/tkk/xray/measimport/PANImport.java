@@ -28,6 +28,7 @@ public class PANImport {
     public static Data PANImport(InputStream s) throws ImportException, IOException {
         double[] alpha_0;
         double[] meas;
+        Boolean is_2theta_omega = null;
         try {
             Double firstAngle = null, stepWidth = null;
             Integer nrOfData = null;
@@ -41,6 +42,24 @@ public class PANImport {
                 line = r.readLine();
                 if(line == null)
                     throw new ImportException();
+                if(line.length() > 10 && line.substring(0,10).equals("ScanAxis, ")) {
+                    String axis;
+                    if(is_2theta_omega != null)
+                        throw new ImportException();
+                    axis = line.substring(10);
+                    if (axis.equals("2Theta/Omega"))
+                    {
+                      is_2theta_omega = Boolean.TRUE;
+                    }
+                    else if (axis.equals("Omega/2Theta"))
+                    {
+                      is_2theta_omega = Boolean.FALSE;
+                    }
+                    else
+                    {
+                      throw new ImportException();
+                    }
+                }
                 if(line.length() > 12 && line.substring(0,12).equals("FirstAngle, ")) {
                     if(firstAngle != null)
                         throw new ImportException();
@@ -65,6 +84,13 @@ public class PANImport {
             int size = nrOfData.intValue();
             double alpha = firstAngle.doubleValue();
             double width = stepWidth.doubleValue();
+            if (is_2theta_omega == null)
+              throw new ImportException();
+            if (is_2theta_omega)
+            {
+              alpha /= 2;
+              width /= 2;
+            }
 
             alpha_0 = new double[size];
             meas = new double[size];
