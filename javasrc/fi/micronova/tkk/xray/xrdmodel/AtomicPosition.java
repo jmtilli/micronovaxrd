@@ -4,6 +4,11 @@ import org.w3c.dom.*;
 
 public class AtomicPosition {
     public final double x,y,z;
+    public AtomicPosition(double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
     public AtomicPosition(Node n) {
         x = Double.parseDouble(n.getAttributes().getNamedItem("x").getNodeValue());
         y = Double.parseDouble(n.getAttributes().getNamedItem("y").getNodeValue());
