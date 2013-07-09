@@ -412,7 +412,7 @@ public class LayerStack implements LayerListener, ValueListener {
         for(Layer l: layers) {
             if(!copies.containsKey(l)) {
                 Layer l2 = l.deepCopy();
-                layerAdded(l2);
+                result.layerAdded(l2);
                 copies.put(l, l2);
             }
         }
