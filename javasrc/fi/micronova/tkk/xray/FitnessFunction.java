@@ -4,22 +4,10 @@ package fi.micronova.tkk.xray;
  * All the supported algorithms and their Octave and human-readable names.
  */
 public enum FitnessFunction {
-    /*
-    CovGA("CovGA","CovGA"),
-    HGA("HGA","HGA"),
-    JGA("JGA","JGA"),
-    XGA("XGA","XGA"),
-    CGA("CGA","CGA"),
-    MGA("MGA","MGA");
-    */
-    /*
-    ICAGA("ICAGA","ICAGA",false),
-    PCAGA("PCAGA","PCAGA",false),
-    CGA("CGA","CGA",false),
-    */
     relchi2("relchi2fitnessfunction","Mixed relative / chi-squared"),
-    chi2("chi2fitnessfunction","chi-squared"),
-    logfitness("logfitnessfunction","p-norm in logarithmic space");
+    logfitness("logfitnessfunction","p-norm in logarithmic space"),
+    sqrtfitness("sqrtfitnessfunction","p-norm in sqrt-space"),
+    chi2("chi2fitnessfunction","chi-squared");
 
     /** Octave name */
     public final String octName;
