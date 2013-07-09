@@ -1,6 +1,6 @@
 package fi.micronova.tkk.xray.xrdmodel;
 import java.util.*;
-import fi.micronova.tkk.xray.complex.*;
+import fi.iki.jmtilli.javacomplex.Complex;
 
 class DummyAtom implements Atom {
     private final int Z;

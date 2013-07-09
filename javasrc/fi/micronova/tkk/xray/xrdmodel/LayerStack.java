@@ -6,7 +6,9 @@ import javax.swing.event.*;
 import java.util.*;
 import org.w3c.dom.*;
 import java.io.*;
-import fi.micronova.tkk.xray.complex.*;
+import fi.iki.jmtilli.javacomplex.Complex;
+import fi.iki.jmtilli.javacomplex.ComplexBuffer;
+import fi.iki.jmtilli.javacomplex.ComplexUtils;
 
 
 /** Layer model.
@@ -935,6 +937,458 @@ public class LayerStack implements LayerListener, ValueListener {
         return oct.getMatrix("meas")[0];
     }
 
+    public double[] xrdCurveFast(double[] theta) throws SimulationException {
+        int nlayers = layers.size();
+        double[] result = new double[theta.length];
+        ComplexBuffer[] X = new ComplexBuffer[theta.length];
+        double[] sin_theta_B_ar = new double[nlayers];
+        double[] xyspace = new double[nlayers];
+        double[] d_ar = new double[nlayers];
+        Complex[] chi_0_ar = new Complex[nlayers];
+        Complex[] chi_h_ar = new Complex[nlayers];
+        Complex[] chi_h_neg_ar = new Complex[nlayers];
+        final double stddevs = 4;
+
+        // XXX: can throw if theta.length == 0 or theta.length == 1
+        double dtheta = (theta[theta.length-1] - theta[0])/(theta.length-1);
+
+        double thetaoffset = offset.getExpected();
+        double[] filter = null;
+        /* substrate */
+
+        if(nlayers == 0)
+            throw new SimulationException("No layers");
+
+        filter = DataTools.gaussianFilter(dtheta, stddev.getExpected(), stddevs);
+        if(filter != null) {
+            if(!DataTools.isUniformlySpaced(theta)) {
+                filter = null;
+            }
+        }
+
+        /*
+        Susceptibilities substrateSusc;
+        SimpleMaterial substrateMat;
+        */
+
+        //double zspace_s;
+        //
+
+        /* calculate in-plane lattice constants */
+        xyspace[nlayers-1] = layers.get(nlayers-1).calcXYSpace(0);
+        for(int i=nlayers-2; i>=0; i--) {
+            xyspace[i] = layers.get(i).calcXYSpace(xyspace[i+1]);
+        }
+
+        for(int i=0; i<nlayers; i++) {
+            Layer layer = layers.get(i);
+            SimpleMaterial sm = layer.getSimpleMaterial(xyspace[i]);
+            Susceptibilities susc = sm.suscFast(lambda);
+
+            chi_0_ar[i] = susc.chi_0;
+            chi_h_ar[i] = susc.chi_h;
+            chi_h_neg_ar[i] = susc.chi_h_neg;
+            sin_theta_B_ar[i] = lambda/(2*sm.getZSpace());
+
+            d_ar[i] = layer.getThickness().getExpected();
+        }
+        /*
+        substrateMat = substrate.flatten();
+        substrateSusc = substrateMat.susc(lambda);
+        zspace_s = substrateMat.getZSpace();
+        theta_Bs = Math.asin(lambda/(2*zspace_s));
+        */
+
+        // we approximate that C = |cos(2*theta)| =~ |cos(2*theta_Bs)|
+        double sin_theta_Bs = sin_theta_B_ar[nlayers-1];
+        double theta_Bs = Math.asin(sin_theta_Bs);
+        double gamma0_s = Math.sin(theta_Bs - thetaoffset);
+        double gammah_s = -Math.sin(theta_Bs + thetaoffset);
+        double b_s = gamma0_s/gammah_s;
+        double sin_theta_Bs_times_b_s_times_minus4 = -4*sin_theta_Bs*b_s;
+
+        for(int i=0; i<result.length; i++) {
+            result[i] = 0;
+        }
+
+        ComplexBuffer sqrteta2m1 = new ComplexBuffer();
+        ComplexBuffer eta_denom = new ComplexBuffer();
+        ComplexBuffer eta_denom_inv_s = new ComplexBuffer();
+        ComplexBuffer sqrt_eta_sq_m_1 = new ComplexBuffer();
+        ComplexBuffer chi_0_s_mul_2 = new ComplexBuffer();
+        ComplexBuffer eta = new ComplexBuffer();
+
+        boolean[] spols = {false,true};
+        for(boolean spol: spols) {
+
+            Complex chi_0_s = chi_0_ar[nlayers-1];
+            chi_0_s_mul_2.set(chi_0_s).multiplyInPlace(2);
+            Complex chi_h_s = chi_h_ar[nlayers-1];
+            Complex chi_h_neg_s = chi_h_neg_ar[nlayers-1];
+
+            assert(!Double.isNaN(chi_0_s.getReal()) && !Double.isNaN(chi_0_s.getImag()));
+            assert(!Double.isNaN(chi_h_s.getReal()) && !Double.isNaN(chi_h_s.getImag()));
+            assert(!Double.isNaN(chi_h_neg_s.getReal()) && !Double.isNaN(chi_h_neg_s.getImag()));
+
+            double C_s = spol ? 1 : (Math.abs(Math.cos(2*theta_Bs)));
+            eta_denom_inv_s.set(chi_h_s).multiplyInPlace(chi_h_neg_s);
+            eta_denom_inv_s.multiplyInPlace(Math.abs(b_s));
+            eta_denom_inv_s.sqrtInPlace();
+            eta_denom_inv_s.multiplyInPlace(C_s*2.0);
+            eta_denom_inv_s.inverseInPlace();
+
+            for(int i=0; i<theta.length; i++) {
+                double b_times_alphah = (Math.sin(theta[i] + thetaoffset) - sin_theta_Bs)*sin_theta_Bs_times_b_s_times_minus4;
+
+                // eta = (b_s*alphah + 2*chi_0_s) / (2*C_s*sqrt(abs(b_s)*chi_h_s*chi_h_neg_s))
+                eta.set(chi_0_s_mul_2).addInPlace(b_times_alphah).multiplyInPlace(eta_denom_inv_s);
+                // X = eta +- sqrt(eta^2 - 1)
+                sqrt_eta_sq_m_1.set(eta).multiplyInPlace(eta).subtractInPlace(1.0).sqrtInPlace();
+                if (eta.getReal() < +0.0)
+                {
+                    sqrt_eta_sq_m_1.negateInPlace();
+                }
+                X[i] = new ComplexBuffer(eta).subtractInPlace(sqrt_eta_sq_m_1);
+            }
+
+            ComplexBuffer sqrt_chi_h_and_neg_mul = new ComplexBuffer();
+            ComplexBuffer chi_0_mul_2 = new ComplexBuffer();
+            ComplexBuffer eta_divisor_inv = new ComplexBuffer();
+            ComplexBuffer T = new ComplexBuffer(), T_mul_minus_I = new ComplexBuffer();
+            ComplexBuffer S1S2_divisor = new ComplexBuffer(), S1S2 = new ComplexBuffer();
+            ComplexBuffer expterm = new ComplexBuffer();
+            ComplexBuffer S1 = new ComplexBuffer(), S2 = new ComplexBuffer();
+
+            for(int j=nlayers-2; j>=0; j--) {
+                Complex chi_0 = chi_0_ar[j];
+                Complex chi_h = chi_h_ar[j];
+                Complex chi_h_neg = chi_h_neg_ar[j];
+                chi_0_mul_2.set(chi_0).multiplyInPlace(2);
+
+                sqrt_chi_h_and_neg_mul.set(chi_h);
+                sqrt_chi_h_and_neg_mul.multiplyInPlace(chi_h_neg);
+                sqrt_chi_h_and_neg_mul.sqrtInPlace();
+
+                double sin_theta_B = sin_theta_B_ar[j];
+                double d = d_ar[j];
+                double theta_B = Math.asin(sin_theta_B);
+                double gamma0 = Math.sin(theta_B - thetaoffset);
+                double gammah = -Math.sin(theta_B + thetaoffset);
+                double b = gamma0/gammah;
+                double sin_theta_B_times_b = sin_theta_B*b;
+                double C = spol ? 1 : Math.abs(Math.cos(2*theta_B));
+                double C_mul_2_mul_sqrt_abs_b = C*2*Math.sqrt(Math.abs(b));
+                eta_divisor_inv.set(C_mul_2_mul_sqrt_abs_b).multiplyInPlace(sqrt_chi_h_and_neg_mul).inverseInPlace();
+                double multcoeff = Math.PI*C*d/(lambda*Math.sqrt(Math.abs(gamma0*gammah)));
+                T.set(sqrt_chi_h_and_neg_mul).multiplyInPlace(multcoeff);
+                T_mul_minus_I.set(0, -1).multiplyInPlace(T);
+                //assert(!Double.isNaN(d) && !Double.isNaN(sin_theta_B));
+                /*
+                   This block is 94% of CPU time of this thread even for simple cases.
+                   However, if object GC is taken into account, it's currently 88%.
+                   Unfortunately, calculation of the square root and the exponential is
+                   hard to optimize.
+                 */
+                for(int i=0; i<theta.length; i++) {
+                    /*
+                       eta = (-4*(sin(theta)-sin(theta_B))*sin(theta_B)*b + 2*chi0)
+                           / (2*C*sqrt(|b|)*sqrt(chih*chihneg))
+                       VIRHE!
+                       Pitäisi olla:
+                       eta = (-(sin(theta)-sin(theta_B))*sin(theta_B)*b + 0.5*chi0*(1-b))
+                           / (C*sqrt(|b|)*sqrt(chih*chihneg))
+                           <- eli 2*chi0:n tilalle (1-b)*chi0
+                           Täytynee tarkistaa gamma0:n ja gammah:n kaavat.
+                     */
+                    double b_times_alphah = -4*(Math.sin(theta[i] + thetaoffset) - sin_theta_B)*sin_theta_B_times_b;
+                    //assert(!Double.isNaN(b_times_alphah));
+                    eta.set(chi_0_mul_2).addInPlace(b_times_alphah).multiplyInPlace(eta_divisor_inv);
+                    //eta.set(b_times_alphah).multiplyInPlace(eta_divisor_inv);
+                    sqrteta2m1.set(eta).multiplyInPlace(eta).subtractInPlace(1).sqrtInPlace();
+
+                    /*
+                    assert(!Double.isNaN(T.getReal()));
+                    assert(!Double.isNaN(T.getImag()));
+                    */
+                    /*
+                     * S1 = (X[i] - eta + sqrt(eta^2-1))*exp(-i*T*sqrt(eta^2-1))
+                     * S2 = (X[i] - eta - sqrt(eta^2-1))*exp(i*T*sqrt(eta^2-1))
+                     */
+
+                    expterm.set(T_mul_minus_I).multiplyInPlace(sqrteta2m1).expInPlace();
+                    S1.set(X[i]).subtractInPlace(eta).addInPlace(sqrteta2m1).multiplyInPlace(expterm);
+
+                    expterm.inverseInPlace(); // expterm <- sqrt(-i*T*sqrt(eta^2-1))
+                    S2.set(X[i]).subtractInPlace(eta).subtractInPlace(sqrteta2m1).multiplyInPlace(expterm);
+                    S1S2_divisor.set(S1).subtractInPlace(S2);
+                    S1S2.set(S1).addInPlace(S2).divideInPlace(S1S2_divisor);
+                    /*
+                    assert(!Double.isNaN(S1.getReal()));
+                    assert(!Double.isNaN(S1.getImag()));
+                    assert(!Double.isNaN(S2.getReal()));
+                    assert(!Double.isNaN(S2.getImag()));
+                    assert(!Double.isNaN(S1S2.getReal()));
+                    assert(!Double.isNaN(S1S2.getImag()));
+                    */
+                    /*
+                       X <- eta + sqrt(eta^2 - 1)*(S1+S2)/(S1-S2)
+                     */
+                    X[i].set(sqrteta2m1).multiplyInPlace(S1S2).addInPlace(eta);
+                    /*
+                    assert(!Double.isNaN(X[i].getReal()));
+                    assert(!Double.isNaN(X[i].getImag()));
+                    */
+                }
+            }
+            for(int i=0; i<X.length; i++) {
+                double Xabs = ComplexUtils.abs(X[i]);
+                //assert(!Double.isNaN(Xabs));
+                result[i] += Xabs*Xabs/2;
+                if(Double.isNaN(result[i]))
+                    result[i] = 0;
+            }
+        }
+        if(filter != null)
+            result = DataTools.applyOddFilter(filter, result);
+        double prod = getProd().getExpected();
+        double sum = getSum().getExpected();
+
+        /* both are in decibels */
+        prod = Math.exp(prod * Math.log(10)/10);
+        sum = Math.exp(sum * Math.log(10)/10);
+
+        for(int i=0; i<result.length; i++) {
+            result[i] = result[i] * prod + sum;
+        }
+        return result;
+        /* TODO: stddev */
+    }
+
+    public double[] xrdCurveSlow(double[] theta) throws SimulationException {
+        int nlayers = layers.size();
+        double[] result = new double[theta.length];
+        Complex[] X = new Complex[theta.length];
+        double[] sin_theta_B_ar = new double[nlayers];
+        double[] xyspace = new double[nlayers];
+        double[] d_ar = new double[nlayers];
+        Complex[] chi_0_ar = new Complex[nlayers];
+        Complex[] chi_h_ar = new Complex[nlayers];
+        Complex[] chi_h_neg_ar = new Complex[nlayers];
+        final double stddevs = 4;
+
+        // XXX: can throw if theta.length == 0 or theta.length == 1
+        double dtheta = (theta[theta.length-1] - theta[0])/(theta.length-1);
+
+        double thetaoffset = offset.getExpected();
+        double[] filter = null;
+        /* substrate */
+
+        if(nlayers == 0)
+            throw new SimulationException("No layers");
+
+        filter = DataTools.gaussianFilter(dtheta, stddev.getExpected(), stddevs);
+        if(filter != null) {
+            if(!DataTools.isUniformlySpaced(theta)) {
+                filter = null;
+            }
+        }
+
+        /*
+        Susceptibilities substrateSusc;
+        SimpleMaterial substrateMat;
+        */
+
+        //double zspace_s;
+        //
+
+        /* calculate in-plane lattice constants */
+        xyspace[nlayers-1] = layers.get(nlayers-1).calcXYSpace(0);
+        for(int i=nlayers-2; i>=0; i--) {
+            xyspace[i] = layers.get(i).calcXYSpace(xyspace[i+1]);
+        }
+
+        for(int i=0; i<nlayers; i++) {
+            Layer layer = layers.get(i);
+            SimpleMaterial sm = layer.getSimpleMaterial(xyspace[i]);
+            Susceptibilities susc = sm.susc(lambda);
+
+            chi_0_ar[i] = susc.chi_0;
+            chi_h_ar[i] = susc.chi_h;
+            chi_h_neg_ar[i] = susc.chi_h_neg;
+            sin_theta_B_ar[i] = lambda/(2*sm.getZSpace());
+
+            d_ar[i] = layer.getThickness().getExpected();
+        }
+        /*
+        substrateMat = substrate.flatten();
+        substrateSusc = substrateMat.susc(lambda);
+        zspace_s = substrateMat.getZSpace();
+        theta_Bs = Math.asin(lambda/(2*zspace_s));
+        */
+
+        // we approximate that C = |cos(2*theta)| =~ |cos(2*theta_Bs)|
+        double sin_theta_Bs = sin_theta_B_ar[nlayers-1];
+        double theta_Bs = Math.asin(sin_theta_Bs);
+        double gamma0_s = Math.sin(theta_Bs - thetaoffset);
+        double gammah_s = -Math.sin(theta_Bs + thetaoffset);
+        double b_s = gamma0_s/gammah_s;
+        double sin_theta_Bs_times_b_s_times_minus4 = -4*sin_theta_Bs*b_s;
+
+        for(int i=0; i<result.length; i++) {
+            result[i] = 0;
+        }
+
+        Complex sqrteta2m1;
+        Complex eta_denom;
+        Complex eta_denom_inv_s;
+        Complex sqrt_eta_sq_m_1;
+        Complex chi_0_s_mul_2;
+        Complex eta;
+
+        boolean[] spols = {false,true};
+        for(boolean spol: spols) {
+
+            Complex chi_0_s = chi_0_ar[nlayers-1];
+            chi_0_s_mul_2 = chi_0_s.multiply(2);
+            Complex chi_h_s = chi_h_ar[nlayers-1];
+            Complex chi_h_neg_s = chi_h_neg_ar[nlayers-1];
+
+            assert(!Double.isNaN(chi_0_s.getReal()) && !Double.isNaN(chi_0_s.getImag()));
+            assert(!Double.isNaN(chi_h_s.getReal()) && !Double.isNaN(chi_h_s.getImag()));
+            assert(!Double.isNaN(chi_h_neg_s.getReal()) && !Double.isNaN(chi_h_neg_s.getImag()));
+
+            double C_s = spol ? 1 : (Math.abs(Math.cos(2*theta_Bs)));
+            eta_denom_inv_s = chi_h_s.multiply(chi_h_neg_s);
+            eta_denom_inv_s = eta_denom_inv_s.multiply(Math.abs(b_s));
+            eta_denom_inv_s = eta_denom_inv_s.sqrt();
+            eta_denom_inv_s = eta_denom_inv_s.multiply(C_s*2.0);
+            eta_denom_inv_s = eta_denom_inv_s.inverse();
+
+            for(int i=0; i<theta.length; i++) {
+                double b_times_alphah = (Math.sin(theta[i] + thetaoffset) - sin_theta_Bs)*sin_theta_Bs_times_b_s_times_minus4;
+
+                // eta = (b_s*alphah + 2*chi_0_s) / (2*C_s*sqrt(abs(b_s)*chi_h_s*chi_h_neg_s))
+                eta = chi_0_s_mul_2.add(b_times_alphah).multiply(eta_denom_inv_s);
+                // X = eta +- sqrt(eta^2 - 1)
+                sqrt_eta_sq_m_1 = eta.multiply(eta).subtract(1.0).sqrt();
+                if (eta.getReal() < +0.0)
+                {
+                    sqrt_eta_sq_m_1 = sqrt_eta_sq_m_1.negate();
+                }
+                X[i] = eta.subtract(sqrt_eta_sq_m_1);
+            }
+
+            Complex sqrt_chi_h_and_neg_mul;
+            Complex chi_0_mul_2;
+            Complex eta_divisor_inv;
+            Complex T, T_mul_minus_I;
+            Complex S1S2_divisor, S1S2;
+            Complex expterm;
+            Complex S1, S2;
+
+            for(int j=nlayers-2; j>=0; j--) {
+                Complex chi_0 = chi_0_ar[j];
+                Complex chi_h = chi_h_ar[j];
+                Complex chi_h_neg = chi_h_neg_ar[j];
+                chi_0_mul_2 = chi_0.multiply(2);
+
+                sqrt_chi_h_and_neg_mul = chi_h.multiply(chi_h_neg).sqrt();
+
+                double sin_theta_B = sin_theta_B_ar[j];
+                double d = d_ar[j];
+                double theta_B = Math.asin(sin_theta_B);
+                double gamma0 = Math.sin(theta_B - thetaoffset);
+                double gammah = -Math.sin(theta_B + thetaoffset);
+                double b = gamma0/gammah;
+                double sin_theta_B_times_b = sin_theta_B*b;
+                double C = spol ? 1 : Math.abs(Math.cos(2*theta_B));
+                double C_mul_2_mul_sqrt_abs_b = C*2*Math.sqrt(Math.abs(b));
+                eta_divisor_inv = sqrt_chi_h_and_neg_mul.multiply(C_mul_2_mul_sqrt_abs_b).inverse();
+                double multcoeff = Math.PI*C*d/(lambda*Math.sqrt(Math.abs(gamma0*gammah)));
+                T = sqrt_chi_h_and_neg_mul.multiply(multcoeff);
+                T_mul_minus_I = new Complex(0, -1).multiply(T);
+                //assert(!Double.isNaN(d) && !Double.isNaN(sin_theta_B));
+                /*
+                   This block is 94% of CPU time of this thread even for simple cases.
+                   However, if object GC is taken into account, it's currently 88%.
+                   Unfortunately, calculation of the square root and the exponential is
+                   hard to optimize.
+                 */
+                for(int i=0; i<theta.length; i++) {
+                    /*
+                       eta = (-4*(sin(theta)-sin(theta_B))*sin(theta_B)*b + 2*chi0)
+                           / (2*C*sqrt(|b|)*sqrt(chih*chihneg))
+                       VIRHE!
+                       Pitäisi olla:
+                       eta = (-(sin(theta)-sin(theta_B))*sin(theta_B)*b + 0.5*chi0*(1-b))
+                           / (C*sqrt(|b|)*sqrt(chih*chihneg))
+                           <- eli 2*chi0:n tilalle (1-b)*chi0
+                           Täytynee tarkistaa gamma0:n ja gammah:n kaavat.
+                     */
+                    double b_times_alphah = -4*(Math.sin(theta[i] + thetaoffset) - sin_theta_B)*sin_theta_B_times_b;
+                    //assert(!Double.isNaN(b_times_alphah));
+                    eta = chi_0_mul_2.add(b_times_alphah).multiply(eta_divisor_inv);
+                    //eta.set(b_times_alphah).multiplyInPlace(eta_divisor_inv);
+                    sqrteta2m1 = eta.multiply(eta).subtract(1.0).sqrt();
+
+                    /*
+                    assert(!Double.isNaN(T.getReal()));
+                    assert(!Double.isNaN(T.getImag()));
+                    */
+                    /*
+                     * S1 = (X[i] - eta + sqrt(eta^2-1))*exp(-i*T*sqrt(eta^2-1))
+                     * S2 = (X[i] - eta - sqrt(eta^2-1))*exp(i*T*sqrt(eta^2-1))
+                     */
+
+                    expterm = T_mul_minus_I.multiply(sqrteta2m1).exp();
+                    S1 = X[i].subtract(eta).add(sqrteta2m1).multiply(expterm);
+
+                    expterm = expterm.inverse(); // expterm <- sqrt(-i*T*sqrt(eta^2-1))
+                    S2 = X[i].subtract(eta).subtract(sqrteta2m1).multiply(expterm);
+                    S1S2_divisor = S1.subtract(S2);
+                    S1S2 = S1.add(S2).divide(S1S2_divisor);
+                    /*
+                    assert(!Double.isNaN(S1.getReal()));
+                    assert(!Double.isNaN(S1.getImag()));
+                    assert(!Double.isNaN(S2.getReal()));
+                    assert(!Double.isNaN(S2.getImag()));
+                    assert(!Double.isNaN(S1S2.getReal()));
+                    assert(!Double.isNaN(S1S2.getImag()));
+                    */
+                    /*
+                       X <- eta + sqrt(eta^2 - 1)*(S1+S2)/(S1-S2)
+                     */
+                    X[i] = sqrteta2m1.multiply(S1S2).add(eta);
+                    /*
+                    assert(!Double.isNaN(X[i].getReal()));
+                    assert(!Double.isNaN(X[i].getImag()));
+                    */
+                }
+            }
+            for(int i=0; i<X.length; i++) {
+                double Xabs = ComplexUtils.abs(X[i]);
+                //assert(!Double.isNaN(Xabs));
+                result[i] += Xabs*Xabs/2;
+                if(Double.isNaN(result[i]))
+                    result[i] = 0;
+            }
+        }
+        if(filter != null)
+            result = DataTools.applyOddFilter(filter, result);
+        double prod = getProd().getExpected();
+        double sum = getSum().getExpected();
+
+        /* both are in decibels */
+        prod = Math.exp(prod * Math.log(10)/10);
+        sum = Math.exp(sum * Math.log(10)/10);
+
+        for(int i=0; i<result.length; i++) {
+            result[i] = result[i] * prod + sum;
+        }
+        return result;
+        /* TODO: stddev */
+    }
+
     public double[] xrdCurve(double[] theta) throws SimulationException {
         int nlayers = layers.size();
         double[] result = new double[theta.length];
@@ -1009,9 +1463,9 @@ public class LayerStack implements LayerListener, ValueListener {
             Complex chi_h_s = chi_h_ar[nlayers-1];
             Complex chi_h_neg_s = chi_h_neg_ar[nlayers-1];
 
-            assert(!Double.isNaN(chi_0_s.real) && !Double.isNaN(chi_0_s.imag));
-            assert(!Double.isNaN(chi_h_s.real) && !Double.isNaN(chi_h_s.imag));
-            assert(!Double.isNaN(chi_h_neg_s.real) && !Double.isNaN(chi_h_neg_s.imag));
+            assert(!Double.isNaN(chi_0_s.getReal()) && !Double.isNaN(chi_0_s.getImag()));
+            assert(!Double.isNaN(chi_h_s.getReal()) && !Double.isNaN(chi_h_s.getImag()));
+            assert(!Double.isNaN(chi_h_neg_s.getReal()) && !Double.isNaN(chi_h_neg_s.getImag()));
 
             double theta_Bs = Math.asin(sin_theta_Bs);
             double gamma0_s = Math.sin(theta_Bs - thetaoffset);
@@ -1023,10 +1477,10 @@ public class LayerStack implements LayerListener, ValueListener {
                 double alphah = -4*(Math.sin(theta[i] + thetaoffset) - sin_theta_Bs)*sin_theta_Bs;
 
 
-                Complex eta = Complex.div(Complex.add(b_s*alphah,Complex.mul(2,chi_0_s)),
-                    Complex.mul(2*C_s*Math.sqrt(Math.abs(b_s)),Complex.sqrt(Complex.mul(chi_h_s, chi_h_neg_s))));
+                Complex eta = ComplexUtils.divide(ComplexUtils.add(b_s*alphah,ComplexUtils.multiply(2,chi_0_s)),
+                    ComplexUtils.multiply(2*C_s*Math.sqrt(Math.abs(b_s)),ComplexUtils.sqrt(ComplexUtils.multiply(chi_h_s, chi_h_neg_s))));
 
-                X[i] = Complex.sub(eta, Complex.mul(Math.signum(eta.real), Complex.sqrt(Complex.sub(Complex.mul(eta,eta),1))));
+                X[i] = ComplexUtils.subtract(eta, ComplexUtils.multiply(Math.signum(eta.getReal()), ComplexUtils.sqrt(ComplexUtils.subtract(ComplexUtils.multiply(eta,eta),1))));
             }
 
 
@@ -1045,43 +1499,43 @@ public class LayerStack implements LayerListener, ValueListener {
                 for(int i=0; i<theta.length; i++) {
                     double alphah = -4*(Math.sin(theta[i] + thetaoffset) - sin_theta_B)*sin_theta_B;
                     //assert(!Double.isNaN(alphah));
-                    Complex eta = Complex.div(Complex.add(b*alphah,Complex.mul(2,chi_0)),
-                        Complex.mul(2*C*Math.sqrt(Math.abs(b)),Complex.sqrt(Complex.mul(chi_h, chi_h_neg))));
-                    Complex sqrteta2m1 = Complex.sqrt(Complex.sub(Complex.mul(eta,eta),1));
-                    Complex T = Complex.mul((Math.PI*C*d)/(lambda*
+                    Complex eta = ComplexUtils.divide(ComplexUtils.add(b*alphah,ComplexUtils.multiply(2,chi_0)),
+                        ComplexUtils.multiply(2*C*Math.sqrt(Math.abs(b)),ComplexUtils.sqrt(ComplexUtils.multiply(chi_h, chi_h_neg))));
+                    Complex sqrteta2m1 = ComplexUtils.sqrt(ComplexUtils.subtract(ComplexUtils.multiply(eta,eta),1));
+                    Complex T = ComplexUtils.multiply((Math.PI*C*d)/(lambda*
                                 // for small thetaoffset, we could optimize by using Math.abs(sin_theta_B)
                                 // it is actually sqrt(sin(theta_B+thetaoffset)*sin(theta_B-thetaoffset)) = sqrt(abs(gamma0*gammah))
                                 // but the difference is negligible for small thetaoffset
                                 //Math.abs(sin_theta_B)),
                                 Math.sqrt(Math.abs(gamma0*gammah))),
-                                             Complex.sqrt(Complex.mul(chi_h,chi_h_neg)));
+                                             ComplexUtils.sqrt(ComplexUtils.multiply(chi_h,chi_h_neg)));
 
                     /*
-                    assert(!Double.isNaN(T.real));
-                    assert(!Double.isNaN(T.imag));
+                    assert(!Double.isNaN(T.getReal()));
+                    assert(!Double.isNaN(T.getImag()));
                     */
-                    Complex S1 = Complex.mul(Complex.add(Complex.sub(X[i],eta),sqrteta2m1),
-                                   Complex.exp(Complex.mul(Complex.mul(new Complex(0,-1),T),sqrteta2m1)));
-                    Complex S2 = Complex.mul(Complex.sub(Complex.sub(X[i],eta),sqrteta2m1),
-                                   Complex.exp(Complex.mul(Complex.mul(new Complex(0,1),T),sqrteta2m1)));
-                    Complex S1S2 = Complex.div(Complex.add(S1,S2),Complex.sub(S1,S2));
+                    Complex S1 = ComplexUtils.multiply(ComplexUtils.add(ComplexUtils.subtract(X[i],eta),sqrteta2m1),
+                                   ComplexUtils.exp(ComplexUtils.multiply(ComplexUtils.multiply(new Complex(0,-1),T),sqrteta2m1)));
+                    Complex S2 = ComplexUtils.multiply(ComplexUtils.subtract(ComplexUtils.subtract(X[i],eta),sqrteta2m1),
+                                   ComplexUtils.exp(ComplexUtils.multiply(ComplexUtils.multiply(new Complex(0,1),T),sqrteta2m1)));
+                    Complex S1S2 = ComplexUtils.divide(ComplexUtils.add(S1,S2),ComplexUtils.subtract(S1,S2));
                     /*
-                    assert(!Double.isNaN(S1.real));
-                    assert(!Double.isNaN(S1.imag));
-                    assert(!Double.isNaN(S2.real));
-                    assert(!Double.isNaN(S2.imag));
-                    assert(!Double.isNaN(S1S2.real));
-                    assert(!Double.isNaN(S1S2.imag));
+                    assert(!Double.isNaN(S1.getReal()));
+                    assert(!Double.isNaN(S1.getImag()));
+                    assert(!Double.isNaN(S2.getReal()));
+                    assert(!Double.isNaN(S2.getImag()));
+                    assert(!Double.isNaN(S1S2.getReal()));
+                    assert(!Double.isNaN(S1S2.getImag()));
                     */
-                    X[i] = Complex.add(eta,Complex.mul(sqrteta2m1, S1S2));
+                    X[i] = ComplexUtils.add(eta,ComplexUtils.multiply(sqrteta2m1, S1S2));
                     /*
-                    assert(!Double.isNaN(X[i].real));
-                    assert(!Double.isNaN(X[i].imag));
+                    assert(!Double.isNaN(X[i].getReal()));
+                    assert(!Double.isNaN(X[i].getImag()));
                     */
                 }
             }
             for(int i=0; i<X.length; i++) {
-                double Xabs = Complex.abs(X[i]);
+                double Xabs = ComplexUtils.abs(X[i]);
                 //assert(!Double.isNaN(Xabs));
                 result[i] += Xabs*Xabs/2;
                 if(Double.isNaN(result[i]))

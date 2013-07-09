@@ -1,7 +1,9 @@
 package fi.micronova.tkk.xray.xrdmodel;
 import fi.micronova.tkk.xray.util.*;
 import java.util.*;
-import fi.micronova.tkk.xray.complex.*;
+import fi.iki.jmtilli.javacomplex.Complex;
+import fi.iki.jmtilli.javacomplex.ComplexUtils;
+import fi.iki.jmtilli.javacomplex.ComplexBuffer;
 import org.w3c.dom.*;
 
 /* immutable */
@@ -46,21 +48,40 @@ public class UnitCell {
     public UnitCell distort(double V) {
         return new UnitCell(V, this.atoms);
     }
-    /* In theory, s could be calculated from m, but since we don't store
-     * unit cell vectors, we have to pass s as an argument. */
-    public Complex susc(Miller h, double s, double lambda) throws UnsupportedWavelength { /* structure factor */
-        Complex sf = new Complex();
+    public Complex suscFast(Miller h, double s, double lambda) throws UnsupportedWavelength { /* structure factor */
+        ComplexBuffer sf = new ComplexBuffer();
+        ComplexBuffer c = new ComplexBuffer();
+        ComplexBuffer expterm = new ComplexBuffer();
         final double r_e = 2.817940325e-15;
         double T = -r_e*lambda*lambda/(Math.PI*V);
         for(LatticeAtom atom: atoms) {
             double asf = atom.atom.asf().calc(s);
             Complex hoenl = atom.atom.hoenl(lambda);
-            Complex c = Complex.mul(atom.occupation, (Complex.add(asf,hoenl)));
+            c.set(asf).addInPlace(hoenl).multiplyInPlace(atom.occupation);
             double B = atom.atom.bFactor();
-            Complex expterm = Complex.exp(Complex.sub(Complex.mul(new Complex(0,-2*Math.PI),atom.pos.dot(h)),B*s*s));
-            sf = Complex.add(sf, Complex.mul(c, expterm));
+            expterm.set(0, -2*Math.PI).multiplyInPlace(atom.pos.dot(h));
+            expterm.subtractInPlace(B*s*s).expInPlace();
+            c.multiplyInPlace(expterm);
+            sf.addInPlace(c);
         }
-        return Complex.mul(T,sf);
+        sf.multiplyInPlace(T);
+        return sf.get();
+    }
+    /* In theory, s could be calculated from m, but since we don't store
+     * unit cell vectors, we have to pass s as an argument. */
+    public Complex susc(Miller h, double s, double lambda) throws UnsupportedWavelength { /* structure factor */
+        Complex sf = Complex.ZERO;
+        final double r_e = 2.817940325e-15;
+        double T = -r_e*lambda*lambda/(Math.PI*V);
+        for(LatticeAtom atom: atoms) {
+            double asf = atom.atom.asf().calc(s);
+            Complex hoenl = atom.atom.hoenl(lambda);
+            Complex c = ComplexUtils.multiply(atom.occupation, (ComplexUtils.add(asf,hoenl)));
+            double B = atom.atom.bFactor();
+            Complex expterm = ComplexUtils.exp(ComplexUtils.subtract(ComplexUtils.multiply(new Complex(0,-2*Math.PI),atom.pos.dot(h)),B*s*s));
+            sf = ComplexUtils.add(sf, ComplexUtils.multiply(c, expterm));
+        }
+        return ComplexUtils.multiply(T,sf);
     }
     public UnitCell getProportion(double p) {
         List<LatticeAtom> atoms2 = new ArrayList<LatticeAtom>();

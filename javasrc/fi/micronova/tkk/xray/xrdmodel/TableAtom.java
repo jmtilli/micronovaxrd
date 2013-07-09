@@ -1,6 +1,7 @@
 package fi.micronova.tkk.xray.xrdmodel;
 import java.util.*;
-import fi.micronova.tkk.xray.complex.*;
+import fi.iki.jmtilli.javacomplex.Complex;
+import fi.iki.jmtilli.javacomplex.ComplexUtils;
 
 class TableAtom implements Atom {
     public final int Z;
@@ -29,17 +30,28 @@ class TableAtom implements Atom {
     public ASF asf() {
         return asfField;
     }
+    private double last_wavelength;
+    private Complex last_hoenl;
     public Complex hoenl(double lambda) throws UnsupportedWavelength {
+        synchronized(this)
+        {
+            if(lambda == last_wavelength)
+            {
+                return last_hoenl;
+            }
+        }
+
         final double h = 4.13566743e-15; // in eV*s
         final double c = 299792458; // exact
         double E = h*c/lambda;
-        double E1, E2;
+        Double E_d = new Double(E);
+        Double E1, E2;
         double p;
-        Complex fE1, fE2, f;
+        Complex fE1, fE2, f, result;
         SortedMap<Double,Complex> head, tail;
 
-        head = f12map.headMap(E);
-        tail = f12map.tailMap(E);
+        head = f12map.headMap(E_d);
+        tail = f12map.tailMap(E_d);
         if(head.isEmpty() || tail.isEmpty())
             throw new UnsupportedWavelength("Unsupported wavelength: "+lambda);
         E1 = head.lastKey();
@@ -47,8 +59,14 @@ class TableAtom implements Atom {
         fE1 = f12map.get(E1);
         fE2 = f12map.get(E2);
         p = (E-E1)/(E2-E1);
-        f = Complex.add(Complex.mul(1-p, fE1), Complex.mul(p, fE2));
+        f = ComplexUtils.add(ComplexUtils.multiply(1-p, fE1), ComplexUtils.multiply(p, fE2));
 
-        return Complex.sub(f,asfField.calc(0));
+        result = ComplexUtils.subtract(f,asfField.calc(0));
+        synchronized(this)
+        {
+            last_wavelength = lambda;
+            last_hoenl = result;
+        }
+        return result;
     }
 };

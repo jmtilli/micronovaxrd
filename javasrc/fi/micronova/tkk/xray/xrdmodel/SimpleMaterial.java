@@ -8,7 +8,7 @@ import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
-import fi.micronova.tkk.xray.complex.*;
+import fi.iki.jmtilli.javacomplex.Complex;
 
 /* immutable */
 public class SimpleMaterial implements Material {
@@ -104,7 +104,7 @@ public class SimpleMaterial implements Material {
             ASF asf = atom.atom.asf();
 
             B.append(atom.atom.bFactor()+"; ...\n");
-            hoenl.append("((" + atomHoenl.real + ")+(" + atomHoenl.imag + ")*i); ...\n");
+            hoenl.append("((" + atomHoenl.getReal() + ")+(" + atomHoenl.getImag() + ")*i); ...\n");
             for(int i=0; i<asf.gaussians.size(); i++) {
                 ASFGaussian gaussian = asf.gaussians.get(i);
                 sf_a.append(gaussian.a+",");
@@ -281,6 +281,13 @@ public class SimpleMaterial implements Material {
         Complex chi_0 = unitcell.susc(new Miller(), 0, lambda);
         Complex chi_h = unitcell.susc(reflection, 1/(2*zspace), lambda);
         Complex chi_h_neg = unitcell.susc(reflection.neg(), 1/(2*zspace), lambda);
+        return new Susceptibilities(chi_0, chi_h, chi_h_neg);
+    }
+
+    public Susceptibilities suscFast(double lambda) throws UnsupportedWavelength { /* structure factor */
+        Complex chi_0 = unitcell.suscFast(new Miller(), 0, lambda);
+        Complex chi_h = unitcell.suscFast(reflection, 1/(2*zspace), lambda);
+        Complex chi_h_neg = unitcell.suscFast(reflection.neg(), 1/(2*zspace), lambda);
         return new Susceptibilities(chi_0, chi_h, chi_h_neg);
     }
 };

@@ -1,5 +1,5 @@
 package fi.micronova.tkk.xray.xrdmodel;
-import fi.micronova.tkk.xray.complex.*;
+import fi.iki.jmtilli.javacomplex.Complex;
 public class Susceptibilities {
     public final Complex chi_0;
     public final Complex chi_h;
