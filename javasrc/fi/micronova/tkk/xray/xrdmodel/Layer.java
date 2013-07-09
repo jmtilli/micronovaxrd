@@ -50,9 +50,46 @@ public class Layer implements ValueListener {
     private final FitValue d, p, r; /* thickness (in SI units), composition */
 
     private Material mat1, mat2;
-    private Mixture mixture; /* this must be changed whenever mat1 and mat2 are */
+    //private Mixture mixture; /* this must be changed whenever mat1 and mat2 are */
 
     private final Set<LayerListener> listeners = new HashSet<LayerListener>();
+
+    private static boolean utilEquals(Object o1, Object o2)
+    {
+      if (o1 == null)
+      {
+        return o2 == null;
+      }
+      if (o2 == null)
+      {
+        return false;
+      }
+      return o1.equals(o2);
+    }
+    /**
+       Deep equality comparison for layers.
+
+       LayerStack.getNumbering() requires that the equals method of Layer is
+       the same as for objects, ie. two layers are the same only if they are
+       the same object.
+
+       This method here does deep equality comparison, ie. it compares the
+       contents of the objects.
+     */
+    public static boolean layerDeepEquals(Layer l1, Layer l2)
+    {
+      if (   !utilEquals(l1.name, l2.name)
+          || !utilEquals(l1.d, l2.d)
+          || !utilEquals(l1.p, l2.p)
+          || !utilEquals(l1.r, l2.r)
+          || !utilEquals(l1.mat1, l2.mat1)
+          || !utilEquals(l1.mat2, l2.mat2))
+      {
+        return false;
+      }
+      return true;
+
+    }
 
     public void addLayerListener(LayerListener listener) {
         listeners.add(listener);

@@ -366,8 +366,9 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
 
 
-        JTabbedPane tabs;
-        JPanel layered, graph, fit;
+        final JTabbedPane tabs = new JTabbedPane();
+        JPanel layered, graph;
+        final JPanel fit = new JPanel();
         JPanel wlPanel, layeredPanel;
         JPanel layerButtonPanel;
         JTextField wl1, wl2, wl3;
@@ -386,11 +387,8 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         //layers.addListDataListener(new ScrollbarUpdater(layers, sliderPanel));
         new ScrollbarUpdater(layers, sliderPanel);
 
-        tabs = new JTabbedPane();
-
         layered = new JPanel();
         graph = new JPanel();
-        fit = new JPanel();
 
         layered.setLayout(new BorderLayout());
         graph.setLayout(new BorderLayout());
@@ -1185,6 +1183,17 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                     chooserDirectory = chooser.getCurrentDirectory();
                     try {
                         loadLayers(chooser.getSelectedFile(),true);
+                        if (tabs.getSelectedComponent() == fit)
+                        {
+                            JOptionPane.showMessageDialog(
+                                null,
+                                "The model was loaded to the manual fit " +
+                                "tab.\n\nYou're on the automatic fit tab.\n\n" +
+                                "To import " +
+                                "the model to the automatic fit tab, press " +
+                                "\"Import model\"",
+                                "Info", JOptionPane.INFORMATION_MESSAGE);
+                        }
                     }
                     catch(LayerLoadException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -1198,6 +1207,25 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         fileSaveLayers.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
                 JFileChooser chooser = new JFileChooser();
+                if (    tabs.getSelectedComponent() == fit
+                    &&  fitLayers != null
+                    && !fitLayers.equals(layers))
+                {
+                    if (JOptionPane.showConfirmDialog(
+                            null,
+                            "The model that's going to be saved is the one " +
+                            "on the manual fit tab and that's different " +
+                            "from the model on the automatic fit tab.\n\n" +
+                            "You're on the automatic fit tab. To export " +
+                            "the model to the manual fit tab, press " +
+                            "\"Export model\".\n\nDo you still want to save?",
+                            "Question", JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE)
+                      != JOptionPane.YES_OPTION)
+                    {
+                      return;
+                    }
+                }
                 if(chooserDirectory != null)
                     chooser.setCurrentDirectory(chooserDirectory);
                 if(measPath != null) {
@@ -1239,6 +1267,25 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         fileLayerExport.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
                 JFileChooser chooser = new JFileChooser();
+                if (    tabs.getSelectedComponent() == fit
+                    &&  fitLayers != null
+                    && !fitLayers.equals(layers))
+                {
+                    if (JOptionPane.showConfirmDialog(
+                            null,
+                            "The model that's going to be exported is the " +
+                            "one on the manual fit tab and that's different " +
+                            "from the model on the automatic fit tab.\n\n" +
+                            "You're on the automatic fit tab. To export " +
+                            "the model to the manual fit tab, press " +
+                            "\"Export model\".\n\nDo you still want to export?",
+                            "Question", JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE)
+                      != JOptionPane.YES_OPTION)
+                    {
+                      return;
+                    }
+                }
                 if(chooserDirectory != null)
                     chooser.setCurrentDirectory(chooserDirectory);
                 if(chooser.showSaveDialog(thisFrame) == JFileChooser.APPROVE_OPTION) {
@@ -1290,6 +1337,25 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         JMenuItem dataPlot = new JMenuItem("Linear plot");
         dataPlot.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
+                if (    tabs.getSelectedComponent() == fit
+                    &&  fitLayers != null
+                    && !fitLayers.equals(layers))
+                {
+                    if (JOptionPane.showConfirmDialog(
+                            null,
+                            "The model that's going to be plotted is the one " +
+                            "on the manual fit tab and that's different " +
+                            "from the model on the automatic fit tab.\n\n" +
+                            "You're on the automatic fit tab. To export " +
+                            "the model to the manual fit tab, press " +
+                            "\"Export model\".\n\nDo you still want to plot?",
+                            "Question", JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE)
+                      != JOptionPane.YES_OPTION)
+                    {
+                      return;
+                    }
+                }
                 thisFrame.plot(PlotStyle.LIN);
             }
         });
@@ -1297,6 +1363,25 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         dataPlot = new JMenuItem("Logarithmic plot");
         dataPlot.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
+                if (    tabs.getSelectedComponent() == fit
+                    &&  fitLayers != null
+                    && !fitLayers.equals(layers))
+                {
+                    if (JOptionPane.showConfirmDialog(
+                            null,
+                            "The model that's going to be plotted is the one " +
+                            "on the manual fit tab and that's different " +
+                            "from the model on the automatic fit tab.\n\n" +
+                            "You're on the automatic fit tab. To export " +
+                            "the model to the manual fit tab, press " +
+                            "\"Export model\".\n\nDo you still want to plot?",
+                            "Question", JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE)
+                      != JOptionPane.YES_OPTION)
+                    {
+                      return;
+                    }
+                }
                 thisFrame.plot(PlotStyle.LOG);
             }
         });
@@ -1304,6 +1389,25 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         dataPlot = new JMenuItem("Sqrt-plot");
         dataPlot.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
+                if (    tabs.getSelectedComponent() == fit
+                    &&  fitLayers != null
+                    && !fitLayers.equals(layers))
+                {
+                    if (JOptionPane.showConfirmDialog(
+                            null,
+                            "The model that's going to be plotted is the one " +
+                            "on the manual fit tab and that's different " +
+                            "from the model on the automatic fit tab.\n\n" +
+                            "You're on the automatic fit tab. To export " +
+                            "the model to the manual fit tab, press " +
+                            "\"Export model\".\n\nDo you still want to plot?",
+                            "Question", JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE)
+                      != JOptionPane.YES_OPTION)
+                    {
+                      return;
+                    }
+                }
                 thisFrame.plot(PlotStyle.SQRT);
             }
         });

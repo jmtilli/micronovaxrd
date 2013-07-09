@@ -21,6 +21,29 @@ public class FitValue {
     private final boolean supported; /* whether fitting is actually supported. not included in XML serialization */
     private final List<ValueListener> listeners = new ArrayList<ValueListener>();
 
+    public boolean equals(Object o)
+    {
+      FitValue that;
+      if (this == o)
+      {
+        return true;
+      }
+      if (o == null || !(o instanceof FitValue))
+      {
+        return false;
+      }
+      that = (FitValue)o;
+      if (   this.min       != that.min
+          || this.expected  != that.expected
+          || this.max       != that.max
+          || this.enable    != that.enable
+          || this.supported != that.supported)
+      {
+        return false;
+      }
+      return true;
+    }
+
     public boolean isSupported() {
         return supported;
     }

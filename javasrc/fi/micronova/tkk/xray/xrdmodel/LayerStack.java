@@ -63,6 +63,59 @@ public class LayerStack implements LayerListener, ValueListener {
 
     private LookupTable table;
 
+    public boolean equals(Object o)
+    {
+      LayerStack that;
+      Map<Layer, Integer> this_numbering, that_numbering;
+      if (this == o)
+      {
+        return true;
+      }
+      if (o == null || !(o instanceof LayerStack))
+      {
+        return false;
+      }
+      that = (LayerStack)o;
+      // compare wavelengths and table references
+      if (   this.lambda != that.lambda
+          || this.table != that.table)
+      {
+        return false;
+      }
+
+      // compare fit values
+      if (   !this.stddev.equals(that.stddev)
+          || !this.prod.equals(that.prod)
+          || !this.sum.equals(that.sum)
+          || !this.offset.equals(that.offset))
+      {
+        return false;
+      }
+
+      // compare layers: size, numbering, contents
+      if (this.layers.size() != that.layers.size())
+      {
+        return false;
+      }
+      this_numbering = this.getNumbering();
+      that_numbering = that.getNumbering();
+      for (int i = 0; i < this.layers.size(); i++)
+      {
+        Layer this_layer = this.layers.get(i);
+        Layer that_layer = that.layers.get(i);
+        if (   this_numbering.get(this_layer).intValue()
+            != that_numbering.get(that_layer).intValue())
+        {
+          return false;
+        }
+        if (!Layer.layerDeepEquals(this_layer, that_layer))
+        {
+          return false;
+        }
+      }
+      return true;
+    }
+
     /** Bijection between layers and the number of actual layers.
      * However, it is stored in a map although it is a bijection, since
      * it should be used only to get the layer number for a layer. */
