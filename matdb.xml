@@ -469,10 +469,11 @@
         </unitcell>
     </mat>
 
-    <mat name="Aluminium nitride (0002)" xy="3.1130e-10" z='2.4908e-10' poisson='0.35'>
+    <!-- Values of v = 0.272 for InN and v = 0.203 for AlN also appear most reliable. -->
+    <mat name="Aluminium nitride (0002)" xy="3.1106e-10" z='2.48975e-10' poisson='0.203'>
         <comment>Hexagonal III-V semiconductor</comment>
         <refl h='0' k='0' l='2'/>
-        <unitcell V="4.17138958535585e-29">
+        <unitcell V="4.17258030417540e-29">
             <atom Z="13" occupation="1">
                 <pos x="0.33333" y="0.66667" z="0.00000" />
                 <pos x="0.66667" y="0.33333" z="0.50000" />
@@ -483,10 +484,11 @@
             </atom>
         </unitcell>
     </mat>
-    <mat name="Aluminium nitride (0004)" xy="3.1130e-10" z='1.2454e-10' poisson='0.35'>
+    <!-- Values of v = 0.272 for InN and v = 0.203 for AlN also appear most reliable. -->
+    <mat name="Aluminium nitride (0004)" xy="3.1106e-10" z='1.244875e-10' poisson='0.203'>
         <comment>Hexagonal III-V semiconductor</comment>
         <refl h='0' k='0' l='4'/>
-        <unitcell V="4.17138958535585e-29">
+        <unitcell V="4.17258030417540e-29">
             <atom Z="13" occupation="1">
                 <pos x="0.33333" y="0.66667" z="0.00000" />
                 <pos x="0.66667" y="0.33333" z="0.50000" />
@@ -498,10 +500,11 @@
         </unitcell>
     </mat>
     <!-- 3.19 -->
-    <mat name="Gallium nitride, hexagonal (0002)" xy="3.1893e-10" z='2.59255e-10' poisson='0.36'>
+    <!-- v = 0.183 is appropriate for MOVPE-grown GaN with a moderate dislocation density -->
+    <mat name="Gallium nitride, hexagonal (0002)" xy="3.1896e-10" z='2.59275e-10' poisson='0.183'>
         <comment>Hexagonal III-V semiconductor</comment>
         <refl h='0' k='0' l='2'/>
-        <unitcell V="4.55181099696839e-29">
+        <unitcell V="4.56871130048379e-29">
             <atom Z="31" occupation="1">
                 <pos x="0.33333" y="0.66667" z="0.00000" />
                 <pos x="0.66667" y="0.33333" z="0.50000" />
@@ -512,10 +515,11 @@
             </atom>
         </unitcell>
     </mat>
-    <mat name="Gallium nitride, hexagonal (0004)" xy="3.1893e-10" z='1.296275e-10' poisson='0.36'>
+    <!-- v = 0.183 is appropriate for MOVPE-grown GaN with a moderate dislocation density -->
+    <mat name="Gallium nitride, hexagonal (0004)" xy="3.1896e-10" z='1.296375e-10' poisson='0.183'>
         <comment>Hexagonal III-V semiconductor</comment>
         <refl h='0' k='0' l='4'/>
-        <unitcell V="4.55181099696839e-29">
+        <unitcell V="4.56871130048379e-29">
             <atom Z="31" occupation="1">
                 <pos x="0.33333" y="0.66667" z="0.00000" />
                 <pos x="0.66667" y="0.33333" z="0.50000" />
@@ -527,10 +531,11 @@
         </unitcell>
     </mat>
 
-    <mat name="Indium nitride (0002)" xy="3.5300e-10" z='2.8450e-10' poisson='0.21'>
+    <!-- Values of v = 0.272 for InN and v = 0.203 for AlN also appear most reliable. -->
+    <mat name="Indium nitride (0002)" xy="3.5378e-10" z='2.85165e-10' poisson='0.272'>
         <comment>Hexagonal III-V semiconductor</comment>
         <refl h='0' k='0' l='2'/>
-        <unitcell V="61.8602985153709e-30">
+        <unitcell V="6.18192032571193e-29">
             <atom Z="49" occupation="1">
                 <pos x="0.33333" y="0.66667" z="0.00000" />
                 <pos x="0.66667" y="0.33333" z="0.50000" />
@@ -541,10 +546,11 @@
             </atom>
         </unitcell>
     </mat>
-    <mat name="Indium nitride (0004)" xy="3.5300e-10" z='1.4225e-10' poisson='0.21'>
+    <!-- Values of v = 0.272 for InN and v = 0.203 for AlN also appear most reliable. -->
+    <mat name="Indium nitride (0004)" xy="3.5378e-10" z='1.425825e-10' poisson='0.272'>
         <comment>Hexagonal III-V semiconductor</comment>
         <refl h='0' k='0' l='4'/>
-        <unitcell V="61.8602985153709e-30">
+        <unitcell V="6.18192032571193e-29">
             <atom Z="49" occupation="1">
                 <pos x="0.33333" y="0.66667" z="0.00000" />
                 <pos x="0.66667" y="0.33333" z="0.50000" />
