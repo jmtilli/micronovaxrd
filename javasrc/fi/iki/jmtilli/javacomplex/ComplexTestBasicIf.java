@@ -47,7 +47,7 @@ public class ComplexTestBasicIf {
     assertFalse(Complex.I.multiply(3.0).add(
                 Complex.ONE.multiply(4.0)).isNaN());
     assertFalse(Complex.I.multiply(3.0).add(
-                Complex.ONE.multiply(4.0)).inverse().isNaN());
+                Complex.ONE.multiply(4.0)).invert().isNaN());
 
     assertFalse(new Complex(Double.POSITIVE_INFINITY, 0.0).isNaN());
     assertFalse(new Complex(Double.POSITIVE_INFINITY, 1.0).isNaN());
@@ -72,7 +72,7 @@ public class ComplexTestBasicIf {
     assertFalse(ComplexUtils.isNaN(Complex.I.multiply(3.0).add(
                 Complex.ONE.multiply(4.0))));
     assertFalse(ComplexUtils.isNaN(Complex.I.multiply(3.0).add(
-                Complex.ONE.multiply(4.0)).inverse()));
+                Complex.ONE.multiply(4.0)).invert()));
 
     assertFalse(ComplexUtils.isNaN(new Complex(Double.POSITIVE_INFINITY, 0.0)));
     assertFalse(ComplexUtils.isNaN(new Complex(Double.POSITIVE_INFINITY, 1.0)));
@@ -102,7 +102,7 @@ public class ComplexTestBasicIf {
     assertFalse(Complex.I.multiply(3.0).add(
                 Complex.ONE.multiply(4.0)).isInfinite());
     assertFalse(Complex.I.multiply(3.0).add(
-                Complex.ONE.multiply(4.0)).inverse().isInfinite());
+                Complex.ONE.multiply(4.0)).invert().isInfinite());
 
     assertTrue(new Complex(Double.POSITIVE_INFINITY, 0.0).isInfinite());
     assertTrue(new Complex(Double.POSITIVE_INFINITY, 1.0).isInfinite());
@@ -133,7 +133,7 @@ public class ComplexTestBasicIf {
     assertFalse(ComplexUtils.isInfinite(Complex.I.multiply(3.0).add(
                 Complex.ONE.multiply(4.0))));
     assertFalse(ComplexUtils.isInfinite(Complex.I.multiply(3.0).add(
-                Complex.ONE.multiply(4.0)).inverse()));
+                Complex.ONE.multiply(4.0)).invert()));
 
     assertTrue(ComplexUtils.isInfinite(new Complex(Double.POSITIVE_INFINITY,
                                                    0.0)));

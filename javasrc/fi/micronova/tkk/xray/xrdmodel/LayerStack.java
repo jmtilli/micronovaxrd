@@ -1035,7 +1035,7 @@ public class LayerStack implements LayerListener, ValueListener {
             eta_denom_inv_s.multiplyInPlace(Math.abs(b_s));
             eta_denom_inv_s.sqrtInPlace();
             eta_denom_inv_s.multiplyInPlace(C_s*2.0);
-            eta_denom_inv_s.inverseInPlace();
+            eta_denom_inv_s.invertInPlace();
 
             for(int i=0; i<theta.length; i++) {
                 double b_times_alphah = (Math.sin(theta[i] + thetaoffset) - sin_theta_Bs)*sin_theta_Bs_times_b_s_times_minus4;
@@ -1078,7 +1078,7 @@ public class LayerStack implements LayerListener, ValueListener {
                 double sin_theta_B_times_b = sin_theta_B*b;
                 double C = spol ? 1 : Math.abs(Math.cos(2*theta_B));
                 double C_mul_2_mul_sqrt_abs_b = C*2*Math.sqrt(Math.abs(b));
-                eta_divisor_inv.set(C_mul_2_mul_sqrt_abs_b).multiplyInPlace(sqrt_chi_h_and_neg_mul).inverseInPlace();
+                eta_divisor_inv.set(C_mul_2_mul_sqrt_abs_b).multiplyInPlace(sqrt_chi_h_and_neg_mul).invertInPlace();
                 double multcoeff = Math.PI*C*d/(lambda*Math.sqrt(Math.abs(gamma0*gammah)));
                 T.set(sqrt_chi_h_and_neg_mul).multiplyInPlace(multcoeff);
                 T_mul_minus_I.set(0, -1).multiplyInPlace(T);
@@ -1118,7 +1118,7 @@ public class LayerStack implements LayerListener, ValueListener {
                     expterm.set(T_mul_minus_I).multiplyInPlace(sqrteta2m1).expInPlace();
                     S1.set(X[i]).subtractInPlace(eta).addInPlace(sqrteta2m1).multiplyInPlace(expterm);
 
-                    expterm.inverseInPlace(); // expterm <- sqrt(-i*T*sqrt(eta^2-1))
+                    expterm.invertInPlace(); // expterm <- sqrt(-i*T*sqrt(eta^2-1))
                     S2.set(X[i]).subtractInPlace(eta).subtractInPlace(sqrteta2m1).multiplyInPlace(expterm);
                     S1S2_divisor.set(S1).subtractInPlace(S2);
                     S1S2.set(S1).addInPlace(S2).divideInPlace(S1S2_divisor);
@@ -1262,7 +1262,7 @@ public class LayerStack implements LayerListener, ValueListener {
             eta_denom_inv_s = eta_denom_inv_s.multiply(Math.abs(b_s));
             eta_denom_inv_s = eta_denom_inv_s.sqrt();
             eta_denom_inv_s = eta_denom_inv_s.multiply(C_s*2.0);
-            eta_denom_inv_s = eta_denom_inv_s.inverse();
+            eta_denom_inv_s = eta_denom_inv_s.invert();
 
             for(int i=0; i<theta.length; i++) {
                 double b_times_alphah = (Math.sin(theta[i] + thetaoffset) - sin_theta_Bs)*sin_theta_Bs_times_b_s_times_minus4;
@@ -1303,7 +1303,7 @@ public class LayerStack implements LayerListener, ValueListener {
                 double sin_theta_B_times_b = sin_theta_B*b;
                 double C = spol ? 1 : Math.abs(Math.cos(2*theta_B));
                 double C_mul_2_mul_sqrt_abs_b = C*2*Math.sqrt(Math.abs(b));
-                eta_divisor_inv = sqrt_chi_h_and_neg_mul.multiply(C_mul_2_mul_sqrt_abs_b).inverse();
+                eta_divisor_inv = sqrt_chi_h_and_neg_mul.multiply(C_mul_2_mul_sqrt_abs_b).invert();
                 double multcoeff = Math.PI*C*d/(lambda*Math.sqrt(Math.abs(gamma0*gammah)));
                 T = sqrt_chi_h_and_neg_mul.multiply(multcoeff);
                 T_mul_minus_I = new Complex(0, -1).multiply(T);
@@ -1343,7 +1343,7 @@ public class LayerStack implements LayerListener, ValueListener {
                     expterm = T_mul_minus_I.multiply(sqrteta2m1).exp();
                     S1 = X[i].subtract(eta).add(sqrteta2m1).multiply(expterm);
 
-                    expterm = expterm.inverse(); // expterm <- sqrt(-i*T*sqrt(eta^2-1))
+                    expterm = expterm.invert(); // expterm <- sqrt(-i*T*sqrt(eta^2-1))
                     S2 = X[i].subtract(eta).subtract(sqrteta2m1).multiply(expterm);
                     S1S2_divisor = S1.subtract(S2);
                     S1S2 = S1.add(S2).divide(S1S2_divisor);

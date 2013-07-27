@@ -200,7 +200,7 @@ public class ComplexBuffer implements ComplexNumber, Serializable {
 
      @return this
    */
-  public ComplexBuffer inverseInPlace()
+  public ComplexBuffer invertInPlace()
   {
     return divideReversedInPlace(1.0);
   }

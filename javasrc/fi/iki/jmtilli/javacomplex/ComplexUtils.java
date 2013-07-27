@@ -379,7 +379,7 @@ public class ComplexUtils {
      @param c The complex number
      @return 1 divided by c
    */
-  public static Complex inverse(ComplexNumber c)
+  public static Complex invert(ComplexNumber c)
   {
     return divide(1.0, c);
   }

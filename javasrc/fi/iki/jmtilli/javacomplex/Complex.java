@@ -494,9 +494,9 @@ public class Complex implements ComplexNumber, Serializable {
     
      @return 1 divided by this complex number
    */
-  public Complex inverse()
+  public Complex invert()
   {
-    return ComplexUtils.inverse(this);
+    return ComplexUtils.invert(this);
   }
 
   /**

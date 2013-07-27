@@ -257,26 +257,26 @@ public class ComplexTestArith {
     assertSameObject(buf, buf.negateInPlace());
     assertEqualTolerance(1e-10, buf, new Complex(-1, 2));
   }
-  private static void inverseTest()
+  private static void invertTest()
   {
     assertEqualTolerance(1e-10,
                          new Complex(1, 2).multiply(
-                           new Complex(1, 2).inverse()),
+                           new Complex(1, 2).invert()),
                          new Complex(1, 0));
     assertEqualTolerance(1e-10,
                          new Complex(1, -2).multiply(
-                           new Complex(1, -2).inverse()),
+                           new Complex(1, -2).invert()),
                          new Complex(1, 0));
   }
-  private static void inverseBufTest()
+  private static void invertBufTest()
   {
     ComplexBuffer buf = new ComplexBuffer();
     assertSameObject(buf, buf.set(1,2));
-    assertSameObject(buf, buf.inverseInPlace());
+    assertSameObject(buf, buf.invertInPlace());
     assertSameObject(buf, buf.multiplyInPlace(new Complex(1, 2)));
     assertEqualTolerance(1e-10, buf, new Complex(1, 0));
     assertSameObject(buf, buf.set(1,-2));
-    assertSameObject(buf, buf.inverseInPlace());
+    assertSameObject(buf, buf.invertInPlace());
     assertSameObject(buf, buf.multiplyInPlace(new Complex(1, -2)));
     assertEqualTolerance(1e-10, buf, new Complex(1, 0));
   }
@@ -906,8 +906,8 @@ public class ComplexTestArith {
     conjugateBufTest();
     negateTest();
     negateBufTest();
-    inverseTest();
-    inverseBufTest();
+    invertTest();
+    invertBufTest();
     sqrtTest();
     sqrtBufTest();
     powTest();
