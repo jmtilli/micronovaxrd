@@ -1,7 +1,7 @@
 package fi.micronova.tkk.xray.xrdmodel;
 import java.util.*;
 import java.io.*;
-import fi.iki.jmtilli.javacomplex.Complex;
+import fi.iki.jmtilli.javafastcomplex.Complex;
 
 
 /** Scattering factor database.

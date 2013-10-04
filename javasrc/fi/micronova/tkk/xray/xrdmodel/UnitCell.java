@@ -1,9 +1,9 @@
 package fi.micronova.tkk.xray.xrdmodel;
 import fi.micronova.tkk.xray.util.*;
 import java.util.*;
-import fi.iki.jmtilli.javacomplex.Complex;
-import fi.iki.jmtilli.javacomplex.ComplexUtils;
-import fi.iki.jmtilli.javacomplex.ComplexBuffer;
+import fi.iki.jmtilli.javafastcomplex.Complex;
+import fi.iki.jmtilli.javafastcomplex.ComplexUtils;
+import fi.iki.jmtilli.javafastcomplex.ComplexBuffer;
 import org.w3c.dom.*;
 
 /* immutable */

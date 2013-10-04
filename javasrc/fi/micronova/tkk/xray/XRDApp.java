@@ -175,6 +175,27 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         */
     }
 
+    public void useSimulationAsMeasurement()
+    {
+        try {
+            GraphData d = data.simulate(layers);
+            loadMeasurement(d.alpha_0, d.simul, new ImportOptions(1, 0, 90, 0, 90, true, false)); /* no normalization */
+            measPath = null;
+            setTitle("XRD");
+        }
+        catch(SimulationException ex) {
+            JOptionPane.showMessageDialog(null, "Simulation error", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    public void addNoise(double level_db)
+    {
+        GraphData data2 = data.addNoise(Math.exp(Math.log(10)*level_db/10));
+        data.newData(data2.alpha_0, data2.meas, data2.simul, data2.logformat);
+        /* ... */
+        p.draw();
+        pfit.draw();
+    }
+
     public XRDApp() {
         super("XRD");
         data = new GraphData(null, null, null, false);
@@ -1098,16 +1119,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
         fileSwap.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
-                try {
-                    GraphData d;
-                    d = data.simulate(layers);
-                    loadMeasurement(d.alpha_0, d.simul, new ImportOptions(1, 0, 90, 0, 90, true, false)); /* no normalization */
-                    measPath = null;
-                    setTitle("XRD");
-                }
-                catch(SimulationException ex) {
-                    JOptionPane.showMessageDialog(null, "Simulation error", "Error", JOptionPane.ERROR_MESSAGE);
-                }
+                useSimulationAsMeasurement();
             }
         });
         fileSwapOct.addActionListener(new ActionListener() {
@@ -1421,11 +1433,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                 PhotonLevelDialog dialog = new PhotonLevelDialog(thisFrame);
                 Double level;
                 if((level = dialog.call()) != null) {
-                    GraphData data2 = data.addNoise(Math.exp(Math.log(10)*level/10));
-                    data.newData(data2.alpha_0, data2.meas, data2.simul, data2.logformat);
-                    /* ... */
-                    p.draw();
-                    pfit.draw();
+                    addNoise(level);
                 }
                 dialog.dispose();
             }

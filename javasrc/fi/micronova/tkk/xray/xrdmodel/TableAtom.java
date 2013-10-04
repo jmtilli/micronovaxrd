@@ -1,7 +1,7 @@
 package fi.micronova.tkk.xray.xrdmodel;
 import java.util.*;
-import fi.iki.jmtilli.javacomplex.Complex;
-import fi.iki.jmtilli.javacomplex.ComplexUtils;
+import fi.iki.jmtilli.javafastcomplex.Complex;
+import fi.iki.jmtilli.javafastcomplex.ComplexUtils;
 
 class TableAtom implements Atom {
     public final int Z;

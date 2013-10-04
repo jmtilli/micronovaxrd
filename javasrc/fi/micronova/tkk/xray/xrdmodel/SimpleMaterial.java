@@ -8,7 +8,7 @@ import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
-import fi.iki.jmtilli.javacomplex.Complex;
+import fi.iki.jmtilli.javafastcomplex.Complex;
 
 /* immutable */
 public class SimpleMaterial implements Material {

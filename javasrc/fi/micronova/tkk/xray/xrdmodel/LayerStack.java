@@ -6,9 +6,9 @@ import javax.swing.event.*;
 import java.util.*;
 import org.w3c.dom.*;
 import java.io.*;
-import fi.iki.jmtilli.javacomplex.Complex;
-import fi.iki.jmtilli.javacomplex.ComplexBuffer;
-import fi.iki.jmtilli.javacomplex.ComplexUtils;
+import fi.iki.jmtilli.javafastcomplex.Complex;
+import fi.iki.jmtilli.javafastcomplex.ComplexBuffer;
+import fi.iki.jmtilli.javafastcomplex.ComplexUtils;
 
 
 /** Layer model.
@@ -938,6 +938,7 @@ public class LayerStack implements LayerListener, ValueListener {
     }
 
     public double[] xrdCurveFast(double[] theta) throws SimulationException {
+
         int nlayers = layers.size();
         double[] result = new double[theta.length];
         ComplexBuffer[] X = new ComplexBuffer[theta.length];
@@ -948,6 +949,7 @@ public class LayerStack implements LayerListener, ValueListener {
         Complex[] chi_h_ar = new Complex[nlayers];
         Complex[] chi_h_neg_ar = new Complex[nlayers];
         final double stddevs = 4;
+        double[] sin_theta_plus_thetaoffset = new double[theta.length];
 
         // XXX: can throw if theta.length == 0 or theta.length == 1
         double dtheta = (theta[theta.length-1] - theta[0])/(theta.length-1);
@@ -964,6 +966,10 @@ public class LayerStack implements LayerListener, ValueListener {
             if(!DataTools.isUniformlySpaced(theta)) {
                 filter = null;
             }
+        }
+        for (int i = 0; i < theta.length; i++)
+        {
+            sin_theta_plus_thetaoffset[i] = Math.sin(theta[i] + thetaoffset);
         }
 
         /*
@@ -1038,7 +1044,7 @@ public class LayerStack implements LayerListener, ValueListener {
             eta_denom_inv_s.invertInPlace();
 
             for(int i=0; i<theta.length; i++) {
-                double b_times_alphah = (Math.sin(theta[i] + thetaoffset) - sin_theta_Bs)*sin_theta_Bs_times_b_s_times_minus4;
+                double b_times_alphah = (sin_theta_plus_thetaoffset[i] - sin_theta_Bs)*sin_theta_Bs_times_b_s_times_minus4;
 
                 // eta = (b_s*alphah + 2*chi_0_s) / (2*C_s*sqrt(abs(b_s)*chi_h_s*chi_h_neg_s))
                 eta.set(chi_0_s_mul_2).addInPlace(b_times_alphah).multiplyInPlace(eta_denom_inv_s);
@@ -1100,11 +1106,12 @@ public class LayerStack implements LayerListener, ValueListener {
                            <- eli 2*chi0:n tilalle (1-b)*chi0
                            Täytynee tarkistaa gamma0:n ja gammah:n kaavat.
                      */
-                    double b_times_alphah = -4*(Math.sin(theta[i] + thetaoffset) - sin_theta_B)*sin_theta_B_times_b;
+                    double b_times_alphah = -4*(sin_theta_plus_thetaoffset[i] - sin_theta_B)*sin_theta_B_times_b;
                     //assert(!Double.isNaN(b_times_alphah));
                     eta.set(chi_0_mul_2).addInPlace(b_times_alphah).multiplyInPlace(eta_divisor_inv);
                     //eta.set(b_times_alphah).multiplyInPlace(eta_divisor_inv);
                     sqrteta2m1.set(eta).multiplyInPlace(eta).subtractInPlace(1).sqrtInPlace();
+                    //sqrteta2m1.set(eta).multiplyInPlace(eta).subtractInPlace(1);
 
                     /*
                     assert(!Double.isNaN(T.getReal()));
@@ -1116,6 +1123,7 @@ public class LayerStack implements LayerListener, ValueListener {
                      */
 
                     expterm.set(T_mul_minus_I).multiplyInPlace(sqrteta2m1).expInPlace();
+                    //expterm.set(T_mul_minus_I).multiplyInPlace(sqrteta2m1);
                     S1.set(X[i]).subtractInPlace(eta).addInPlace(sqrteta2m1).multiplyInPlace(expterm);
 
                     expterm.invertInPlace(); // expterm <- sqrt(-i*T*sqrt(eta^2-1))
@@ -1175,6 +1183,7 @@ public class LayerStack implements LayerListener, ValueListener {
         Complex[] chi_h_ar = new Complex[nlayers];
         Complex[] chi_h_neg_ar = new Complex[nlayers];
         final double stddevs = 4;
+        double[] sin_theta_plus_thetaoffset = new double[theta.length];
 
         // XXX: can throw if theta.length == 0 or theta.length == 1
         double dtheta = (theta[theta.length-1] - theta[0])/(theta.length-1);
@@ -1191,6 +1200,10 @@ public class LayerStack implements LayerListener, ValueListener {
             if(!DataTools.isUniformlySpaced(theta)) {
                 filter = null;
             }
+        }
+        for (int i = 0; i < theta.length; i++)
+        {
+            sin_theta_plus_thetaoffset[i] = Math.sin(theta[i] + thetaoffset);
         }
 
         /*
@@ -1265,7 +1278,7 @@ public class LayerStack implements LayerListener, ValueListener {
             eta_denom_inv_s = eta_denom_inv_s.invert();
 
             for(int i=0; i<theta.length; i++) {
-                double b_times_alphah = (Math.sin(theta[i] + thetaoffset) - sin_theta_Bs)*sin_theta_Bs_times_b_s_times_minus4;
+                double b_times_alphah = (sin_theta_plus_thetaoffset[i] - sin_theta_Bs)*sin_theta_Bs_times_b_s_times_minus4;
 
                 // eta = (b_s*alphah + 2*chi_0_s) / (2*C_s*sqrt(abs(b_s)*chi_h_s*chi_h_neg_s))
                 eta = chi_0_s_mul_2.add(b_times_alphah).multiply(eta_denom_inv_s);
@@ -1325,7 +1338,7 @@ public class LayerStack implements LayerListener, ValueListener {
                            <- eli 2*chi0:n tilalle (1-b)*chi0
                            Täytynee tarkistaa gamma0:n ja gammah:n kaavat.
                      */
-                    double b_times_alphah = -4*(Math.sin(theta[i] + thetaoffset) - sin_theta_B)*sin_theta_B_times_b;
+                    double b_times_alphah = -4*(sin_theta_plus_thetaoffset[i] - sin_theta_B)*sin_theta_B_times_b;
                     //assert(!Double.isNaN(b_times_alphah));
                     eta = chi_0_mul_2.add(b_times_alphah).multiply(eta_divisor_inv);
                     //eta.set(b_times_alphah).multiplyInPlace(eta_divisor_inv);

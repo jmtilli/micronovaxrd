@@ -1,5 +1,5 @@
 package fi.micronova.tkk.xray.xrdmodel;
-import fi.iki.jmtilli.javacomplex.Complex;
+import fi.iki.jmtilli.javafastcomplex.Complex;
 public interface Atom {
     public int getZ();
     public double bFactor();
