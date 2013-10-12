@@ -21,10 +21,9 @@ import fi.micronova.tkk.xray.dialogs.*;
 
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
 import org.xml.sax.SAXException;
-import org.w3c.dom.*;
+
+import fi.iki.jmtilli.javaxmlfrag.*;
 
 
 
@@ -150,7 +149,13 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         try {
             FileInputStream fstr = new FileInputStream(f);
             BufferedInputStream bs = new BufferedInputStream(fstr);
-            LayerStack newLayers = new LayerStack(XMLUtil.parse(bs).getDocumentElement(), table);
+            DocumentFragment doc_frag =
+                DocumentFragmentHandler.parseWhole(bs);
+            if (!doc_frag.getTag().equals("model"))
+            {
+              throw new XMLException("root tag name is not model");
+            }
+            LayerStack newLayers = new LayerStack(doc_frag, table);
             layers.deepCopyFrom(newLayers);
         }
         catch(IOException ex) {
@@ -163,7 +168,10 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             throw new LayerLoadException("Invalid mixture in layer model file");
         }
         catch(SAXException ex) {
-            throw new LayerLoadException("Invalid XML format");
+            throw new LayerLoadException("Invalid physical XML format");
+        }
+        catch(XMLException ex) {
+            throw new LayerLoadException("Invalid logical XML format");
         }
         catch(ElementNotFound ex) {
             throw new LayerLoadException(ex.getMessage());
@@ -1255,9 +1263,9 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                         Fcode.fencode(layers.structExport(additional_data), fstr);
                         */
 
-                        Document doc = XMLUtil.newDocument();
-                        doc.appendChild(layers.export(doc));
-                        XMLUtil.unparse(doc, fstr);
+                        DocumentFragment doc = new DocumentFragment("model");
+                        layers.toXMLRow(doc);
+                        doc.unparse(XMLDocumentType.WHOLE, fstr);
                     }
                     catch(IOException ex) {
                         JOptionPane.showMessageDialog(null, "I/O error", "Error", JOptionPane.ERROR_MESSAGE);

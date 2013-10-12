@@ -4,10 +4,10 @@ import java.util.*;
 import fi.iki.jmtilli.javafastcomplex.Complex;
 import fi.iki.jmtilli.javafastcomplex.ComplexUtils;
 import fi.iki.jmtilli.javafastcomplex.ComplexBuffer;
-import org.w3c.dom.*;
+import fi.iki.jmtilli.javaxmlfrag.*;
 
 /* immutable */
-public class UnitCell {
+public class UnitCell implements XMLRowable {
     public final double V;
     public final List<LatticeAtom> atoms;
 
@@ -102,35 +102,32 @@ public class UnitCell {
         }
         return new UnitCell(this.V, atoms);
     }
-    public UnitCell(Node n, LookupTable table) throws ElementNotFound {
+    public UnitCell(DocumentFragment f, LookupTable table)
+      throws ElementNotFound
+    {
         List<LatticeAtom> atoms = new ArrayList<LatticeAtom>();
-        V = Double.parseDouble(n.getAttributes().getNamedItem("V").getNodeValue());
-        for(Node n2: XMLUtil.getNamedChildElements(n,"atom")) {
+        V = f.getAttrDoubleNotNull("V");
+        for(DocumentFragment f2: f.getMulti("atom")) {
             int Z;
             double occupation;
             Atom atom;
-            Z = Integer.parseInt(n2.getAttributes().getNamedItem("Z").getNodeValue());
-            occupation = Double.parseDouble(n2.getAttributes().getNamedItem("occupation").getNodeValue());
+            Z = f2.getAttrIntNotNull("Z");
+            occupation = f2.getAttrDoubleNotNull("occupation");
             atom = table.lookup(Z);
-            for(Node n3: XMLUtil.getNamedChildElements(n2,"pos")) {
-                double x,y,z;
-                if(n3.getNodeName().equals("pos") && n3.getNodeType() == Node.ELEMENT_NODE)
-                    atoms.add(new LatticeAtom(atom, occupation, new AtomicPosition(n3)));
+            for(DocumentFragment f3: f2.getMulti("pos")) {
+                atoms.add(new LatticeAtom(atom, occupation,
+                                          new AtomicPosition(f3)));
             }
         }
         this.atoms = Collections.unmodifiableList(atoms);
     }
-    public Element export(Document doc) {
-        Element unitcell;
-        unitcell = doc.createElement("unitcell");
-        unitcell.setAttribute("V",""+this.V);
-        for(LatticeAtom latticeatom: atoms) {
-            Element atom = doc.createElement("atom");
-            atom.setAttribute("Z",""+latticeatom.atom.getZ());
-            atom.setAttribute("occupation",""+latticeatom.occupation);
-            atom.appendChild(latticeatom.pos.export(doc));
-            unitcell.appendChild(atom);
+    public void toXMLRow(DocumentFragment f) {
+        f.setAttrDouble("V", this.V);
+        for (LatticeAtom latticeatom: atoms) {
+            DocumentFragment atom = f.add("atom");
+            atom.setAttrInt("Z", latticeatom.atom.getZ());
+            atom.setAttrDouble("occupation", latticeatom.occupation);
+            atom.setRow("pos", latticeatom.pos);
         }
-        return unitcell;
     }
 };

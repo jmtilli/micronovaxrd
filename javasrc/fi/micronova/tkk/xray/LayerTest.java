@@ -1,10 +1,10 @@
 package fi.micronova.tkk.xray;
 import java.awt.*;
-import org.w3c.dom.*;
 import java.io.*;
 import fi.micronova.tkk.xray.util.*;
 import fi.micronova.tkk.xray.xrdmodel.*;
 import fi.micronova.tkk.xray.octif.*;
+import fi.iki.jmtilli.javaxmlfrag.*;
 
 
 public class LayerTest {
@@ -22,8 +22,9 @@ public class LayerTest {
             }
             LookupTable table = SFTables.defaultLookup();
             MatDB db = new MatDB(new File("matdb.xml"),table);
-            Material si = MaterialImportDispatcher.doImport(XMLUtil.parse(new FileInputStream(new File("Silicon-400.xml"))).getDocumentElement(),table);
-            LayerStack layers = new LayerStack(XMLUtil.parse(new FileInputStream(new File("layers.xml"))).getDocumentElement(),table);
+            Material si = MaterialImportDispatcher.doImport(
+                DocumentFragmentHandler.parseWhole(new FileInputStream(new File("Silicon-400.xml"))),table);
+            LayerStack layers = new LayerStack(DocumentFragmentHandler.parseWhole(new FileInputStream(new File("layers.xml"))),table);
 
             new LayerDialog((Frame)null, layers.getElementAt(0), db, layers.getLambda()).call();
 
@@ -42,9 +43,9 @@ public class LayerTest {
             System.out.println("];");
             */
 
-            Document doc = XMLUtil.newDocument();
-            doc.appendChild(layers.export(doc));
-            XMLUtil.unparse(doc, System.out);
+            DocumentFragment doc = new DocumentFragment("model");
+            layers.toXMLRow(doc);
+            doc.unparse(XMLDocumentType.WHOLE, System.out);
         }
         catch(Throwable ex) {
             ex.printStackTrace();

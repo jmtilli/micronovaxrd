@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.List;
 import fi.micronova.tkk.xray.xrdmodel.*;
 import fi.micronova.tkk.xray.util.*;
+import fi.iki.jmtilli.javaxmlfrag.*;
 
 
 
@@ -187,7 +188,7 @@ public class MixtureDialog extends JDialog {
     public static void main(String[] args) {
         try {
             LookupTable lookup = SFTables.defaultLookup();
-            Mixture m = new Mixture(XMLUtil.parse(new FileInputStream("test.xml")).getDocumentElement(),lookup);
+            Mixture m = new Mixture(DocumentFragmentHandler.parseWhole(new FileInputStream("test.xml")), lookup);
             MatDB db = new MatDB(new File("matdb.xml"),lookup);
             MixtureDialog dlg = new MixtureDialog((Frame)null, m.materials, 1.54056e-10, db);
             m = dlg.call();

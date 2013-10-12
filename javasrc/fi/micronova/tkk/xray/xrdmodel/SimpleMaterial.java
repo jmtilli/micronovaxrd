@@ -2,13 +2,8 @@ package fi.micronova.tkk.xray.xrdmodel;
 import fi.micronova.tkk.xray.util.*;
 import java.io.*;
 import java.util.*;
-import javax.xml.parsers.*;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
-import org.w3c.dom.*;
-import org.xml.sax.SAXException;
 import fi.iki.jmtilli.javafastcomplex.Complex;
+import fi.iki.jmtilli.javaxmlfrag.*;
 
 /* immutable */
 public class SimpleMaterial implements Material {
@@ -176,47 +171,27 @@ public class SimpleMaterial implements Material {
         this.poisson = poisson;
         this.unitcell = unitcell;
     }
-    public SimpleMaterial(Node n, LookupTable table) throws ElementNotFound {
-        this.name = n.getAttributes().getNamedItem("name").getNodeValue();
-        this.xyspace = Double.parseDouble(n.getAttributes().getNamedItem("xy").getNodeValue());
-        this.zspace = Double.parseDouble(n.getAttributes().getNamedItem("z").getNodeValue());
-        this.poisson = Double.parseDouble(n.getAttributes().getNamedItem("poisson").getNodeValue());
-        this.comment = XMLUtil.getNamedChildElements(n,"comment").get(0).getTextContent();
-        this.reflection = new Miller(XMLUtil.getNamedChildElements(n,"refl").get(0));
-        this.unitcell = new UnitCell(XMLUtil.getNamedChildElements(n,"unitcell").get(0), table);
-
-        /*
-        for(Node n2 = n.getFirstChild(); n2 != null; n2 = n2.getNextSibling()) {
-            String n2name = n2.getNodeName();
-            if(n2.getNodeType() != Node.ELEMENT_NODE)
-                continue;
-            if(n2name.equals("comment")) {
-                this.comment = n2.getTextContent();
-            }
-            else if(n2name.equals("refl")) {
-                this.reflection = new Miller(n2);
-            }
-            else if(n2name.equals("unitcell")) {
-                unitcell = new UnitCell(n2,table);
-            }
-        }
-        */
+    public SimpleMaterial(DocumentFragment f, LookupTable table)
+      throws ElementNotFound
+    {
+        this.name = f.getAttrStringNotNull("name");
+        this.xyspace = f.getAttrDoubleNotNull("xy");
+        this.zspace = f.getAttrDoubleNotNull("z");
+        this.poisson = f.getAttrDoubleNotNull("poisson");
+        this.comment = f.getStringNotNull("comment");
+        this.reflection = new Miller(f.get("refl"));
+        this.unitcell = new UnitCell(f.get("unitcell"), table);
     }
-    public Element export(Document doc) {
-        Element mat,comment,refl,spacing;
-
-        mat = doc.createElement("mat");
-        mat.setAttribute("name",this.name);
-        mat.setAttribute("xy",""+xyspace);
-        mat.setAttribute("z",""+zspace);
-        mat.setAttribute("poisson",""+poisson);
-        //mat.appendChild(name = doc.createElement("name"));
-        //name.appendChild(doc.createTextNode(this.name));
-        mat.appendChild(comment = doc.createElement("comment"));
-        comment.appendChild(doc.createTextNode(this.comment));
-        mat.appendChild(reflection.export(doc,"refl"));
-        mat.appendChild(unitcell.export(doc));
-        return mat;
+    public DocumentFragment toXMLRow() {
+        DocumentFragment f = new DocumentFragment("mat");
+        f.setAttrString("name", this.name);
+        f.setAttrDouble("xy", xyspace);
+        f.setAttrDouble("z", zspace);
+        f.setAttrDouble("poisson", poisson);
+        f.setString("comment", this.comment);
+        f.setRow("refl", reflection);
+        f.setRow("unitcell", unitcell);
+        return f;
     }
 
 
@@ -226,51 +201,14 @@ public class SimpleMaterial implements Material {
         Material absmat;
         SimpleMaterial mat;
         try {
-            DocumentBuilderFactory bf;
-            DocumentBuilder b;
-            Document d;
-            TransformerFactory tf;
-            Transformer t;
+            DocumentFragment d;
             LookupTable tab = SFTables.defaultLookup();
 
-            bf = DocumentBuilderFactory.newInstance();
-            b = bf.newDocumentBuilder();
-            d = b.parse(new FileInputStream(new File(args[0])));
-            //mat = new SimpleMaterial(d.getDocumentElement(),new DummyLookupTable());
-            absmat = MaterialImportDispatcher.doImport(d.getDocumentElement(),tab);
+            d = DocumentFragmentHandler.parseWhole(new FileInputStream(new File(args[0])));
+            absmat = MaterialImportDispatcher.doImport(d,tab);
             mat = absmat.flatten();
             System.out.println(absmat.octaveRepr(1.54056e-10));
             System.out.println(mat.susc(1.54056e-10));
-            /*
-            System.out.println(mat.getName());
-            System.out.println(mat.getComment());
-            System.out.println(mat.getReflection().h);
-            System.out.println(mat.getXYSpace());
-            System.out.println(mat.getPoisson());
-            d = b.newDocument();
-            d.appendChild(mat.export(d));
-            tf = TransformerFactory.newInstance();
-            t = tf.newTransformer();
-            t.setOutputProperty(OutputKeys.INDENT, "yes");
-            t.transform(new DOMSource(d), new StreamResult(System.out));
-            */
-        }
-        catch(IOException ex) {
-            ex.printStackTrace();
-        }
-        catch(ParserConfigurationException ex) {
-            ex.printStackTrace();
-        }
-        /*
-        catch(TransformerConfigurationException ex) {
-            ex.printStackTrace();
-        }
-        catch(TransformerException ex) {
-            ex.printStackTrace();
-        }
-        */
-        catch(SAXException ex) {
-            ex.printStackTrace();
         }
         catch(Exception ex) {
             ex.printStackTrace();

@@ -4,11 +4,12 @@ import fi.micronova.tkk.xray.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.util.*;
-import org.w3c.dom.*;
 import java.io.*;
 import fi.iki.jmtilli.javafastcomplex.Complex;
 import fi.iki.jmtilli.javafastcomplex.ComplexBuffer;
+import fi.iki.jmtilli.javafastcomplex.ComplexNumber;
 import fi.iki.jmtilli.javafastcomplex.ComplexUtils;
+import fi.iki.jmtilli.javaxmlfrag.*;
 
 
 /** Layer model.
@@ -44,7 +45,7 @@ import fi.iki.jmtilli.javafastcomplex.ComplexUtils;
  *
  */
 
-public class LayerStack implements LayerListener, ValueListener {
+public class LayerStack implements LayerListener, ValueListener, XMLRowable {
     /* MAY CONTAIN DUPLICATES! */
     private ArrayList<Layer> layers;
 
@@ -438,26 +439,22 @@ public class LayerStack implements LayerListener, ValueListener {
         return false;
     }
 
-    /** XML export, TODO: modify to handle duplicate layers. */
-    public Element export(Document doc) {
-        Element model = doc.createElement("model");
-        Element layers = doc.createElement("layers");
-        //Element substrate = doc.createElement("substrate");
-        Element sumProp = doc.createElement("sum");
-        Element prodProp = doc.createElement("prod");
-        Element stdProp = doc.createElement("stddev");
-        Element offProp = doc.createElement("offset");
-
-        model.appendChild(layers);
-        //model.appendChild(substrate);
-        //substrate.appendChild(this.substrate.export(doc));
+    public void toXMLRow(DocumentFragment f)
+    {
+        DocumentFragment fl;
+        f.setAttrDouble("lambda", lambda);
+        f.set("sum").setRow("fitvalue", sum);
+        f.set("prod").setRow("fitvalue", prod);
+        f.set("stddev").setRow("fitvalue", stddev);
+        f.set("offset").setRow("fitvalue", offset);
+        fl = f.set("layers");
 
         if(!has_duplicates()) {
             for(Layer l: this.layers)
-                layers.appendChild(l.export(doc));
+                fl.add("layer", l);
         } else {
             int free_id = 0;
-            Element order = doc.createElement("order");
+            DocumentFragment order = f.add("order");
             Map<Layer,String> ids = new HashMap<Layer,String>();
             for(Layer l: this.layers) {
                 if(!ids.containsKey(l)) {
@@ -465,83 +462,65 @@ public class LayerStack implements LayerListener, ValueListener {
                 }
             }
             for(Layer l: ids.keySet()) {
-                Element layerElement = l.export(doc);
-                layerElement.setAttribute("id",ids.get(l));
-                layers.appendChild(layerElement);
+                DocumentFragment layer = fl.add("layer");
+                l.toXMLRow(layer);
+                layer.setAttr("id",ids.get(l));
             }
             for(Layer l: this.layers) {
-                Element layerRef = doc.createElement("layerref");
-                layerRef.setAttribute("layerid",ids.get(l));
-                order.appendChild(layerRef);
+                DocumentFragment layerRef = order.add("layerref");
+                layerRef.setAttr("layerid",ids.get(l));
             }
-            model.appendChild(order);
         }
-
-        model.setAttribute("lambda",""+lambda);
-        //model.setAttribute("stddev",""+stddev);
-        sumProp.appendChild(sum.export(doc));
-        prodProp.appendChild(prod.export(doc));
-        stdProp.appendChild(stddev.export(doc));
-        offProp.appendChild(offset.export(doc));
-        model.appendChild(sumProp);
-        model.appendChild(prodProp);
-        model.appendChild(stdProp);
-        model.appendChild(offProp);
-        return model;
     }
 
-    public LayerStack(Node n, LookupTable table) throws ElementNotFound, InvalidMixtureException {
-        Node layersNode = XMLUtil.getNamedChildElements(n,"layers").get(0);
-        //Node substrateNode = XMLUtil.getNamedChildElements(n,"substrate").get(0);
-        Node sumNode = XMLUtil.getNamedChildElements(n,"sum").get(0);
-        Node prodNode = XMLUtil.getNamedChildElements(n,"prod").get(0);
-        Node stdNode = null; /* not present in old files */
-        Node offNode = null; /* not present in old files */
-        List<Node> stdElements = XMLUtil.getNamedChildElements(n,"stddev");
-        List<Node> offElements = XMLUtil.getNamedChildElements(n,"offset");
-        if(!stdElements.isEmpty())
-            stdNode = stdElements.get(0);
-        if(!offElements.isEmpty())
-            offNode = offElements.get(0);
-        //Node substrateMat = XMLUtil.getChildElements(substrateNode).get(0);
-        this.table = table;
-        this.lambda = Double.parseDouble(n.getAttributes().getNamedItem("lambda").getNodeValue());
-        //this.stddev = Double.parseDouble(n.getAttributes().getNamedItem("stddev").getNodeValue());
-        if(stdNode != null)
-            this.stddev = new FitValue(XMLUtil.getNamedChildElements(stdNode,"fitvalue").get(0),false);
+    public LayerStack(DocumentFragment f, LookupTable table)
+      throws ElementNotFound, InvalidMixtureException
+    {
+        DocumentFragment layersNode = f.get("layers");
+        this.sum = new FitValue(f.get("sum").get("fitvalue"));
+        this.prod = new FitValue(f.get("prod").get("fitvalue"));
+        if (f.get("offset") != null)
+        {
+            this.offset = new FitValue(f.get("offset").get("fitvalue"));
+        }
         else
-            this.stddev = new FitValue(0,0,0,false,false);
-
-        if(offNode != null)
-            this.offset = new FitValue(XMLUtil.getNamedChildElements(offNode,"fitvalue").get(0));
-        else
+        {
             this.offset = new FitValue(-0.15*Math.PI/180,0,0.15*Math.PI/180,false);
+        }
+        if (f.get("stddev") != null)
+        {
+            this.stddev = new FitValue(f.get("stddev").get("fitvalue"),
+                                       false);
+        }
+        else
+        {
+            this.stddev = new FitValue(0,0,0,false,false);
+        }
+        this.table = table;
+        this.lambda = f.getAttrDoubleNotNull("lambda");
 
-        this.sum = new FitValue(XMLUtil.getNamedChildElements(sumNode,"fitvalue").get(0));
-        this.prod = new FitValue(XMLUtil.getNamedChildElements(prodNode,"fitvalue").get(0));
         this.sum.addValueListener(this);
         this.prod.addValueListener(this);
         this.stddev.addValueListener(this);
         this.offset.addValueListener(this);
-        //this.substrate = MaterialImportDispatcher.doImport(substrateMat,table);
         this.layers = new ArrayList<Layer>();
 
         Map<String,Layer> layersById = new HashMap<String,Layer>();
         List<Layer> order = new ArrayList<Layer>();
 
-        for(Node layerNode: XMLUtil.getNamedChildElements(layersNode,"layer")) {
+        for(DocumentFragment layerNode: layersNode.getMulti("layer")) {
             Layer l = new Layer(layerNode, table);
-            if(layerNode.getAttributes().getNamedItem("id") != null) {
-                String id = layerNode.getAttributes().getNamedItem("id").getNodeValue();
+            if(layerNode.getAttrStringObject("id") != null) {
+                String id = layerNode.getAttrStringNotNull("id");
                 layersById.put(id, l);
             }
             order.add(l);
         }
-        if(!XMLUtil.getNamedChildElements(n,"order").isEmpty()) {
-            Node orderNode = XMLUtil.getNamedChildElements(n,"order").get(0);
+        if (f.get("order") != null) {
+            DocumentFragment orderNode = f.get("order");
             order = new ArrayList<Layer>(); /* don't use the default order since the order is explicitly specified */
-            for(Node refNode: XMLUtil.getNamedChildElements(orderNode,"layerref")) {
-                String id = refNode.getAttributes().getNamedItem("layerid").getNodeValue();
+            for(DocumentFragment refNode: orderNode.getMulti("layerref")) {
+                String id = refNode.getAttrStringNotNull("layerid");
                 Layer l = layersById.get(id);
                 order.add(l);
             }

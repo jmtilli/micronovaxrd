@@ -3,7 +3,7 @@ import fi.micronova.tkk.xray.util.*;
 /* Layer */
 
 import java.util.*;
-import org.w3c.dom.*;
+import fi.iki.jmtilli.javaxmlfrag.*;
 
 
 
@@ -42,7 +42,7 @@ import org.w3c.dom.*;
  *
  */
 
-public class Layer implements ValueListener {
+public class Layer implements ValueListener, XMLRowable {
     private String name;
 
     /* the following FitValues are "owned" by this object and are never
@@ -98,51 +98,47 @@ public class Layer implements ValueListener {
         listeners.remove(listener);
     }
 
-    public Layer(Node n, LookupTable table) throws ElementNotFound, InvalidMixtureException {
+    public Layer(DocumentFragment frag, LookupTable table)
+      throws ElementNotFound, InvalidMixtureException
+    {
         List<Material> materials = new ArrayList<Material>();
-        this.name = n.getAttributes().getNamedItem("name").getNodeValue();
-        for(Node n2 = n.getFirstChild(); n2 != null; n2 = n2.getNextSibling()) {
-            if(n2.getNodeType() != Node.ELEMENT_NODE)
-                continue;
-            Material mat = MaterialImportDispatcher.doImport(n2,table);
+        this.name = frag.getAttrStringNotNull("name");
+        d = new FitValue(frag.get("d").get("fitvalue"));
+        p = new FitValue(frag.get("p").get("fitvalue"));
+        if (frag.get("r") != null)
+        {
+            r = new FitValue(frag.get("r").get("fitvalue"));
+        }
+        else
+        {
+            r = new FitValue(0,0,1,false);
+        }
+        for(DocumentFragment frag2: frag.getChildren()) {
+            Material mat = MaterialImportDispatcher.doImport(frag2, table);
             if(mat != null)
                 materials.add(mat);
         }
-        Node dNode = XMLUtil.getNamedChildElements(n,"d").get(0);
-        Node pNode = XMLUtil.getNamedChildElements(n,"p").get(0);
-        if(!XMLUtil.getNamedChildElements(n,"r").isEmpty()) {
-            Node rNode = XMLUtil.getNamedChildElements(n,"r").get(0);
-            r = new FitValue(XMLUtil.getNamedChildElements(rNode,"fitvalue").get(0));
-        } else {
-            r = new FitValue(0,0,1,false);
-        }
-        d = new FitValue(XMLUtil.getNamedChildElements(dNode,"fitvalue").get(0));
-        p = new FitValue(XMLUtil.getNamedChildElements(pNode,"fitvalue").get(0));
         d.addValueListener(this);
         p.addValueListener(this);
         r.addValueListener(this);
-        assert(materials.size() == 2);
+        if(materials.size() != 2)
+        {
+            throw new RuntimeException("must have 2 materials");
+        }
         mat1 = materials.get(0);
         mat2 = materials.get(1);
 
         mix(mat1, mat2, p);
     }
 
-    public Element export(Document doc) {
-        Element layerElement = doc.createElement("layer");
-        Element dprop = doc.createElement("d");
-        Element pprop = doc.createElement("p");
-        Element rprop = doc.createElement("r");
-        layerElement.setAttribute("name",name);
-        dprop.appendChild(d.export(doc));
-        pprop.appendChild(p.export(doc));
-        rprop.appendChild(r.export(doc));
-        layerElement.appendChild(dprop);
-        layerElement.appendChild(pprop);
-        layerElement.appendChild(rprop);
-        layerElement.appendChild(mat1.export(doc));
-        layerElement.appendChild(mat2.export(doc));
-        return layerElement;
+    public void toXMLRow(DocumentFragment f) {
+        f.setAttr("name", name);
+        f.set("d").setRow("fitvalue", d);
+        f.set("p").setRow("fitvalue", p);
+        f.set("r").setRow("fitvalue", r);
+        // NB: these may have the same tag name (mixture or mat):
+        f.add(mat1.toXMLRow());
+        f.add(mat2.toXMLRow());
     }
 
     /** This can be sent by a FitValue */

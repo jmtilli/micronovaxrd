@@ -1,7 +1,7 @@
 package fi.micronova.tkk.xray.xrdmodel;
-import org.w3c.dom.*;
+import fi.iki.jmtilli.javaxmlfrag.*;
 
-public class Miller {
+public class Miller implements XMLRowable {
     public final int h,k,l;
 
     public Miller() {
@@ -12,17 +12,15 @@ public class Miller {
         this.k = k;
         this.l = l;
     }
-    public Miller(Node n) {
-        h = Integer.parseInt(n.getAttributes().getNamedItem("h").getNodeValue());
-        k = Integer.parseInt(n.getAttributes().getNamedItem("k").getNodeValue());
-        l = Integer.parseInt(n.getAttributes().getNamedItem("l").getNodeValue());
+    public Miller(DocumentFragment frag) {
+        h = frag.getAttrIntNotNull("h");
+        k = frag.getAttrIntNotNull("k");
+        l = frag.getAttrIntNotNull("l");
     }
-    public Element export(Document doc, String nodeName) {
-        Element e = doc.createElement(nodeName);
-        e.setAttribute("h",""+this.h);
-        e.setAttribute("k",""+this.k);
-        e.setAttribute("l",""+this.l);
-        return e;
+    public void toXMLRow(DocumentFragment frag) {
+        frag.setAttrInt("h", this.h);
+        frag.setAttrInt("k", this.k);
+        frag.setAttrInt("l", this.l);
     }
     public boolean equals(Object o) {
         if(o == null)

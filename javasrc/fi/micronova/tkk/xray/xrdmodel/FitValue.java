@@ -3,7 +3,7 @@ package fi.micronova.tkk.xray.xrdmodel;
 
 
 import java.util.*;
-import org.w3c.dom.*;
+import fi.iki.jmtilli.javaxmlfrag.*;
 
 
 /* Not immutable! */
@@ -15,7 +15,7 @@ import org.w3c.dom.*;
  * and not thread safe.
  *
  */
-public class FitValue {
+public class FitValue implements XMLRowable {
     private double min, expected, max;
     private boolean enable; /* whether to fit the value or not */
     private final boolean supported; /* whether fitting is actually supported. not included in XML serialization */
@@ -59,21 +59,16 @@ public class FitValue {
         for(ValueListener listener: listeners)
             listener.valueChanged(ev);
     }
-    public FitValue(Node n) {
-        enable = Integer.parseInt(n.getAttributes().getNamedItem("enable").getNodeValue()) != 0;
-        min = Double.parseDouble(n.getAttributes().getNamedItem("min").getNodeValue());
-        expected = Double.parseDouble(n.getAttributes().getNamedItem("expected").getNodeValue());
-        max = Double.parseDouble(n.getAttributes().getNamedItem("max").getNodeValue());
-        supported = true;
+    public FitValue(DocumentFragment frag)
+    {
+        this(frag, true);
     }
-    public FitValue(Node n, boolean supported) {
-        min = Double.parseDouble(n.getAttributes().getNamedItem("min").getNodeValue());
-        expected = Double.parseDouble(n.getAttributes().getNamedItem("expected").getNodeValue());
-        max = Double.parseDouble(n.getAttributes().getNamedItem("max").getNodeValue());
-        if(supported)
-            enable = Integer.parseInt(n.getAttributes().getNamedItem("enable").getNodeValue()) != 0;
-        else
-            enable = false;
+    public FitValue(DocumentFragment frag, boolean supported)
+    {
+        min = frag.getAttrDoubleNotNull("min");
+        expected = frag.getAttrDoubleNotNull("expected");
+        max = frag.getAttrDoubleNotNull("max");
+        enable = frag.getAttrIntNotNull("enable") != 0;
         this.supported = supported;
     }
     public FitValue(double min, double expected, double max)
@@ -121,15 +116,12 @@ public class FitValue {
     public void deepCopyFrom(FitValue v2) {
         setValues(v2.min, v2.expected, v2.max, v2.enable);
     }
-    /** Make a fencodeable data structure of this object
-     */
-    public Element export(Document doc) {
-        Element fitValue = doc.createElement("fitvalue");
-        fitValue.setAttribute("min",""+min);
-        fitValue.setAttribute("expected",""+expected);
-        fitValue.setAttribute("max",""+max);
-        fitValue.setAttribute("enable",enable?"1":"0");
-        return fitValue;
+    public void toXMLRow(DocumentFragment f)
+    {
+        f.setAttrDouble("min", min);
+        f.setAttrDouble("expected", expected);
+        f.setAttrDouble("max", max);
+        f.setAttrInt("enable", enable?1:0);
     }
     public double getMin() { return this.min; };
     public double getMax() { return this.max; };

@@ -1,29 +1,28 @@
 package fi.micronova.tkk.xray.xrdmodel;
 import java.util.*;
-import org.w3c.dom.*;
+import fi.iki.jmtilli.javaxmlfrag.*;
 
-public class AtomicPosition {
+public class AtomicPosition implements XMLRowable {
     public final double x,y,z;
     public AtomicPosition(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
-    public AtomicPosition(Node n) {
-        x = Double.parseDouble(n.getAttributes().getNamedItem("x").getNodeValue());
-        y = Double.parseDouble(n.getAttributes().getNamedItem("y").getNodeValue());
-        z = Double.parseDouble(n.getAttributes().getNamedItem("z").getNodeValue());
+    public AtomicPosition(DocumentFragment frag)
+    {
+        x = frag.getAttrDoubleNotNull("x");
+        y = frag.getAttrDoubleNotNull("y");
+        z = frag.getAttrDoubleNotNull("z");
+    }
+    public void toXMLRow(DocumentFragment frag)
+    {
+        frag.setAttrDouble("x", this.x);
+        frag.setAttrDouble("y", this.y);
+        frag.setAttrDouble("z", this.z);
     }
     public double dot(Miller m) {
         return x*m.h + y*m.k + z*m.l;
-    }
-    public Element export(Document doc) {
-        Element pos;
-        pos = doc.createElement("pos");
-        pos.setAttribute("x",""+this.x);
-        pos.setAttribute("y",""+this.y);
-        pos.setAttribute("z",""+this.z);
-        return pos;
     }
     public boolean equals(Object o2) {
         if(o2 == null)

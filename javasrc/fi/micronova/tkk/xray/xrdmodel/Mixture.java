@@ -1,7 +1,7 @@
 package fi.micronova.tkk.xray.xrdmodel;
 import fi.micronova.tkk.xray.util.*;
 import java.util.*;
-import org.w3c.dom.*;
+import fi.iki.jmtilli.javaxmlfrag.*;
 
 /* immutable */
 public class Mixture implements Material {
@@ -12,16 +12,24 @@ public class Mixture implements Material {
             this.p = p;
             this.mat = mat;
         }
-        public Constituent(Node n, LookupTable table) throws ElementNotFound, InvalidMixtureException {
-            p = Double.parseDouble(n.getAttributes().getNamedItem("p").getNodeValue());
-            mat = MaterialImportDispatcher.doImport(XMLUtil.getChildElements(n).get(0),table);
+        public Constituent(DocumentFragment f, LookupTable table)
+          throws ElementNotFound, InvalidMixtureException
+        {
+            List<DocumentFragment> children = f.getNonTextChildren();
+            p = f.getAttrDoubleNotNull("p");
+            if (children.size() != 1)
+            {
+                throw new RuntimeException("children: " +
+                                           children.size() +
+                                           ", expected 1");
+            }
+            mat = MaterialImportDispatcher.doImport(children.get(0), table);
         }
-        public Element export(Document doc) {
-            Element c;
-            c = doc.createElement("constituent");
-            c.setAttribute("p",""+p);
-            c.appendChild(mat.export(doc));
-            return c;
+        public DocumentFragment toXMLRow() {
+            DocumentFragment frag = new DocumentFragment("constituent");
+            frag.setAttrDouble("p", p);
+            frag.add(mat.toXMLRow());
+            return frag;
         }
     };
     private static class SimpleConstituent {
@@ -55,10 +63,13 @@ public class Mixture implements Material {
         return "mixture";
     }
 
-    private static List<Constituent> doImport(Node n, LookupTable table) throws ElementNotFound, InvalidMixtureException {
+    private static List<Constituent> doImport(DocumentFragment f,
+                                              LookupTable table)
+      throws ElementNotFound, InvalidMixtureException
+    {
         List<Constituent> materials = new ArrayList<Constituent>();
-        for(Node n2: XMLUtil.getNamedChildElements(n,"constituent"))
-            materials.add(new Constituent(n2,table));
+        for(DocumentFragment f2: f.getMulti("constituent"))
+            materials.add(new Constituent(f2,table));
         return materials;
     }
 
@@ -96,15 +107,16 @@ public class Mixture implements Material {
         this.avgUlVolume = avgUlVolume;
     }
 
-    public Mixture(Node n, LookupTable table) throws ElementNotFound, InvalidMixtureException {
-        this(doImport(n, table));
+    public Mixture(DocumentFragment f, LookupTable table)
+      throws ElementNotFound, InvalidMixtureException
+    {
+        this(doImport(f, table));
     }
-    public Element export(Document doc) {
-        Element mix;
-        mix = doc.createElement("mixture");
+    public DocumentFragment toXMLRow() {
+        DocumentFragment frag = new DocumentFragment("mixture");
         for(Constituent c: materials)
-            mix.appendChild(c.export(doc));
-        return mix;
+            frag.add(c.toXMLRow());
+        return frag;
     }
 
     private List<SimpleConstituent> simpleList() {
