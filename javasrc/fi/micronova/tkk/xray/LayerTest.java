@@ -44,7 +44,7 @@ public class LayerTest {
             */
 
             DocumentFragment doc = new DocumentFragment("model");
-            layers.toXMLRow(doc);
+            doc.setThisRow(layers);
             doc.unparse(XMLDocumentType.WHOLE, System.out);
         }
         catch(Throwable ex) {

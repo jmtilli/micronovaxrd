@@ -151,10 +151,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             BufferedInputStream bs = new BufferedInputStream(fstr);
             DocumentFragment doc_frag =
                 DocumentFragmentHandler.parseWhole(bs);
-            if (!doc_frag.getTag().equals("model"))
-            {
-              throw new XMLException("root tag name is not model");
-            }
+            doc_frag.assertTag("model");
             LayerStack newLayers = new LayerStack(doc_frag, table);
             layers.deepCopyFrom(newLayers);
         }
@@ -1264,7 +1261,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                         */
 
                         DocumentFragment doc = new DocumentFragment("model");
-                        layers.toXMLRow(doc);
+                        doc.setThisRow(layers);
                         doc.unparse(XMLDocumentType.WHOLE, fstr);
                     }
                     catch(IOException ex) {

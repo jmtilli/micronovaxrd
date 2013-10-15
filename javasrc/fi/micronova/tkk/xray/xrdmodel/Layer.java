@@ -132,7 +132,7 @@ public class Layer implements ValueListener, XMLRowable {
     }
 
     public void toXMLRow(DocumentFragment f) {
-        f.setAttr("name", name);
+        f.setAttrString("name", name);
         f.set("d").setRow("fitvalue", d);
         f.set("p").setRow("fitvalue", p);
         f.set("r").setRow("fitvalue", r);

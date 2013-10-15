@@ -451,7 +451,7 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
 
         if(!has_duplicates()) {
             for(Layer l: this.layers)
-                fl.add("layer", l);
+                fl.add("layer").setThisRow(l);
         } else {
             int free_id = 0;
             DocumentFragment order = f.add("order");
@@ -463,12 +463,12 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
             }
             for(Layer l: ids.keySet()) {
                 DocumentFragment layer = fl.add("layer");
-                l.toXMLRow(layer);
-                layer.setAttr("id",ids.get(l));
+                layer.setThisRow(l);
+                layer.setAttrString("id",ids.get(l));
             }
             for(Layer l: this.layers) {
                 DocumentFragment layerRef = order.add("layerref");
-                layerRef.setAttr("layerid",ids.get(l));
+                layerRef.setAttrString("layerid",ids.get(l));
             }
         }
     }
