@@ -103,11 +103,11 @@ public class Layer implements ValueListener, XMLRowable {
     {
         List<Material> materials = new ArrayList<Material>();
         this.name = frag.getAttrStringNotNull("name");
-        d = new FitValue(frag.get("d").get("fitvalue"));
-        p = new FitValue(frag.get("p").get("fitvalue"));
+        d = new FitValue(frag.getNotNull("d").getNotNull("fitvalue"));
+        p = new FitValue(frag.getNotNull("p").getNotNull("fitvalue"));
         if (frag.get("r") != null)
         {
-            r = new FitValue(frag.get("r").get("fitvalue"));
+            r = new FitValue(frag.getNotNull("r").getNotNull("fitvalue"));
         }
         else
         {

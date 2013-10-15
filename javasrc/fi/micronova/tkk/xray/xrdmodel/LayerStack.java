@@ -476,12 +476,12 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
     public LayerStack(DocumentFragment f, LookupTable table)
       throws ElementNotFound, InvalidMixtureException
     {
-        DocumentFragment layersNode = f.get("layers");
-        this.sum = new FitValue(f.get("sum").get("fitvalue"));
-        this.prod = new FitValue(f.get("prod").get("fitvalue"));
+        DocumentFragment layersNode = f.getNotNull("layers");
+        this.sum = new FitValue(f.getNotNull("sum").getNotNull("fitvalue"));
+        this.prod = new FitValue(f.getNotNull("prod").getNotNull("fitvalue"));
         if (f.get("offset") != null)
         {
-            this.offset = new FitValue(f.get("offset").get("fitvalue"));
+            this.offset = new FitValue(f.getNotNull("offset").getNotNull("fitvalue"));
         }
         else
         {
@@ -489,7 +489,7 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
         }
         if (f.get("stddev") != null)
         {
-            this.stddev = new FitValue(f.get("stddev").get("fitvalue"),
+            this.stddev = new FitValue(f.getNotNull("stddev").getNotNull("fitvalue"),
                                        false);
         }
         else
@@ -517,7 +517,7 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
             order.add(l);
         }
         if (f.get("order") != null) {
-            DocumentFragment orderNode = f.get("order");
+            DocumentFragment orderNode = f.getNotNull("order");
             order = new ArrayList<Layer>(); /* don't use the default order since the order is explicitly specified */
             for(DocumentFragment refNode: orderNode.getMulti("layerref")) {
                 String id = refNode.getAttrStringNotNull("layerid");
