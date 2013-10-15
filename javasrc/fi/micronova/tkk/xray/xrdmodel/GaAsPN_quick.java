@@ -79,7 +79,7 @@ public class GaAsPN_quick {
                                     new FitValue(0,30,100), // d
                                     new FitValue(0,0.007,1), // p
                                     new FitValue(0,0,1), // r
-                                    GaAs, GaAs);
+                                    GaAsP, GaAsN);
       final double lambda = 1.54056e-10;
       final LayerStack stack = new LayerStack(lambda, tab);
       final double[] theta = new double[2000];
