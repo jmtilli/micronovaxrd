@@ -604,36 +604,14 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         b = new JButton("Optics...");
         b.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
+                int i = layeredList.getSelectedIndex();
                 int[] i2 = layeredList.getSelectedIndices();
-                for(int i: i2) {
-                    Layer l = layers.getElementAt(i);
-                    double xyspace = layers.getElementAt(layers.getSize()-1).calcXYSpace(0);
-                    for (int j=layers.getSize()-2; j>=i; j--)
-                    {
-                        xyspace = layers.getElementAt(j).calcXYSpace(xyspace);
-                    }
-                    SimpleMaterial sm0 = l.getSimpleMaterial(0);
-                    SimpleMaterial sm = sm0.getStrainedMaterial(xyspace);
-                    try {
-                        Susceptibilities susc = sm.susc(layers.getLambda());
-                        Susceptibilities susc0 = sm0.susc(layers.getLambda());
-                        System.out.println("susc = " + susc); // FIXME replace with dialog
-                        System.out.println("susc0 = " + susc0); // FIXME replace with dialog
-                        System.out.println("xyspace = " + sm.getXYSpace() + " m");
-                        System.out.println("xyspace0 = " + sm0.getXYSpace() + " m");
-                        System.out.println("zspace = " + sm.getZSpace() + " m");
-                        System.out.println("zspace0 = " + sm0.getZSpace() + " m");
-                        System.out.println("poisson = " + sm.getPoisson());
-                        System.out.println("reflection = " + sm.getReflection());
-                        System.out.println("bragg = " +
-                                               180/Math.PI
-                                             * Math.asin(  layers.getLambda()
-                                                         / (2*sm.getZSpace())) + " degrees");
-                    }
-                    catch(UnsupportedWavelength ex)
-                    {
-                        JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    }
+                if(i < 0 || i >= layers.getSize() || i2.length != 1)
+                    JOptionPane.showMessageDialog(null, "Can't display optical information", "Error", JOptionPane.ERROR_MESSAGE);
+                else {
+                    InfoDialog d = new InfoDialog(thisFrame);
+                    d.call(layers, i);
+                    d.dispose();
                 }
             }
         });
