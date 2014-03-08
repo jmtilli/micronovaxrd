@@ -15,7 +15,7 @@ import fi.micronova.tkk.xray.xrdmodel.*;
 /* A dialog for layer settings */
 public class MaterialDialog extends JDialog {
     private double lambda;
-    private JComboBox materials;
+    private JComboBox<SimpleMaterial> materials;
     private SimpleMaterial mat;
 
     public MaterialDialog(Frame f, SimpleMaterial oldMat, MatDB db, final double lambda)
@@ -31,7 +31,7 @@ public class MaterialDialog extends JDialog {
 
     private void init(SimpleMaterial oldMat, MatDB db, final double lambda)
     {
-        materials = new JComboBox(new Vector<SimpleMaterial>(db.materials));
+        materials = new JComboBox<SimpleMaterial>(new Vector<SimpleMaterial>(db.materials));
         materials.setSelectedItem(oldMat);
 
         this.lambda = lambda;

@@ -172,7 +172,7 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
         l.addLayerListener(this);
     }
 
-    public final ListModel listModel = new ListModel() {
+    public final ListModel<String> listModel = new ListModel<String>() {
         public void addListDataListener(ListDataListener l) {
             listListeners.add(l);
         }
@@ -190,7 +190,7 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
          *
          * The caching could be implemented in getNumbering.
          * */
-        public Object getElementAt(int i) {
+        public String getElementAt(int i) {
             Map<Layer,Integer> numbering = getNumbering();
             Layer l = layers.get(i);
             int j = numbering.get(l);

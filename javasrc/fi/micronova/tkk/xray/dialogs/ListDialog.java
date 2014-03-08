@@ -24,7 +24,7 @@ public class ListDialog extends JDialog {
     }
     private void init(Collection<?> data) {
         Container dialog;
-        JList list;
+        JList<Object> list;
         JScrollPane scrollPane;
         Dimension d;
 
@@ -32,7 +32,7 @@ public class ListDialog extends JDialog {
 
         dialog.setLayout(new BorderLayout());
 
-        list = new JList(new Vector<Object>(data));
+        list = new JList<Object>(new Vector<Object>(data));
         scrollPane = new JScrollPane(list);
 
         d = scrollPane.getPreferredSize();

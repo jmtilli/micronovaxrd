@@ -107,7 +107,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
     private static final double Cu_K_alpha = 1.5405620e-10; /* This is the default wavelength */
     private Image green, yellow, red;
     private LayerStack layers, emptyLayers;
-    private JList layeredList;
+    private JList<String> layeredList;
     private double dbMin = -5, dbMax = 50;
 
     private enum PlotStyle {LIN, LOG, SQRT};
@@ -405,7 +405,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         emptyLayers = new LayerStack(Cu_K_alpha, table);
         layers = emptyLayers.deepCopy();
 
-        layeredList = new JList(layers.listModel);
+        layeredList = new JList<String>(layers.listModel);
         final XRDApp thisFrame = this;
 
         /* TODO ScrollbarUpdater */
@@ -795,7 +795,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
         GridBagConstraints c = new GridBagConstraints();
         JPanel fitSouth = new JPanel();
-        JList fitList = new JList(fitLayers.listModel);
+        JList<String> fitList = new JList<String>(fitLayers.listModel);
         JScrollPane fitListPane = new JScrollPane(fitList);
         fitListPane.setPreferredSize(new Dimension(400,150));
 
@@ -827,8 +827,8 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         final SpinnerNumberModel firstAngleModel = new SpinnerNumberModel(0,0,90,0.01);
         final SpinnerNumberModel lastAngleModel = new SpinnerNumberModel(90,0,90,0.01);
         final SpinnerNumberModel thresholdModel = new SpinnerNumberModel(20,-500,500,0.1);
-        final JComboBox algoBox = new JComboBox(Algorithm.values());
-        final JComboBox funcBox = new JComboBox(FitnessFunction.values());
+        final JComboBox<Algorithm> algoBox = new JComboBox<Algorithm>(Algorithm.values());
+        final JComboBox<FitnessFunction> funcBox = new JComboBox<FitnessFunction>(FitnessFunction.values());
         /*
         final JCheckBox nonlinBox = new JCheckBox("Nonlinear fitness space estimation");
         nonlinBox.setSelected(true);
