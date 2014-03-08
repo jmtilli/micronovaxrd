@@ -33,17 +33,12 @@ import fi.iki.jmtilli.javaxmlfrag.*;
  *   - material info: wavelength, reflection(?), Bragg's angle, chi0, chih, chihinv, xyspace, zspace, poisson
  * - documentation (Javadoc, XRRD, short introduction for programmers & users)
  * - testing (both regression and real-life)
- * - performance (eg. Complex number class optimization and Matlab code optimization. DE in Java?)
+ * - performance (DE in Java?)
  */
 
 /* TODO list:
  * - better debug information for red light
  * - better lambda checking (eg. when adding new layers or modifying previous layers)
- *
- * testing:
- * - test this software works with Matlab
- *   + assert must be included
- *   + feval must be used instead of normal function calls
  *
  * coding style:
  * - change public listeners to inner classes
@@ -58,11 +53,9 @@ import fi.iki.jmtilli.javaxmlfrag.*;
  * ensuring we get correct results:
  * - regression testing: ensure there are no differences between Octave and Java code
  * - verify that the same sign convention is used by Bartels et al
- * - rewrite Complex number class to use better formulas [and write a complex
- *   buffer class for better efficiency]
  *
  * other things worth doing:
- * - code DE in Java so that we don't need Matlab or Octave anymore
+ * - code DE in Java so that we don't need Octave anymore
  *
  *
  */
@@ -118,25 +111,9 @@ public class XRDApp extends JFrame implements ChooserWrapper {
     /* There are two ways to load mfiles to Octave. The first is to embed them in
      * the .jar file and list them here. The second is to have the files in the
      * working directory (that is, the directory with the jar file and octave_path.txt).
-     * Matlab supports only the second method, so we'll use that.
+     * We'll use the second method.
      */
     private static final String[] mfiles = {};
-/*
-    private static final String[] mfiles = { "GS.m", "calculate_electron_density.m",
-        "hsdistr.m", "randommatrix.m", "LocalSearch.m",
-        "calculate_mass_density.m", "hsdistr_ordered.m",
-        "randomsearch.m", "RotateVectors.m", "computeHessian.m",
-        "index.m", "removeRepeatedPoints.m", "RouletteWheel.m",
-        "computeNabla.m", "limit2bound.m", "twoPXover.m", "SAmutate.m",
-        "crop.m", "lookuptable2.m", "uonerand.m",
-        "StochasticOrthogonalSelection.m", "cyclingTwoPXover.m",
-        "mdwXover.m", "urandomsearch.m", "XRRimport.m", "fir.m",
-        "mix.m", "weightedXover.m", "apply_odd_filter.m",
-        "fitnessfunction.m", "myrandperm.m", "wmix.m",
-        "gaussian_filter.m", "octave-cell2mat.m", "xrrCurve.m",
-        "calculate_beta_coeff.m", "halfXover.m", "onerand.m",
-        "xrrGA.m"};
-        */
 
 
 
@@ -248,19 +225,12 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
 
 
-    /** Start an Octave or Matlab instance.
+    /** Start an Octave instance.
      *
      * <p>
      *
      * We try to read a file named 'octave_path.txt'. If it is found, we try to
-     * start Octave using the command in that file. If not, we try to start
-     * Matlab using the default command. On windows, Matlab can't be started
-     * with another command than the default command (which is stored in
-     * the registry during Matlab installation). On Unix systems, it would be
-     * possible to start Matlab using another command than the default command
-     * ('matlab'), but on the other hand, it's easy to write a shell script
-     * named 'matlab' to start it so I didn't bother adding the option to
-     * adjust the command to start Matlab.
+     * start Octave using the command in that file.
      */
     public static Oct startOctave() throws OctException {
         Oct oct;
@@ -285,29 +255,10 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         }
 
         if(path == null) {
-            try {
-                boolean debug = new File("matlab_debug.txt").exists();
-                /* Matlab */
-                oct = new OctMatlab(debug);
-                /* not supported by Matlab */
-                for(String mfile: mfiles) {
-                    throw new OctException("Function definitions on stdin not supported by Matlab");
-                }
-                oct.sync();
-            }
-            catch(OctException ex) {
-                throw new OctException(
-                        "\n\nCan't start Matlab.\n\n"+
-                        "Since a file named octave_path.txt didn't exist or was empty,\n"+
-                        "Matlab is used instead of Octave. Matlab is started with the\n"+
-                        "default command. On Unix systems, it's 'matlab'. On Windows,\n"+
-                        "the default command is stored in registry automatically during\n"+
-                        "Matlab installation. If you use Unix, ensure that Matlab starts\n"+
-                        "properly with the command 'matlab'. If you use Windows, try\n"+
-                        "reinstalling Matlab.\n\n"+
-                        "The error message was:\n\n"+
-                        ex.getMessage());
-            }
+            throw new OctException(
+                    "\n\nCan't start Octave.\n\n"+
+                    "Since a file named octave_path.txt didn't exist or was empty,\n"+
+                    "Octave cannot be started.\n");
         } else {
             try {
                 oct = new OctOctave(path);
@@ -324,9 +275,8 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             catch(OctException ex) {
                 throw new OctException(
                         "\n\nCan't start Octave.\n\n"+
-                        "Since a file named octave_path.txt wasn't empty Octave is used,\n"+
-                        "instead of Matlab. Octave is started with the command in\n"+
-                        "octave_path.txt, which is currently:\n\n"+
+                        "Since a file named octave_path.txt wasn't empty Octave is started,\n"+
+                        "with the command in octave_path.txt, which is currently:\n\n"+
                         path+"\n\n"+
                         "On Unix systems, the command should be generally 'octave -q'.\n"+
                         "On Windows systems, Octave installation is more difficult.\n"+
@@ -429,13 +379,9 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                     return;
                 alreadyRun = true;
                 JOptionPane.showMessageDialog(null,
-                    "There was an error with Octave/Matlab.\nPlease save your layer model and restart the program.\n\n"+
-                    "If you are using Matlab, try creating a text file named matlab_debug.txt.\n"+
-                    "If this file exists, Matlab keeps a log of its commands in the file matcmds.txt,\n"+
-                    "which allows you to find out the exact cause of the error.\n"+
-                    "Keeping the log slows down Matlab considerably so it should be used only when necessary.\n\n"+
-                    "If you are using Octave, this log is always saved to octcmds.txt.",
-                    "Octave/Matlab error", JOptionPane.ERROR_MESSAGE);
+                    "There was an error with Octave.\nPlease save your layer model and restart the program.\n\n"+
+                    "The log of commands is saved to octcmds.txt.",
+                    "Octave error", JOptionPane.ERROR_MESSAGE);
             }
         };
 
