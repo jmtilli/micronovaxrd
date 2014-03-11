@@ -97,6 +97,7 @@
     <!-- <javac srcdir="${src}" destdir="${build}"/> -->
     <!-- <javac srcdir="." destdir="." /> -->
     <javac srcdir="${src}" debug="on" source="1.5">
+			  <compilerarg value="-Xlint:unchecked"/>
         <classpath refid="classpath"/>
     </javac>
   </target>
