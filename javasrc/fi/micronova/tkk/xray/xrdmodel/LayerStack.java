@@ -71,7 +71,7 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
       double[] result = new double[3+3*layers.size()];
       result[0] = prod.getValueForFitting(type);
       result[1] = sum.getValueForFitting(type);
-      result[2] = prod.getValueForFitting(type);
+      result[2] = offset.getValueForFitting(type);
       for (int i = 0; i < layers.size(); i++)
       {
         Layer l = layers.get(i);
@@ -92,7 +92,7 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
       }
       this.prod.setExpected(values[0]);
       this.sum.setExpected(values[1]);
-      this.prod.setExpected(values[2]);
+      this.offset.setExpected(values[2]);
       /*
          If there are duplicate layers, the last value takes precedence.
        */
