@@ -140,6 +140,46 @@ public class GraphData {
         }
     }
 
+    public GraphData crop(double firstAngle, double lastAngle)
+    {
+        double[] alpha_0, meas = null, simul = null;
+        int count = 0;
+        for (double alpha_0_i: this.alpha_0)
+        {
+            if (alpha_0_i >= firstAngle && alpha_0_i <= lastAngle)
+            {
+                count++;
+            }
+        }
+        alpha_0 = new double[count];
+        if (this.meas != null)
+        {
+            meas = new double[count];
+        }
+        if (this.simul != null)
+        {
+            simul = new double[count];
+        }
+        count = 0;
+        for (int i = 0; i < this.alpha_0.length; i++)
+        {
+            if (this.alpha_0[i] >= firstAngle && this.alpha_0[i] <= lastAngle)
+            {
+                alpha_0[count] = this.alpha_0[i];
+                if (this.meas != null)
+                {
+                    meas[count] = this.meas[i];
+                }
+                if (this.simul != null)
+                {
+                    simul[count] = this.simul[i];
+                }
+                count++;
+            }
+        }
+        return new GraphData(alpha_0, meas, simul);
+    }
+
     /** Makes a simulated copy of GraphData in a linear format.
      *
      * This method is thread-safe. Alpha_0 and meas are copied from this

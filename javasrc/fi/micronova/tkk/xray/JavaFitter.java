@@ -38,7 +38,6 @@ public class JavaFitter implements FitterInterface {
     private LayerTask endTask;
     private LayerTask plotTask;
     private Runnable errTask;
-    private GraphData data;
     private Algorithm algo;
     private volatile boolean closing = false;
     private int iterations;
@@ -95,7 +94,7 @@ public class JavaFitter implements FitterInterface {
         }
         stack = stack.deepCopy();
         data = data.convertToLinear();
-        this.data = data;
+        data = data.crop(firstAngle, lastAngle);
         this.green = green;
         this.yellow = yellow;
         this.light = light;
