@@ -76,7 +76,7 @@ public class GaAsPN_slow {
                                         new FitValue(0,0,0),
                                         GaAs, GaAs);
       final Layer layer = new Layer("",
-                                    new FitValue(0,30,100), // d
+                                    new FitValue(0,30e-9,100e-9), // d
                                     new FitValue(0,0.007,1), // p
                                     new FitValue(0,0,1), // r
                                     GaAsP, GaAsN);
