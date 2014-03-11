@@ -90,7 +90,7 @@ import fi.iki.jmtilli.javaxmlfrag.*;
 
 public class XRDApp extends JFrame implements ChooserWrapper {
     private File chooserDirectory = null;
-    private Fitter f = null;
+    private FitterInterface f = null;
     private String measPath = null; /* Path of imported measurement file */
     private final GraphData data;
 
@@ -811,10 +811,21 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                             fitLayers.deepCopyFrom(s);
                         }
                     };
-                    f = new Fitter(fitLight, oct, data, endTask, plotTask, errTask2, fitLayers,
-                                   (Integer)popSizeModel.getNumber(), (Integer)iterationsModel.getNumber(),
-                                   (Double)firstAngleModel.getNumber(), (Double)lastAngleModel.getNumber(),
-                                   green, yellow, (Algorithm)algoBox.getSelectedItem(), (FitnessFunction)funcBox.getSelectedItem(), (Double)thresholdModel.getNumber(), (Integer)pModel.getNumber());//, nonlinBox.isSelected());
+                    Algorithm algo = (Algorithm)algoBox.getSelectedItem();
+                    if (algo.isJava)
+                    {
+                        f = new JavaFitter(fitLight, data, endTask, plotTask, errTask2, fitLayers,
+                                           (Integer)popSizeModel.getNumber(), (Integer)iterationsModel.getNumber(),
+                                           (Double)firstAngleModel.getNumber(), (Double)lastAngleModel.getNumber(),
+                                           green, yellow, algo, (FitnessFunction)funcBox.getSelectedItem(), (Double)thresholdModel.getNumber(), (Integer)pModel.getNumber());//, nonlinBox.isSelected());
+                    }
+                    else
+                    {
+                        f = new Fitter(fitLight, oct, data, endTask, plotTask, errTask2, fitLayers,
+                                       (Integer)popSizeModel.getNumber(), (Integer)iterationsModel.getNumber(),
+                                       (Double)firstAngleModel.getNumber(), (Double)lastAngleModel.getNumber(),
+                                       green, yellow, algo, (FitnessFunction)funcBox.getSelectedItem(), (Double)thresholdModel.getNumber(), (Integer)pModel.getNumber());//, nonlinBox.isSelected());
+                    }
                     startFitButton.setEnabled(false);
                     stopFitButton.setEnabled(true);
                     stopFitButton.addActionListener(new ActionListener() {

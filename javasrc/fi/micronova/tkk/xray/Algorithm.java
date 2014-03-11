@@ -17,17 +17,21 @@ public enum Algorithm {
     PCAGA("PCAGA","PCAGA",false),
     CGA("CGA","CGA",false),
     */
-    DE("DE","DE",true),
-    CovDE("CovDE","CovDE",true);
+    JavaDE("JavaDE","JavaDE",true,true),
+    JavaCovDE("JavaCovDE","JavaCovDE",true,true),
+    DE("DE","DE",true,false),
+    CovDE("CovDE","CovDE",true,false);
 
     /** Octave name */
     public final String octName;
     public final boolean isDE;
+    public final boolean isJava;
     private final String name;
-    Algorithm(String octName, String name, boolean isDE) {
+    Algorithm(String octName, String name, boolean isDE, boolean isJava) {
         this.octName = octName;
         this.name = name;
         this.isDE = isDE;
+        this.isJava = isJava;
     }
     public String toString() {
         return name;
