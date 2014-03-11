@@ -21,6 +21,33 @@ public class FitValue implements XMLRowable {
     private final boolean supported; /* whether fitting is actually supported. not included in XML serialization */
     private final List<ValueListener> listeners = new ArrayList<ValueListener>();
 
+    public static enum FitValueType {
+      MIN, EXPECTED, MAX
+    };
+
+    public double getValue(FitValueType type)
+    {
+      if (type == null)
+      {
+        throw new NullPointerException();
+      }
+      switch (type)
+      {
+        case MIN:
+          return min;
+        case EXPECTED:
+          return expected;
+        case MAX:
+          return max;
+        default:
+          throw new Error("not reached");
+      }
+    }
+    public double getValueForFitting(FitValueType type)
+    {
+      return getValue(enable ? type : FitValueType.EXPECTED);
+    }
+
     public boolean equals(Object o)
     {
       FitValue that;

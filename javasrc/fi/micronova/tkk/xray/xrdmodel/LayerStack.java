@@ -66,6 +66,45 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
 
     private LookupTable table;
 
+    public double[] getFitValuesForFitting(FitValue.FitValueType type)
+    {
+      double[] result = new double[3+3*layers.size()];
+      result[0] = prod.getValueForFitting(type);
+      result[1] = sum.getValueForFitting(type);
+      result[2] = prod.getValueForFitting(type);
+      for (int i = 0; i < layers.size(); i++)
+      {
+        Layer l = layers.get(i);
+        result[3+0*layers.size()+i] =
+          l.getThickness().getValueForFitting(type);
+        result[3+1*layers.size()+i] =
+          l.getComposition().getValueForFitting(type);
+        result[3+2*layers.size()+i] =
+          l.getRelaxation().getValueForFitting(type);
+      }
+      return result;
+    }
+    public void setFitValues(double[] values)
+    {
+      if (values.length != 3+3*layers.size())
+      {
+        throw new IllegalArgumentException();
+      }
+      this.prod.setExpected(values[0]);
+      this.sum.setExpected(values[1]);
+      this.prod.setExpected(values[2]);
+      /*
+         If there are duplicate layers, the last value takes precedence.
+       */
+      for (int i = 0; i < layers.size(); i++)
+      {
+        Layer l = layers.get(i);
+        l.getThickness().setExpected(values[3+0*layers.size()+i]);
+        l.getComposition().setExpected(values[3+1*layers.size()+i]);
+        l.getRelaxation().setExpected(values[3+2*layers.size()+i]);
+      }
+    }
+
     public boolean equals(Object o)
     {
       LayerStack that;
