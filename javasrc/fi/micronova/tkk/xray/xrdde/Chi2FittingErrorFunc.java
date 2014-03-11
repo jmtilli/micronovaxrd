@@ -1,13 +1,7 @@
 package fi.micronova.tkk.xray.xrdde;
 public class Chi2FittingErrorFunc implements FittingErrorFunc {
-  private int p;
-  public Chi2FittingErrorFunc(int p)
+  public Chi2FittingErrorFunc()
   {
-    if (p <= 0)
-    {
-      throw new IllegalArgumentException();
-    }
-    this.p = p;
   }
   public double getError(double[] meas, double[] simul)
   {
@@ -33,7 +27,7 @@ public class Chi2FittingErrorFunc implements FittingErrorFunc {
     /*
        chi2fitnessfunction([3,0],[1,2])
      */
-    Chi2FittingErrorFunc func = new Chi2FittingErrorFunc(2);
+    Chi2FittingErrorFunc func = new Chi2FittingErrorFunc();
     double[] meas = {1,2};
     double[] simul = {3,0};
     System.out.println(func.getError(meas, simul));
