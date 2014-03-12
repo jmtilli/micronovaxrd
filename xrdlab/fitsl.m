@@ -8,8 +8,8 @@ lambda = scan.lambda;
 matZ = matdb;
 
 % calculate material properties for the applied wavelength
-GaAs = Zmat2mat(matZ.GaAs, lambda);
-InAs = Zmat2mat(matZ.InAs, lambda);
+GaAs = Zmat2mat(matZ.GaAs_004, lambda);
+InAs = Zmat2mat(matZ.InAs_004, lambda);
 
 % fixed mixtures
 GaAs_mixture1 = {1.0, GaAs};

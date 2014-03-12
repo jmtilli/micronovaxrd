@@ -1,9 +1,9 @@
 lambda = 1.54056e-10;
 
 matZ = matdb;
-GaAs = Zmat2mat(matZ.GaAs,lambda);
-AlAs = Zmat2mat(matZ.AlAs,lambda);
-InAs = Zmat2mat(matZ.InAs,lambda);
+GaAs = Zmat2mat(matZ.GaAs_004,lambda);
+AlAs = Zmat2mat(matZ.AlAs_004,lambda);
+InAs = Zmat2mat(matZ.InAs_004,lambda);
 
 
 GaAs_mixture = {1.0, GaAs};

@@ -1,116 +1,183 @@
 function matZ = matdb()
-    matZ.Si.V = (5.4309e-10)^3;
-    matZ.Si.zspace = 1.3577e-10;
-    matZ.Si.xyspace = 5.4309e-10;
-    matZ.Si.poissonratio = 0.2800;
-    matZ.Si.Z = [14,14,14,14,14,14,14,14]';
-    matZ.Si.occupation = [1,1,1,1,1,1,1,1]';
-    matZ.Si.H = [4,0,0];
-    matZ.Si.r = [0.00000, 0.00000, 0.00000
-            0.50000, 0.50000, 0.00000
-            0.50000, 0.00000, 0.50000
-            0.00000, 0.50000, 0.50000
-            0.25000, 0.25000, 0.75000
-            0.25000, 0.75000, 0.25000
-            0.75000, 0.25000, 0.25000
-            0.75000, 0.75000, 0.75000];
+    matZ.Si_004.xyspace = 5.4309e-10;
+    matZ.Si_004.poissonratio = 0.2800;
+    matZ.Si_004.zspace = matZ.Si_004.xyspace/4;
+    matZ.Si_004.V = matZ.Si_004.xyspace^3;
+    matZ.Si_004.Z = zincblende_Z(14,14);
+    matZ.Si_004.occupation = zincblende_occupation(1);
+    matZ.Si_004.H = [4,0,0];
+    matZ.Si_004.r = zincblende_r();
 
-    matZ.Ge.V = (5.6578e-10)^3;
-    matZ.Ge.zspace = 1.4144e-10;
-    matZ.Ge.xyspace = 5.6578e-10;
-    matZ.Ge.poissonratio = 0.2730;
-    matZ.Ge.Z = [32,32,32,32,32,32,32,32]';
-    matZ.Ge.occupation = [1,1,1,1,1,1,1,1]';
-    matZ.Ge.H = [4,0,0];
-    matZ.Ge.r = [0.00000, 0.00000, 0.00000
-            0.50000, 0.50000, 0.00000
-            0.50000, 0.00000, 0.50000
-            0.00000, 0.50000, 0.50000
-            0.25000, 0.25000, 0.75000
-            0.25000, 0.75000, 0.25000
-            0.75000, 0.25000, 0.25000
-            0.75000, 0.75000, 0.75000];
+    matZ.Ge_004.xyspace = 5.6578e-10;
+    matZ.Ge_004.poissonratio = 0.2730;
+    matZ.Ge_004.zspace = matZ.Ge_004.xyspace/4;
+    matZ.Ge_004.V = matZ.Ge_004.xyspace^3;
+    matZ.Ge_004.Z = zincblende_Z(32,32);
+    matZ.Ge_004.occupation = zincblende_occupation(1);
+    matZ.Ge_004.H = [4,0,0];
+    matZ.Ge_004.r = zincblende_r();
 
+    matZ.GaAs_002.poissonratio = 0.3117;
+    matZ.GaAs_002.xyspace = 5.6532e-10;
+    matZ.GaAs_002.zspace = matZ.GaAs_002.xyspace/2;
+    matZ.GaAs_002.V = matZ.GaAs_002.xyspace^3;
+    matZ.GaAs_002.Z = zincblende_Z(31,33);
+    matZ.GaAs_002.occupation = zincblende_occupation(1);
+    matZ.GaAs_002.H = [2,0,0];
+    matZ.GaAs_002.r = zincblende_r();
 
-    matZ.GaAs.V = (5.6532e-10)^3;
-    matZ.GaAs.zspace = 1.4133e-10;
-    matZ.GaAs.xyspace = 5.6532e-10;
-    matZ.GaAs.poissonratio = 0.3117;
-    matZ.GaAs.Z = [31,31,31,31,33,33,33,33]';
-    matZ.GaAs.occupation = [1,1,1,1,1,1,1,1]';
-    matZ.GaAs.H = [4,0,0];
-    matZ.GaAs.r = [0.00000, 0.00000, 0.00000
-              0.50000, 0.50000, 0.00000
-              0.50000, 0.00000, 0.50000
-              0.00000, 0.50000, 0.50000
-              0.25000, 0.25000, 0.75000
-              0.25000, 0.75000, 0.25000
-              0.75000, 0.25000, 0.25000
-              0.75000, 0.75000, 0.75000];
+    matZ.GaAs_004.xyspace = 5.6532e-10;
+    matZ.GaAs_004.poissonratio = 0.3117;
+    matZ.GaAs_004.zspace = matZ.GaAs_004.xyspace/4;
+    matZ.GaAs_004.V = matZ.GaAs_004.xyspace^3;
+    matZ.GaAs_004.Z = zincblende_Z(31,33);
+    matZ.GaAs_004.occupation = zincblende_occupation(1);
+    matZ.GaAs_004.H = [4,0,0];
+    matZ.GaAs_004.r = zincblende_r();
 
-    matZ.GaP.V = (5.4505e-10)^3;
-    matZ.GaP.zspace = 5.4505e-10/4;
-    matZ.GaP.xyspace = 5.4505e-10;
-    matZ.GaP.poissonratio = 0.3070;
-    matZ.GaP.Z = [31,31,31,31,15,15,15,15]';
-    matZ.GaP.occupation = [1,1,1,1,1,1,1,1]';
-    matZ.GaP.H = [4,0,0];
-    matZ.GaP.r = [0.00000, 0.00000, 0.00000
-              0.50000, 0.50000, 0.00000
-              0.50000, 0.00000, 0.50000
-              0.00000, 0.50000, 0.50000
-              0.25000, 0.25000, 0.75000
-              0.25000, 0.75000, 0.25000
-              0.75000, 0.25000, 0.25000
-              0.75000, 0.75000, 0.75000];
+    matZ.GaP_002.xyspace = 5.4505e-10;
+    matZ.GaP_002.poissonratio = 0.3070;
+    matZ.GaP_002.zspace = matZ.GaP_002.xyspace/2;
+    matZ.GaP_002.V = matZ.GaP_002.xyspace^3;
+    matZ.GaP_002.Z = zincblende_Z(31,15);
+    matZ.GaP_002.occupation = zincblende_occupation(1);
+    matZ.GaP_002.H = [2,0,0];
+    matZ.GaP_002.r = zincblende_r();
 
-    matZ.InP.V = (5.8687e-10)^3;
-    matZ.InP.zspace = 5.8687e-10/4;
-    matZ.InP.xyspace = 5.8687e-10;
-    matZ.InP.poissonratio = 0.36;
-    matZ.InP.Z = [49,49,49,49,15,15,15,15]';
-    matZ.InP.occupation = [1,1,1,1,1,1,1,1]';
-    matZ.InP.H = [4,0,0];
-    matZ.InP.r = [0.00000, 0.00000, 0.00000
-              0.50000, 0.50000, 0.00000
-              0.50000, 0.00000, 0.50000
-              0.00000, 0.50000, 0.50000
-              0.25000, 0.25000, 0.75000
-              0.25000, 0.75000, 0.25000
-              0.75000, 0.25000, 0.25000
-              0.75000, 0.75000, 0.75000];
+    matZ.GaP_004.xyspace = 5.4505e-10;
+    matZ.GaP_004.poissonratio = 0.3070;
+    matZ.GaP_004.zspace = matZ.GaP_004.xyspace/4;
+    matZ.GaP_004.V = matZ.GaP_004.xyspace^3;
+    matZ.GaP_004.Z = zincblende_Z(31,15);
+    matZ.GaP_004.occupation = zincblende_occupation(1);
+    matZ.GaP_004.H = [4,0,0];
+    matZ.GaP_004.r = zincblende_r();
 
-    matZ.AlAs.V = (5.6618e-10)^3;
-    matZ.AlAs.zspace = 1.4155e-10;
-    matZ.AlAs.xyspace = 5.6618e-10;
-    matZ.AlAs.poissonratio = 0.3240;
-    matZ.AlAs.Z = [13,13,13,13,33,33,33,33]';
-    matZ.AlAs.occupation = [1,1,1,1,1,1,1,1]';
-    matZ.AlAs.H = [4,0,0];
-    matZ.AlAs.r = [0.00000, 0.00000, 0.00000
-              0.50000, 0.50000, 0.00000
-              0.50000, 0.00000, 0.50000
-              0.00000, 0.50000, 0.50000
-              0.25000, 0.25000, 0.75000
-              0.25000, 0.75000, 0.25000
-              0.75000, 0.25000, 0.25000
-              0.75000, 0.75000, 0.75000];
+    matZ.AlP_002.xyspace = 5.4580e-10;
+    matZ.AlP_002.poissonratio = 0.3330;
+    matZ.AlP_002.zspace = matZ.AlP_002.xyspace/2;
+    matZ.AlP_002.V = matZ.AlP_002.xyspace^3;
+    matZ.AlP_002.Z = zincblende_Z(13,15);
+    matZ.AlP_002.occupation = zincblende_occupation(1);
+    matZ.AlP_002.H = [2,0,0];
+    matZ.AlP_002.r = zincblende_r();
 
-    matZ.InAs.V = (6.0584e-10)^3;
-    matZ.InAs.zspace = 1.5146e-10;
-    matZ.InAs.xyspace = 6.0584e-10;
-    matZ.InAs.poissonratio = 0.3520;
-    matZ.InAs.occupation = [1,1,1,1,1,1,1,1]';
-    matZ.InAs.Z = [49,49,49,49,33,33,33,33]';
-    matZ.InAs.H = [4,0,0];
-    matZ.InAs.r = [0.00000, 0.00000, 0.00000
-              0.50000, 0.50000, 0.00000
-              0.50000, 0.00000, 0.50000
-              0.00000, 0.50000, 0.50000
-              0.25000, 0.25000, 0.75000
-              0.25000, 0.75000, 0.25000
-              0.75000, 0.25000, 0.25000
-              0.75000, 0.75000, 0.75000];
+    matZ.AlP_004.xyspace = 5.4580e-10;
+    matZ.AlP_004.poissonratio = 0.3330;
+    matZ.AlP_004.zspace = matZ.AlP_004.xyspace/4;
+    matZ.AlP_004.V = matZ.AlP_004.xyspace^3;
+    matZ.AlP_004.Z = zincblende_Z(13,15);
+    matZ.AlP_004.occupation = zincblende_occupation(1);
+    matZ.AlP_004.H = [4,0,0];
+    matZ.AlP_004.r = zincblende_r();
+
+    matZ.InP_002.xyspace = 5.8687e-10;
+    matZ.InP_002.poissonratio = 0.36;
+    matZ.InP_002.zspace = matZ.InP_002.xyspace/2;
+    matZ.InP_002.V = matZ.InP_002.xyspace^3;
+    matZ.InP_002.Z = zincblende_Z(49,15);
+    matZ.InP_002.occupation = zincblende_occupation(1);
+    matZ.InP_002.H = [2,0,0];
+    matZ.InP_002.r = zincblende_r();
+
+    matZ.InP_004.xyspace = 5.8687e-10;
+    matZ.InP_004.poissonratio = 0.36;
+    matZ.InP_004.zspace = matZ.InP_004.xyspace/4;
+    matZ.InP_004.V = matZ.InP_004.xyspace^3;
+    matZ.InP_004.Z = zincblende_Z(49,15);
+    matZ.InP_004.occupation = zincblende_occupation(1);
+    matZ.InP_004.H = [4,0,0];
+    matZ.InP_004.r = zincblende_r();
+
+    matZ.AlAs_002.xyspace = 5.6618e-10;
+    matZ.AlAs_002.poissonratio = 0.3240;
+    matZ.AlAs_002.zspace = matZ.AlAs_002.xyspace/2;
+    matZ.AlAs_002.V = matZ.AlAs_002.xyspace^3;
+    matZ.AlAs_002.Z = zincblende_Z(13,33);
+    matZ.AlAs_002.occupation = zincblende_occupation(1);
+    matZ.AlAs_002.H = [2,0,0];
+    matZ.AlAs_002.r = zincblende_r();
+
+    matZ.AlAs_004.xyspace = 5.6618e-10;
+    matZ.AlAs_004.poissonratio = 0.3240;
+    matZ.AlAs_004.zspace = matZ.AlAs_004.xyspace/4;
+    matZ.AlAs_004.V = matZ.AlAs_004.xyspace^3;
+    matZ.AlAs_004.Z = zincblende_Z(13,33);
+    matZ.AlAs_004.occupation = zincblende_occupation(1);
+    matZ.AlAs_004.H = [4,0,0];
+    matZ.AlAs_004.r = zincblende_r();
+
+    matZ.InAs_002.xyspace = 6.0584e-10;
+    matZ.InAs_002.poissonratio = 0.3520;
+    matZ.InAs_002.zspace = matZ.InAs_002.xyspace/2;
+    matZ.InAs_002.V = matZ.InAs_002.xyspace^3;
+    matZ.InAs_002.occupation = zincblende_occupation(1);
+    matZ.InAs_002.Z = zincblende_Z(49,33);
+    matZ.InAs_002.H = [2,0,0];
+    matZ.InAs_002.r = zincblende_r();
+
+    matZ.InAs_004.xyspace = 6.0584e-10;
+    matZ.InAs_004.poissonratio = 0.3520;
+    matZ.InAs_004.zspace = matZ.InAs_004.xyspace/4;
+    matZ.InAs_004.V = matZ.InAs_004.xyspace^3;
+    matZ.InAs_004.occupation = zincblende_occupation(1);
+    matZ.InAs_004.Z = zincblende_Z(49,33);
+    matZ.InAs_004.H = [4,0,0];
+    matZ.InAs_004.r = zincblende_r();
+
+    matZ.InSb_002.xyspace = 6.479e-10;
+    matZ.InSb_002.poissonratio = 0.35;
+    matZ.InSb_002.zspace = matZ.InSb_002.xyspace/2;
+    matZ.InSb_002.V = matZ.InSb_002.xyspace^3;
+    matZ.InSb_002.occupation = zincblende_occupation(1);
+    matZ.InSb_002.Z = zincblende_Z(49,51);
+    matZ.InSb_002.H = [2,0,0];
+    matZ.InSb_002.r = zincblende_r();
+
+    matZ.InSb_004.xyspace = 6.479e-10;
+    matZ.InSb_004.poissonratio = 0.35;
+    matZ.InSb_004.zspace = matZ.InSb_004.xyspace/4;
+    matZ.InSb_004.V = matZ.InSb_004.xyspace^3;
+    matZ.InSb_004.occupation = zincblende_occupation(1);
+    matZ.InSb_004.Z = zincblende_Z(49,51);
+    matZ.InSb_004.H = [4,0,0];
+    matZ.InSb_004.r = zincblende_r();
+
+    matZ.AlSb_002.xyspace = 6.1355e-10;
+    matZ.AlSb_002.poissonratio = 0.35;
+    matZ.AlSb_002.zspace = matZ.AlSb_002.xyspace/2;
+    matZ.AlSb_002.V = matZ.AlSb_002.xyspace^3;
+    matZ.AlSb_002.occupation = zincblende_occupation(1);
+    matZ.AlSb_002.Z = zincblende_Z(13,51);
+    matZ.AlSb_002.H = [2,0,0];
+    matZ.AlSb_002.r = zincblende_r();
+
+    matZ.AlSb_004.xyspace = 6.1355e-10;
+    matZ.AlSb_004.poissonratio = 0.35;
+    matZ.AlSb_004.zspace = matZ.AlSb_004.xyspace/4;
+    matZ.AlSb_004.V = matZ.AlSb_004.xyspace^3;
+    matZ.AlSb_004.occupation = zincblende_occupation(1);
+    matZ.AlSb_004.Z = zincblende_Z(13,51);
+    matZ.AlSb_004.H = [4,0,0];
+    matZ.AlSb_004.r = zincblende_r();
+
+    matZ.GaN_cubic_002.xyspace = 4.5034e-10;
+    matZ.GaN_cubic_002.poissonratio = 0.33;
+    matZ.GaN_cubic_002.zspace = matZ.GaN_cubic_002.xyspace/2;
+    matZ.GaN_cubic_002.V = matZ.GaN_cubic_002.xyspace^3;
+    matZ.GaN_cubic_002.occupation = zincblende_occupation(1);
+    matZ.GaN_cubic_002.Z = zincblende_Z(31,7);
+    matZ.GaN_cubic_002.H = [2,0,0];
+    matZ.GaN_cubic_002.r = zincblende_r();
+
+    matZ.GaN_cubic_004.xyspace = 4.5034e-10;
+    matZ.GaN_cubic_004.poissonratio = 0.33;
+    matZ.GaN_cubic_004.zspace = matZ.GaN_cubic_004.xyspace/4;
+    matZ.GaN_cubic_004.V = matZ.GaN_cubic_004.xyspace^3;
+    matZ.GaN_cubic_004.occupation = zincblende_occupation(1);
+    matZ.GaN_cubic_004.Z = zincblende_Z(31,7);
+    matZ.GaN_cubic_004.H = [4,0,0];
+    matZ.GaN_cubic_004.r = zincblende_r();
 
               % the only possible reflections are (222), (444), ...
     matZ.Al2O3.V = 84.89212148e-30;

@@ -2,8 +2,8 @@ lambda = 1.54056e-10;
 
 matZ = matdb;
 
-Si = Zmat2mat(matZ.Si, lambda);
-Ge = Zmat2mat(matZ.Ge, lambda);
+Si = Zmat2mat(matZ.Si_004, lambda);
+Ge = Zmat2mat(matZ.Ge_004, lambda);
 
 Si_mixture = {1.0, Si};
 Ge_mixture = {1.0, Ge};

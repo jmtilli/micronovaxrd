@@ -4,8 +4,8 @@ lambda=1.540562e-10;
 stddevrad=0;
 thetaoffset=0;
 
-GaAs = Zmat2mat(matZ.GaAs, lambda);
-AlAs = Zmat2mat(matZ.AlAs, lambda);
+GaAs = Zmat2mat(matZ.GaAs_004, lambda);
+AlAs = Zmat2mat(matZ.AlAs_004, lambda);
 
 GaAs_mixture1 = {1.0, GaAs};
 AlAs_mixture1 = {1.0, AlAs};
