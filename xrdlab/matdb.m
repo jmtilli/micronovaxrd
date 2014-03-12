@@ -217,4 +217,57 @@ function matZ = matdb()
                     .25000000  -.05640000   .55640000
                    -.25000000   .05640000  -.55640000];
 
+    matZ.AlN_0002.xyspace = 3.1106e-10;
+    matZ.AlN_0002.zspace = 2.48975e-10;
+    matZ.AlN_0002.V = 4.17258030417540e-29;
+    matZ.AlN_0002.poissonratio = 0.203;
+    matZ.AlN_0002.occupation = wurtzite_occupation(1);
+    matZ.AlN_0002.Z = wurtzite_Z(13,7);
+    matZ.AlN_0002.H = [0,0,2];
+    matZ.AlN_0002.r = wurtzite_r();
+
+    matZ.AlN_0004.xyspace = 3.1106e-10;
+    matZ.AlN_0004.zspace = 2.48975e-10/2;
+    matZ.AlN_0004.V = 4.17258030417540e-29;
+    matZ.AlN_0004.poissonratio = 0.203;
+    matZ.AlN_0004.occupation = wurtzite_occupation(1);
+    matZ.AlN_0004.Z = wurtzite_Z(13,7);
+    matZ.AlN_0004.H = [0,0,4];
+    matZ.AlN_0004.r = wurtzite_r();
+
+    matZ.GaN_0002.xyspace = 3.1896e-10;
+    matZ.GaN_0002.zspace = 2.59275e-10;
+    matZ.GaN_0002.V = 4.56871130048379e-29;
+    matZ.GaN_0002.poissonratio = 0.183;
+    matZ.GaN_0002.occupation = wurtzite_occupation(1);
+    matZ.GaN_0002.Z = wurtzite_Z(31,7);
+    matZ.GaN_0002.H = [0,0,2];
+    matZ.GaN_0002.r = wurtzite_r();
+
+    matZ.GaN_0004.xyspace = 3.1896e-10;
+    matZ.GaN_0004.zspace = 2.59275e-10/2;
+    matZ.GaN_0004.V = 4.56871130048379e-29;
+    matZ.GaN_0004.poissonratio = 0.183;
+    matZ.GaN_0004.occupation = wurtzite_occupation(1);
+    matZ.GaN_0004.Z = wurtzite_Z(31,7);
+    matZ.GaN_0004.H = [0,0,4];
+    matZ.GaN_0004.r = wurtzite_r();
+
+    matZ.InN_0002.xyspace = 3.5378e-10;
+    matZ.InN_0002.zspace = 2.85165e-10;
+    matZ.InN_0002.V = 6.18192032571193e-29;
+    matZ.InN_0002.poissonratio = 0.272;
+    matZ.InN_0002.occupation = wurtzite_occupation(1);
+    matZ.InN_0002.Z = wurtzite_Z(49,7);
+    matZ.InN_0002.H = [0,0,2];
+    matZ.InN_0002.r = wurtzite_r();
+
+    matZ.InN_0004.xyspace = 3.5378e-10;
+    matZ.InN_0004.zspace = 2.85165e-10/2;
+    matZ.InN_0004.V = 6.18192032571193e-29;
+    matZ.InN_0004.poissonratio = 0.272;
+    matZ.InN_0004.occupation = wurtzite_occupation(1);
+    matZ.InN_0004.Z = wurtzite_Z(49,7);
+    matZ.InN_0004.H = [0,0,4];
+    matZ.InN_0004.r = wurtzite_r();
 end
