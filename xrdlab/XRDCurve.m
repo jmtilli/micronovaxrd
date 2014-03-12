@@ -155,7 +155,7 @@ function R = XRDCurve(lambda, d, zspace, suscdata, theta, stddevrad, thetaoffset
 	% Wang et al
 	% XXX: don't know which chih and chihinv to use
 	R2 = abs(chih(1)/chihinv(1))*R1;
-	R = R1;
+	R = R2;
 
     % Instrument convolution
     stddevs = 4;
