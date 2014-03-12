@@ -7,7 +7,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import fi.micronova.tkk.xray.octif.*;
 import fi.micronova.tkk.xray.xrdmodel.*;
 import fi.micronova.tkk.xray.util.*;
 import fi.micronova.tkk.xray.chart.*;
@@ -85,13 +84,9 @@ public class JavaFitter implements FitterInterface {
      */
 
     public JavaFitter(JPlotArea light, GraphData data, LayerTask endTask, LayerTask plotTask, Runnable errTask, LayerStack stack, int popsize, int iterations, double firstAngle, double lastAngle, Image green, Image yellow,
-            Algorithm algo, FitnessFunction func, double dBthreshold, int pNorm) throws OctException, SimulationException
+            Algorithm algo, FitnessFunction func, double dBthreshold, int pNorm) throws SimulationException
     {
         FittingErrorFunc func2;
-        if (!algo.isJava)
-        {
-            throw new IllegalArgumentException();
-        }
         stack = stack.deepCopy();
         data = data.convertToLinear();
         data = data.crop(firstAngle, lastAngle);

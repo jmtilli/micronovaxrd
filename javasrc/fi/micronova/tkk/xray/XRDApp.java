@@ -13,7 +13,6 @@ import org.jfree.chart.plot.*;
 
 import fi.micronova.tkk.xray.chart.*;
 import fi.micronova.tkk.xray.chart.ChartFrame;
-import fi.micronova.tkk.xray.octif.*;
 import fi.micronova.tkk.xray.xrdmodel.*;
 import fi.micronova.tkk.xray.util.*;
 import fi.micronova.tkk.xray.measimport.*;
@@ -105,15 +104,6 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
     private enum PlotStyle {LIN, LOG, SQRT};
 
-
-
-
-    /* There are two ways to load mfiles to Octave. The first is to embed them in
-     * the .jar file and list them here. The second is to have the files in the
-     * working directory (that is, the directory with the jar file and octave_path.txt).
-     * We'll use the second method.
-     */
-    private static final String[] mfiles = {};
 
 
 
@@ -225,92 +215,6 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
 
 
-    /** Start an Octave instance.
-     *
-     * <p>
-     *
-     * We try to read a file named 'octave_path.txt'. If it is found, we try to
-     * start Octave using the command in that file.
-     */
-    public static Oct startOctave() throws OctException {
-        Oct oct;
-
-        String path = null;
-        try {
-            FileInputStream rawopf = new FileInputStream("octave_path.txt");
-            InputStreamReader rawopr = new InputStreamReader(rawopf);
-            BufferedReader octpathf = new BufferedReader(rawopr);
-            path = octpathf.readLine();
-            if(path == null)
-                throw new NullPointerException();
-        }
-        catch (IOException ex) {
-            //throw new OctException("Can't read octave_path.txt");
-            //return null;
-        }
-        catch (NullPointerException ex) {
-            //JOptionPane.showMessageDialog(null, "Can't read octave_path.txt", "Error", JOptionPane.ERROR_MESSAGE);
-            //throw new OctException("Can't read octave_path.txt");
-            //return null;
-        }
-
-        if(path == null) {
-            throw new OctException(
-                    "\n\nCan't start Octave.\n\n"+
-                    "Since a file named octave_path.txt didn't exist or was empty,\n"+
-                    "Octave cannot be started.\n");
-        } else {
-            try {
-                oct = new OctOctave(path);
-                for(String mfile: mfiles) {
-                    oct.source(oct.getClass().getClassLoader().getResourceAsStream(mfile));
-                    /*
-                    oct.sync();
-                    System.out.println(mfile);
-                    */
-                }
-                oct.sync();
-                /* Octave */
-            }
-            catch(OctException ex) {
-                throw new OctException(
-                        "\n\nCan't start Octave.\n\n"+
-                        "Since a file named octave_path.txt wasn't empty Octave is started,\n"+
-                        "with the command in octave_path.txt, which is currently:\n\n"+
-                        path+"\n\n"+
-                        "On Unix systems, the command should be generally 'octave -q'.\n"+
-                        "On Windows systems, Octave installation is more difficult.\n"+
-                        "Precise instructions to install Octave are in the file\n"+
-                        "README-1st.txt.\n"+
-                        "The error message was:\n\n"+
-                        ex.getMessage());
-            }
-        }
-
-
-        try {
-            if(oct == null) {
-                    oct = new OctOctave(path);
-
-                    for(String mfile: mfiles) {
-                        oct.source(oct.getClass().getClassLoader().getResourceAsStream(mfile));
-                        /*
-                        oct.sync();
-                        System.out.println(mfile);
-                        */
-                    }
-            }
-
-            oct.sync();
-        }
-        catch (OctException ex) {
-            throw new OctException("Can't start Octave: "+ex.getMessage());
-        }
-
-        return oct;
-    }
-
-
 
     private boolean construct() {
         /* Load atomic masses and scattering factors */
@@ -379,25 +283,11 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                     return;
                 alreadyRun = true;
                 JOptionPane.showMessageDialog(null,
-                    "There was an error with Octave.\nPlease save your layer model and restart the program.\n\n"+
-                    "The log of commands is saved to octcmds.txt.",
-                    "Octave error", JOptionPane.ERROR_MESSAGE);
+                    "There was an error with fitting.\nPlease save your layer model and restart the program.",
+                    "Fitting error", JOptionPane.ERROR_MESSAGE);
             }
         };
 
-
-
-        /* ------- octave ----------- */
-
-        Oct octtemp;
-        try {
-                octtemp = startOctave();
-        }
-        catch(OctException ex) {
-                JOptionPane.showMessageDialog(null, ex.getMessage(), "Octave error", JOptionPane.ERROR_MESSAGE);
-                return false;
-        }
-        final Oct oct = octtemp;
 
 
         /* Empty measurement */
@@ -716,7 +606,6 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         final JMenuItem fileLoadEmpty = new JMenuItem("Load empty measurement...");
         final JMenuItem fileLoadAscii = new JMenuItem("Load ASCII export...");
         final JMenuItem fileSwap = new JMenuItem("Use simulation as measurement");
-        final JMenuItem fileSwapOct = new JMenuItem("Use Octave simulation as measurement");
         final JMenuItem fileLayerExport = new JMenuItem("Export layers to text file...");
 
 
@@ -794,7 +683,6 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                             fileLoadAscii.setEnabled(true);
                             fileLoadEmpty.setEnabled(true);
                             fileSwap.setEnabled(true);
-                            fileSwapOct.setEnabled(true);
                             pfit.setAdditionalTitle("");
                         }
                     };
@@ -812,20 +700,10 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                         }
                     };
                     Algorithm algo = (Algorithm)algoBox.getSelectedItem();
-                    if (algo.isJava)
-                    {
-                        f = new JavaFitter(fitLight, data, endTask, plotTask, errTask2, fitLayers,
-                                           (Integer)popSizeModel.getNumber(), (Integer)iterationsModel.getNumber(),
-                                           (Double)firstAngleModel.getNumber(), (Double)lastAngleModel.getNumber(),
-                                           green, yellow, algo, (FitnessFunction)funcBox.getSelectedItem(), (Double)thresholdModel.getNumber(), (Integer)pModel.getNumber());//, nonlinBox.isSelected());
-                    }
-                    else
-                    {
-                        f = new Fitter(fitLight, oct, data, endTask, plotTask, errTask2, fitLayers,
+                    f = new JavaFitter(fitLight, data, endTask, plotTask, errTask2, fitLayers,
                                        (Integer)popSizeModel.getNumber(), (Integer)iterationsModel.getNumber(),
                                        (Double)firstAngleModel.getNumber(), (Double)lastAngleModel.getNumber(),
                                        green, yellow, algo, (FitnessFunction)funcBox.getSelectedItem(), (Double)thresholdModel.getNumber(), (Integer)pModel.getNumber());//, nonlinBox.isSelected());
-                    }
                     startFitButton.setEnabled(false);
                     stopFitButton.setEnabled(true);
                     stopFitButton.addActionListener(new ActionListener() {
@@ -840,10 +718,6 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                     fileLoadAscii.setEnabled(false); //
                     fileLoadEmpty.setEnabled(false); //
                     fileSwap.setEnabled(false);
-                    fileSwapOct.setEnabled(false);
-                }
-                catch(OctException ex) {
-                    errTask.run();
                 }
                 catch(NoDataPointsException ex) {
                     JOptionPane.showMessageDialog(null, "Too few data points in the fitting range", "Error", JOptionPane.ERROR_MESSAGE);
@@ -853,6 +727,9 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                 }
                 catch(SimulationException ex) {
                     JOptionPane.showMessageDialog(null, "Simulation exception", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                catch(Exception ex) {
+                    errTask.run();
                 }
             }
         });
@@ -964,14 +841,8 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             public void actionPerformed(ActionEvent e) {
                 p.close();
                 pfit.close();
-                try {
-                    if(f != null)
-                        f.close();
-                    synchronized(oct) {
-                        oct.exit();
-                    }
-                }
-                catch(InterruptedException ex) {}
+                if(f != null)
+                    f.close();
                 thisFrame.dispose();
             }
         };
@@ -1062,25 +933,6 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                 useSimulationAsMeasurement();
             }
         });
-        fileSwapOct.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ev) {
-                try {
-                    GraphData d;
-                    synchronized(oct) {
-                        d = data.octSimulate(layers, oct);
-                    }
-                    loadMeasurement(d.alpha_0, d.simul, new ImportOptions(1, 0, 90, 0, 90, true, false)); /* no normalization */
-                    measPath = null;
-                    setTitle("XRD");
-                }
-                catch(SimulationException ex) {
-                    JOptionPane.showMessageDialog(null, "Simulation error", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-                catch(OctException ex) {
-                    errTask.run();
-                }
-            }
-        });
 
         fileLoadAscii.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
@@ -1121,7 +973,6 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
         fileMenu.add(fileLoadAscii);
         fileMenu.add(fileSwap);
-        fileMenu.add(fileSwapOct);
         fileMenu.addSeparator();
 
 

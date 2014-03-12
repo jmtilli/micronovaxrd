@@ -2,7 +2,6 @@ package fi.micronova.tkk.xray;
 import java.util.*;
 import java.io.*;
 import fi.micronova.tkk.xray.xrdmodel.*;
-import fi.micronova.tkk.xray.octif.*;
 import org.uncommons.maths.random.PoissonGenerator;
 import org.uncommons.maths.number.NumberGenerator;
 
@@ -207,73 +206,6 @@ public class GraphData {
         return new GraphData(alpha_0, meas, simul);
     }
 
-    public GraphData octSimulate(LayerStack tempStack, Oct oct) throws SimulationException, OctException {
-        double[] alpha_0, alpha0rad, meas, simul;
-        GraphData linear = convertToLinear();
-
-        tempStack = tempStack.deepCopy();
-
-        alpha_0 = linear.alpha_0;
-        meas = linear.meas;
-
-        alpha0rad = new double[alpha_0.length];
-        for(int i=0; i<alpha0rad.length; i++) {
-            alpha0rad[i] = alpha_0[i]*Math.PI/180;
-        }
-
-        simul = tempStack.octXRDCurve(oct, alpha0rad);
-
-        return new GraphData(alpha_0, meas, simul);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /*
-    private GraphData octSimulate(Oct oct, LayerStack tempStack) throws OctException {
-        synchronized(oct) {
-            double stddevrad = tempStack.getStdDev()*Math.PI/180;
-            oct.putScalar("stddevrad",stddevrad);
-
-            String dCmd = "d = [0,";
-            String rCmd = "r = [";
-            String rhoECmd = "rho_e = [0,";
-            String betaCmd = "beta_coeff = [0,";
-            int size = tempStack.getSize();
-            for(int i=0; i<tempStack.getSize(); i++) {
-                Layer l = tempStack.getElementAt(i);
-                dCmd += l.getThickness().getExpected()+",";
-                rCmd += l.getRoughness().getExpected()+",";
-                rhoECmd += l.getDensity().getExpected()*l.getXRRCompound().getRhoEPerRho()+",";
-                betaCmd += l.getXRRCompound().getBetaPerDelta()+",";
-            }
-            dCmd += "]";
-            rCmd += "0]";
-            rhoECmd += "]";
-            betaCmd += "]";
-            oct.execute(dCmd);
-            oct.execute(rCmd);
-            oct.execute(rhoECmd);
-            oct.execute(betaCmd);
-            oct.putScalar("lambda",tempStack.getLambda());
-            oct.putRowVector("alpha_0",alpha_0);
-            oct.execute("simul = xrrCurve(alpha_0*pi/180, d, rho_e, beta_coeff, r, lambda, stddevrad)"); // convert to radians
-
-            return new GraphData(alpha_0, meas, oct.getMatrix("simul")[0]);
-        }
-    }
-    */
-
     /** regression testing */
     /*
     public static void main(String[] args) {
@@ -325,61 +257,6 @@ public class GraphData {
         }
         catch(ElementNotFound ex) {
             throw new RuntimeException("Doesn't get thrown");
-        }
-
-
-        Oct oct;
-       
-        try {
-	    oct = XRRApp.startOctave();
-            oct.sync();
-            for(int j=0; j<layerStacks.length; j++) {
-                for(int dummy=0; dummy<20; dummy++) {
-                    LayerStack layers = layerStacks[j];
-                    double stddevdeg = Math.random()*0.05;
-                    layers.setStdDev(stddevdeg);
-                    GraphData data2 = data.simulate(layers);
-                    GraphData data3 = data.octSimulate(oct, layers);
-                    assert(data2.alpha_0.length == data3.alpha_0.length);
-                    assert(data2.simul.length == data3.simul.length);
-                    assert(data2.simul.length == data3.alpha_0.length);
-                    for(int i=0; i<data2.simul.length; i++) {
-                        assert(data2.alpha_0[i] == data3.alpha_0[i]);
-                        assert(Math.abs(data2.simul[i] - data3.simul[i]) < 1e-6*(data2.simul[i] + data3.simul[i])/2);
-                    }
-                }
-            }
-
-            for(int i=0; i<layerStacks.length; i++) {
-                LayerStack layers = layerStacks[i];
-                for(int j=0; j<layers.getSize(); j++) {
-                    Layer l = layers.getElementAt(j);
-                    Map<String,Double> m = l.getComposition();
-                    String layerCmd = "layers = {{'Air',1};{";
-                    String rhoCmd = "rho = [0,";
-                    for(String element : m.keySet()) {
-                        layerCmd += "'" + oct.escape(element) + "',";
-                        layerCmd += m.get(element) + ",";
-                    }
-                    rhoCmd += l.getDensity().getExpected()*1e3; // g/m^3
-                    layerCmd += "}}"; 
-                    rhoCmd += "]";
-                    oct.execute(layerCmd);
-                    oct.execute(rhoCmd);
-                    oct.execute("rho_e = calculate_electron_density(layers, rho)");
-                    oct.execute("beta_coeff = calculate_beta_coeff(layers)");
-                    double rho1 = oct.getMatrix("rho_e")[0][1];
-                    double rho2 = l.getXRRCompound().getRhoEPerRho()*l.getDensity().getExpected();
-                    double beta1 = oct.getMatrix("beta_coeff")[0][1];
-                    double beta2 = l.getXRRCompound().getBetaPerDelta();
-                    assert(Math.abs(rho1 - rho2) < 1e-6*(rho1 + rho2)/2);
-                    assert(Math.abs(beta1 - beta2) < 1e-6*(beta1 + beta2)/2);
-                }
-            }
-        }
-        catch (OctException ex) {
-            System.out.println("Octave error");
-            return;
         }
     } */
 }

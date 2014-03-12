@@ -1,5 +1,4 @@
 package fi.micronova.tkk.xray.xrdmodel;
-import fi.micronova.tkk.xray.octif.*;
 import fi.micronova.tkk.xray.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -886,74 +885,6 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
     }
 
 
-
-    private static final double UNIT_TEST_TOL = 1e-5;
-    public void unitTestCase(Oct oct, double[] theta) throws SimulationException, OctException
-    {
-        double[] result1, result2;
-
-        result1 = octXRDCurve(oct, theta);
-        result2 = xrdCurve(theta);
-        assert(result1.length == theta.length);
-        assert(result2.length == theta.length);
-        for(int i=0; i<theta.length; i++) {
-            double avg = (result1[i] + result2[i])/2;
-            double diff = Math.abs(result1[i] - result2[i]);
-            assert(diff <= UNIT_TEST_TOL * avg);
-        }
-    }
-
-    /* TODO: rewrite */
-    public double[] octXRDCurve(Oct oct, double[] theta) throws SimulationException, OctException {
-        oct.putRowVector("theta",theta);
-        oct.putScalar("lambda",lambda);
-        oct.putScalar("stddevrad",stddev.getExpected());
-        oct.putScalar("offset",offset.getExpected());
-        oct.execute("suscdata = zeros("+layers.size()+",3)");
-        oct.execute("zspace = zeros("+layers.size()+",1)");
-        oct.execute("prod = "+getProd().getExpected());
-        oct.execute("sum = "+getSum().getExpected());
-        oct.execute("thetaoffset = "+getOffset().getExpected());
-        oct.execute("prod = 10 ^ (prod / 10)");
-        oct.execute("sum = 10 ^ (sum / 10)");
-        oct.execute("d = zeros("+layers.size()+",1)");
-        oct.putScalar("basexyspace",0); /* dummy */
-
-        for(int i=layers.size()-1; i>=0; i--) {
-            Layer layer = layers.get(i);
-            oct.execute("material1 = "+layer.getMat1().flatten().octaveRepr(lambda));
-            oct.execute("material2 = "+layer.getMat2().flatten().octaveRepr(lambda));
-            oct.execute("mixture1 = {1.0, material1}");
-            oct.execute("mixture2 = {1.0, material2}");
-            oct.execute("mixture.first = mixture1");
-            oct.execute("mixture.second = mixture2");
-            oct.execute("mixture.x = "+layer.getComposition().getExpected());
-            if(i==layers.size()-1)
-                oct.putScalar("rel",1);
-            else
-                oct.putScalar("rel",layer.getRelaxation().getExpected());
-            oct.putScalar("k",i+1);
-            oct.execute("d(k) = "+layer.getThickness().getExpected());
-            oct.execute("[suscdata(k,:),basexyspace,zspace(k)] = matsusc_relaxation(mixture, basexyspace, rel)");
-        }
-
-        /*
-        oct.execute("material1 = "+substrate.flatten().octaveRepr(lambda));
-        oct.execute("material2 = "+substrate.flatten().octaveRepr(lambda));
-        oct.execute("mixture1 = {1.0, material1}");
-        oct.execute("mixture2 = {1.0, material2}");
-        oct.execute("mixture.first = mixture1");
-        oct.execute("mixture.second = mixture2");
-        oct.execute("mixture.x = 0");
-        */
-
-        //oct.putScalar("k",layers.size()+1);
-        //oct.execute("d(k) = 0");
-        //oct.execute("[suscdata(k,:),xyspace(k),zspace(k)] = matsusc(mixture, 0)");
-        // suscdata, zspace, d
-        oct.execute("meas = XRDCurve(lambda, d, zspace, suscdata, theta, stddevrad, thetaoffset) * prod + sum");
-        return oct.getMatrix("meas")[0];
-    }
 
     public double[] xrdCurveFast(double[] theta) throws SimulationException {
 
