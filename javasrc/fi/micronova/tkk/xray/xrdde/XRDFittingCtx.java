@@ -11,7 +11,8 @@ public class XRDFittingCtx {
   private ExecutorService exec;
   private DECtx.CostFunc cost_func;
   private DECtx de_ctx;
-  public XRDFittingCtx(LayerStack new_s, GraphData new_gd, boolean cov_on,
+  public XRDFittingCtx(LayerStack new_s, GraphData new_gd,
+                       boolean cov_on, boolean traditional_recombination_on,
                        int npop, FittingErrorFunc new_func,
                        ExecutorService exec)
   {
@@ -32,7 +33,7 @@ public class XRDFittingCtx {
         this.s.getFitValuesForFitting(FitValue.FitValueType.MIN),
         this.s.getFitValuesForFitting(FitValue.FitValueType.MAX),
         this.s.getFitValuesForFitting(FitValue.FitValueType.EXPECTED),
-        cov_on, npop, exec);
+        cov_on, traditional_recombination_on, npop, exec);
   }
   public void iteration()
   {
@@ -149,7 +150,7 @@ public class XRDFittingCtx {
             new ThreadPoolExecutor(cpus, cpus,
                                    1, TimeUnit.SECONDS,
                                    new LinkedBlockingDeque<Runnable>());
-    XRDFittingCtx init = new XRDFittingCtx(stack, gd, true, 40,
+    XRDFittingCtx init = new XRDFittingCtx(stack, gd, true, true, 40,
                                            new LogFittingErrorFunc(2),
                                            exec);
     for (int i = 0; i < 100; i++)

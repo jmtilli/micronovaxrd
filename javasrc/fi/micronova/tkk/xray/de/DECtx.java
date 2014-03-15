@@ -7,11 +7,14 @@ public class DECtx {
     public double calculate(double[] p) throws Exception;
   };
   private double km;
+  private double kr;
   private double cr;
+  private double pm;
   private double lambda;
   private int cycle;
   private CostFunc func;
   private boolean cov_on;
+  private boolean traditional_recombination_on;
   private int nparam;
   private int npop;
   private double[] p_min;
@@ -171,13 +174,16 @@ public class DECtx {
   }
 
   public DECtx(CostFunc func, double[] p_min, double[] p_max,
-               double[] p, boolean cov_on, int npop,
-               ExecutorService executor_service)
+               double[] p, boolean cov_on, boolean traditional_recombination_on,
+               int npop, ExecutorService executor_service)
   {
     this.km = 0.7;
+    this.kr = 0.5*(this.km + 1); // recommended as a good first choice for kr
+    this.pm = 0.5;
     this.cr = 0.5;
     this.lambda = 1.0;
     this.cycle = 0;
+    this.traditional_recombination_on = traditional_recombination_on;
     this.func = func;
     this.cov_on = cov_on;
     this.npop = npop;
@@ -224,6 +230,7 @@ public class DECtx {
       double[] pa = pop[r.nextInt(npop)].p;
       double[] pb = pop[r.nextInt(npop)].p;
       double[] pc = pop[r.nextInt(npop)].p;
+      boolean mutate;
       mm[i] = new double[nparam];
       // calculate the individual to mutate
       for (int j=0; j<nparam; j++)
@@ -232,9 +239,27 @@ public class DECtx {
       }
       // mutate the best individual by sampled differences scaled
       // by the mutation constant
-      for (int j=0; j<nparam; j++)
+      if (traditional_recombination_on)
       {
-        mm[i][j] = mm[i][j] + km*(pa[j] - pb[j]);
+        mutate = true;
+      }
+      else
+      {
+        mutate = Math.random() < pm;
+      }
+      if (mutate)
+      {
+        for (int j=0; j<nparam; j++)
+        {
+          mm[i][j] = mm[i][j] + km*(pa[j] - pb[j]);
+        }
+      }
+      else
+      {
+        for (int j=0; j<nparam; j++)
+        {
+          mm[i][j] = mm[i][j] + kr*(pa[j] + pb[j] - 2*mm[i][j]);
+        }
       }
     }
     if (cov_on)
@@ -281,14 +306,30 @@ public class DECtx {
        Higher crossover constant means higher probability of getting a parameter
        from the mutated individual.
      */
-    for (int i=0; i<npop; i++)
+    if (traditional_recombination_on)
     {
-      double[] p = pop[i].p;
-      pop2[i] = new PopulationIndividual(p);
-      double[] p2 = pop2[i].p;
-      for (int j=0; j<nparam; j++)
+      for (int i=0; i<npop; i++)
       {
-        if (r.nextDouble() < cr)
+        double[] p = pop[i].p;
+        pop2[i] = new PopulationIndividual(p);
+        double[] p2 = pop2[i].p;
+        for (int j=0; j<nparam; j++)
+        {
+          if (r.nextDouble() < cr)
+          {
+            p2[j] = mm[i][j];
+          }
+        }
+      }
+    }
+    else
+    {
+      for (int i=0; i<npop; i++)
+      {
+        double[] p = pop[i].p;
+        pop2[i] = new PopulationIndividual(p);
+        double[] p2 = pop2[i].p;
+        for (int j=0; j<nparam; j++)
         {
           p2[j] = mm[i][j];
         }
@@ -401,7 +442,7 @@ public class DECtx {
         return p[0]*p[0] + p[1]*p[1];
       }
     };
-    DECtx ctx = new DECtx(func, p_min, p_max, p, true, 20, exec);
+    DECtx ctx = new DECtx(func, p_min, p_max, p, true, true, 20, exec);
     for (int i=0; i<100; i++)
     {
       ctx.iteration();
