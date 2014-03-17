@@ -6,7 +6,7 @@ import fi.micronova.tkk.xray.xrdmodel.*;
 
 public class SliderPanel extends JPanel {
     private final Layer l;
-    private final SingleScrollbarUpdater dUpdater, pUpdater, rUpdater;
+    private final SingleScrollbarUpdater dUpdater, pUpdater, rUpdater, whUpdater;
     public Layer getLayer() {
         return l;
     }
@@ -45,9 +45,11 @@ public class SliderPanel extends JPanel {
         dUpdater = new SingleScrollbarUpdater(l.getThickness(), "d (nm)", 1e9);
         pUpdater = new SingleScrollbarUpdater(l.getComposition(), "p", 1);
         rUpdater = new SingleScrollbarUpdater(l.getRelaxation(), "r", 1);
+        whUpdater = new SingleScrollbarUpdater(l.getSuscFactor(), "wh", 1);
         dUpdater.addToGridBag(this);
         pUpdater.addToGridBag(this);
         rUpdater.addToGridBag(this);
+        whUpdater.addToGridBag(this);
 
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -62,6 +64,7 @@ public class SliderPanel extends JPanel {
         dUpdater.cleanup();
         pUpdater.cleanup();
         rUpdater.cleanup();
+        whUpdater.cleanup();
         l.removeLayerListener(layerListener);
     }
 }

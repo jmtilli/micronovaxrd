@@ -48,6 +48,7 @@ public class Layer implements ValueListener, XMLRowable {
     /* the following FitValues are "owned" by this object and are never
      * actually changed (their new values are set by deepCopyFrom */
     private final FitValue d, p, r; /* thickness (in SI units), composition */
+    private final FitValue wh;
 
     private Material mat1, mat2;
     //private Mixture mixture; /* this must be changed whenever mat1 and mat2 are */
@@ -113,6 +114,14 @@ public class Layer implements ValueListener, XMLRowable {
         {
             r = new FitValue(0,0,1,false);
         }
+        if (frag.get("wh") != null)
+        {
+            wh = new FitValue(frag.getNotNull("wh").getNotNull("fitvalue"));
+        }
+        else
+        {
+            wh = new FitValue(0,1,1,false);
+        }
         for(DocumentFragment frag2: frag.getChildren()) {
             Material mat = MaterialImportDispatcher.doImport(frag2, table);
             if(mat != null)
@@ -136,6 +145,7 @@ public class Layer implements ValueListener, XMLRowable {
         f.set("d").setRow("fitvalue", d);
         f.set("p").setRow("fitvalue", p);
         f.set("r").setRow("fitvalue", r);
+        f.set("wh").setRow("fitvalue", wh);
         // NB: these may have the same tag name (mixture or mat):
         f.add(mat1.toXMLRow());
         f.add(mat2.toXMLRow());
@@ -147,14 +157,16 @@ public class Layer implements ValueListener, XMLRowable {
     };
 
     /* The mixture is a dummy parameter: it is used to distinguish between different constructors */
-    private Layer(String name, FitValue d, FitValue p, FitValue r, Material mat1, Material mat2, Mixture mixture) {
+    private Layer(String name, FitValue d, FitValue p, FitValue r, FitValue wh, Material mat1, Material mat2, Mixture mixture) {
         this.name = name;
         this.d = d.deepCopy();
         this.p = p.deepCopy();
         this.r = r.deepCopy();
+        this.wh = wh.deepCopy();
         this.d.addValueListener(this);
         this.p.addValueListener(this);
         this.r.addValueListener(this);
+        this.wh.addValueListener(this);
         this.mat1 = mat1;
         this.mat2 = mat2;
         //this.mixture = mixture;
@@ -167,12 +179,12 @@ public class Layer implements ValueListener, XMLRowable {
         return new Mixture(constituents);
     }
 
-    public Layer(String name, FitValue d, FitValue p, FitValue r, Material mat1, Material mat2) throws InvalidMixtureException {
-        this(name, d, p, r, mat1, mat2, mix(mat1, mat2, p));
+    public Layer(String name, FitValue d, FitValue p, FitValue r, FitValue wh, Material mat1, Material mat2) throws InvalidMixtureException {
+        this(name, d, p, r, wh, mat1, mat2, mix(mat1, mat2, p));
     }
 
     public Layer deepCopy() {
-        return new Layer(name, d.deepCopy(), p.deepCopy(), r.deepCopy(), mat1, mat2, null);
+        return new Layer(name, d.deepCopy(), p.deepCopy(), r.deepCopy(), wh.deepCopy(), mat1, mat2, null);
     }
 
     /** Changes the two compounds.
@@ -205,7 +217,7 @@ public class Layer implements ValueListener, XMLRowable {
     }
 
     /* set all values without having to send multiple events */
-    public void newValues(String name, FitValue d, FitValue p, FitValue r, Material mat1, Material mat2) throws InvalidMixtureException {
+    public void newValues(String name, FitValue d, FitValue p, FitValue r, FitValue wh, Material mat1, Material mat2) throws InvalidMixtureException {
         mix(mat1, mat2, p);
         this.mat1 = mat1;
         this.mat2 = mat2;
@@ -224,6 +236,9 @@ public class Layer implements ValueListener, XMLRowable {
         this.r.removeValueListener(this);
         this.r.deepCopyFrom(r);
         this.r.addValueListener(this);
+        this.wh.removeValueListener(this);
+        this.wh.deepCopyFrom(wh);
+        this.wh.addValueListener(this);
 
 
         signalEvent(null);
@@ -283,6 +298,23 @@ public class Layer implements ValueListener, XMLRowable {
         //signalEvent(null);
     };
 
+    /** Changes the FitValue object of susceptibility factor.
+     *
+     * <p>
+     *
+     * The susceptibility factor can also be changed by modifying the existing FitValue
+     * returned by getSuscFactor().
+     */
+    public void setSuscFactor(FitValue wh) {
+        /*
+        this.p.removeValueListener(this);
+        this.p = p;
+        p.addValueListener(this);
+        */
+        this.wh.deepCopyFrom(wh);
+        //signalEvent(null);
+    };
+
     public FitValue getRelaxation() {
         return r;
     }
@@ -297,6 +329,9 @@ public class Layer implements ValueListener, XMLRowable {
     }
     public FitValue getComposition() {
         return p;
+    }
+    public FitValue getSuscFactor() {
+        return wh;
     }
 
     public double calcXYSpace(double basexyspace) {
@@ -349,7 +384,8 @@ public class Layer implements ValueListener, XMLRowable {
         return this.name +
 	", d = " + String.format(Locale.US,"%.6g",this.d.getExpected()*1e9) + " nm " + (this.d.getEnabled() ? "(fit)" : "(no fit)") +
 	", p = " + String.format(Locale.US,"%.6g",this.p.getExpected()) + " " + (this.p.getEnabled() ? "(fit)" : "(no fit)") +
-	", r = " + String.format(Locale.US,"%.6g",this.r.getExpected()) + " " + (this.r.getEnabled() ? "(fit)" : "(no fit)");
+	", r = " + String.format(Locale.US,"%.6g",this.r.getExpected()) + " " + (this.r.getEnabled() ? "(fit)" : "(no fit)") +
+	", wh = " + String.format(Locale.US,"%.6g",this.wh.getExpected()) + " " + (this.wh.getEnabled() ? "(fit)" : "(no fit)");
     }
 
 };

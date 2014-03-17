@@ -126,11 +126,13 @@ public class XRDFittingCtx {
                                       new FitValue(0,0,0),
                                       new FitValue(0,0,0),
                                       new FitValue(0,0,0),
+                                      new FitValue(0,1,1, false),
                                       GaAs, GaAs);
     final Layer layer = new Layer("",
                                   new FitValue(0,30e-9,100e-9), // d
                                   new FitValue(0,0.007,1), // p
                                   new FitValue(0,0,0), // r
+                                  new FitValue(0,1,1, false), // wh
                                   GaAsP, GaAsN);
     final double lambda = 1.54056e-10;
     final LayerStack stack = new LayerStack(lambda, tab);

@@ -67,7 +67,7 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
 
     public double[] getFitValuesForFitting(FitValue.FitValueType type)
     {
-      double[] result = new double[3+3*layers.size()];
+      double[] result = new double[3+4*layers.size()];
       result[0] = prod.getValueForFitting(type);
       result[1] = sum.getValueForFitting(type);
       result[2] = offset.getValueForFitting(type);
@@ -80,12 +80,14 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
           l.getComposition().getValueForFitting(type);
         result[3+2*layers.size()+i] =
           l.getRelaxation().getValueForFitting(type);
+        result[3+3*layers.size()+i] =
+          l.getSuscFactor().getValueForFitting(type);
       }
       return result;
     }
     public void setFitValues(double[] values)
     {
-      if (values.length != 3+3*layers.size())
+      if (values.length != 3+4*layers.size())
       {
         throw new IllegalArgumentException();
       }
@@ -101,6 +103,7 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
         l.getThickness().setExpected(values[3+0*layers.size()+i]);
         l.getComposition().setExpected(values[3+1*layers.size()+i]);
         l.getRelaxation().setExpected(values[3+2*layers.size()+i]);
+        l.getSuscFactor().setExpected(values[3+3*layers.size()+i]);
       }
     }
 
@@ -885,6 +888,7 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
     }
 
 
+    private static final double SUSCFACTOR_MIN = 1e-7;
 
     public double[] xrdCurveFast(double[] theta) throws SimulationException {
 
@@ -939,10 +943,15 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
             Layer layer = layers.get(i);
             SimpleMaterial sm = layer.getSimpleMaterial(xyspace[i]);
             Susceptibilities susc = sm.suscFast(lambda);
+            double suscfactor = layer.getSuscFactor().getExpected();
+            if (suscfactor <= SUSCFACTOR_MIN)
+            {
+              suscfactor = SUSCFACTOR_MIN;
+            }
 
             chi_0_ar[i] = susc.chi_0;
-            chi_h_ar[i] = susc.chi_h;
-            chi_h_neg_ar[i] = susc.chi_h_neg;
+            chi_h_ar[i] = susc.chi_h.multiply(suscfactor);
+            chi_h_neg_ar[i] = susc.chi_h_neg.multiply(suscfactor);
             sin_theta_B_ar[i] = lambda/(2*sm.getZSpace());
 
             d_ar[i] = layer.getThickness().getExpected();
@@ -1173,10 +1182,15 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
             Layer layer = layers.get(i);
             SimpleMaterial sm = layer.getSimpleMaterial(xyspace[i]);
             Susceptibilities susc = sm.susc(lambda);
+            double suscfactor = layer.getSuscFactor().getExpected();
+            if (suscfactor <= SUSCFACTOR_MIN)
+            {
+              suscfactor = SUSCFACTOR_MIN;
+            }
 
             chi_0_ar[i] = susc.chi_0;
-            chi_h_ar[i] = susc.chi_h;
-            chi_h_neg_ar[i] = susc.chi_h_neg;
+            chi_h_ar[i] = susc.chi_h.multiply(suscfactor);
+            chi_h_neg_ar[i] = susc.chi_h_neg.multiply(suscfactor);
             sin_theta_B_ar[i] = lambda/(2*sm.getZSpace());
 
             d_ar[i] = layer.getThickness().getExpected();
@@ -1397,10 +1411,15 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
             Layer layer = layers.get(i);
             SimpleMaterial sm = layer.getSimpleMaterial(xyspace[i]);
             Susceptibilities susc = sm.susc(lambda);
+            double suscfactor = layer.getSuscFactor().getExpected();
+            if (suscfactor <= SUSCFACTOR_MIN)
+            {
+              suscfactor = SUSCFACTOR_MIN;
+            }
 
             chi_0_ar[i] = susc.chi_0;
-            chi_h_ar[i] = susc.chi_h;
-            chi_h_neg_ar[i] = susc.chi_h_neg;
+            chi_h_ar[i] = susc.chi_h.multiply(suscfactor);
+            chi_h_neg_ar[i] = susc.chi_h_neg.multiply(suscfactor);
             sin_theta_B_ar[i] = lambda/(2*sm.getZSpace());
 
             d_ar[i] = layer.getThickness().getExpected();

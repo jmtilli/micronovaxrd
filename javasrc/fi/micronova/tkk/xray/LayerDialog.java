@@ -13,8 +13,8 @@ import fi.micronova.tkk.xray.xrdmodel.*;
 /* A dialog for layer settings */
 public class LayerDialog extends JDialog {
     private boolean succesful;
-    private JTextField dmin, dval, dmax, pmin, pval, pmax, nameField, rmin, rval, rmax;
-    private JCheckBox dfit, pfit, rfit; /* fit enable checkboxes */
+    private JTextField dmin, dval, dmax, pmin, pval, pmax, nameField, rmin, rval, rmax, whmin, whval, whmax;
+    private JCheckBox dfit, pfit, rfit, whfit; /* fit enable checkboxes */
     private MaterialPanel mat1, mat2;
     private Layer layer;
 
@@ -115,6 +115,26 @@ public class LayerDialog extends JDialog {
         gridPanel.add(new JPanel(),c);
 
         c.gridwidth = 1;
+        gridPanel.add(new JLabel("susceptibility factor"),c);
+        gridPanel.add(new JLabel("min"),c);
+        whmin = new JTextField(String.format(Locale.US,"%.6g",l.getSuscFactor().getMin()),7);
+        whmin.setMinimumSize(whmin.getPreferredSize());
+        gridPanel.add(whmin,c);
+        gridPanel.add(new JLabel("value"),c);
+        whval = new JTextField(String.format(Locale.US,"%.6g",l.getSuscFactor().getExpected()),7);
+        whval.setMinimumSize(whval.getPreferredSize());
+        gridPanel.add(whval,c);
+        gridPanel.add(new JLabel("max"),c);
+        whmax = new JTextField(String.format(Locale.US,"%.6g",l.getSuscFactor().getMax()),7);
+        whmax.setMinimumSize(whmax.getPreferredSize());
+        gridPanel.add(whmax,c);
+        whfit = new JCheckBox("fit");
+        whfit.setSelected(l.getRelaxation().getEnabled());
+        gridPanel.add(whfit,c);
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        gridPanel.add(new JPanel(),c);
+
+        c.gridwidth = 1;
         gridPanel.add(new JLabel("material 1"),c);
         c.gridwidth = GridBagConstraints.REMAINDER;
         mat1 = new MaterialPanel(layer.getMat1(), lambda, db);
@@ -147,7 +167,7 @@ public class LayerDialog extends JDialog {
                     Material material1 = mat1.getMaterial();
                     Material material2 = mat2.getMaterial();
                     String name;
-                    FitValue d, p, r;
+                    FitValue d, p, r, wh;
 
 
                     d = new FitValue(Double.parseDouble(dmin.getText())/1e9,
@@ -162,9 +182,13 @@ public class LayerDialog extends JDialog {
                                      Double.parseDouble(rval.getText()),
                                      Double.parseDouble(rmax.getText()),
                                      rfit.isSelected());
+                    wh = new FitValue(Double.parseDouble(whmin.getText()),
+                                      Double.parseDouble(whval.getText()),
+                                      Double.parseDouble(whmax.getText()),
+                                      whfit.isSelected());
                     name = nameField.getText();
                     /* This must be first, otherwise cancel can return invalid data */
-                    layer.newValues(name, d, p, r, material1, material2);
+                    layer.newValues(name, d, p, r, wh, material1, material2);
                     succesful = true;
                     setVisible(false);
                 }

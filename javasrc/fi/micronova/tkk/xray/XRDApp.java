@@ -362,7 +362,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             public void actionPerformed(ActionEvent e) {
                 try {
                     Layer l;
-                    l = new Layer("New layer", new FitValue(0,50e-9,100e-9), new FitValue(0,0.5,1), new FitValue(0,0,1,false), db.materials.get(0), db.materials.get(0));
+                    l = new Layer("New layer", new FitValue(0,50e-9,100e-9), new FitValue(0,0.5,1), new FitValue(0,0,1,false), new FitValue(0,1,1,false), db.materials.get(0), db.materials.get(0));
                     LayerDialog d = new LayerDialog(thisFrame, l, db, layers.getLambda());
                     if(d.call()) {
                         layers.add(l, 0);
