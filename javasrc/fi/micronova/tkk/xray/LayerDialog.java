@@ -129,7 +129,7 @@ public class LayerDialog extends JDialog {
         whmax.setMinimumSize(whmax.getPreferredSize());
         gridPanel.add(whmax,c);
         whfit = new JCheckBox("fit");
-        whfit.setSelected(l.getRelaxation().getEnabled());
+        whfit.setSelected(l.getSuscFactor().getEnabled());
         gridPanel.add(whfit,c);
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridPanel.add(new JPanel(),c);
