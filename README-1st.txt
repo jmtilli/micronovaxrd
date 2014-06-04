@@ -93,11 +93,14 @@ adjust this file.
 
 IMPORTANT NOTE:
 
-Even though the program can be started by double-clicking xrd.jar, starting it
-this way limits the maximum memory allocation to 64 MB, which is not enough.
-Hitting the memory limit will result in unpredictable behavior. You should use
-run.bat or run.sh to start the program (run.bat is for Windows and run.sh for
-Unix-like operating systems).
+If you are running on a really old computer with either Java 1.5 or a gigabyte
+of memory or less, you should use run.bat (for Windows) or run.sh (for
+Unix-like operating systems) to start the program. Starting the program by
+double-clicking xrd.jar limits the maximum memory allocation to a value too
+small. Hitting the memory limit will result in unpredictable behavior. This
+note does not apply to modern computers with both a Java version greater than
+1.5 and 2 gigabytes of memory or more. With modern computers, you may start
+the program by double-clicking xrd.jar.
 
 
 
