@@ -131,6 +131,7 @@ public class Layer implements ValueListener, XMLRowable {
         d.addValueListener(this);
         p.addValueListener(this);
         r.addValueListener(this);
+        wh.addValueListener(this);
         if(materials.size() != 2)
         {
             throw new RuntimeException("must have 2 materials");
