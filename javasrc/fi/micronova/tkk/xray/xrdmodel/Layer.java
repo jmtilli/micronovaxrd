@@ -83,6 +83,7 @@ public class Layer implements ValueListener, XMLRowable {
           || !utilEquals(l1.d, l2.d)
           || !utilEquals(l1.p, l2.p)
           || !utilEquals(l1.r, l2.r)
+          || !utilEquals(l1.wh, l2.wh)
           || !utilEquals(l1.mat1, l2.mat1)
           || !utilEquals(l1.mat2, l2.mat2))
       {
