@@ -110,7 +110,6 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
     public boolean equals(Object o)
     {
       LayerStack that;
-      Map<Layer, Integer> this_numbering, that_numbering;
       if (this == o)
       {
         return true;
@@ -141,18 +140,14 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
       {
         return false;
       }
-      this_numbering = this.getNumbering();
-      that_numbering = that.getNumbering();
+      Map<FitValue,Integer> this_numbering = this.getFitValueNumbering();
+      Map<FitValue,Integer> that_numbering = that.getFitValueNumbering();
       for (int i = 0; i < this.layers.size(); i++)
       {
         Layer this_layer = this.layers.get(i);
         Layer that_layer = that.layers.get(i);
-        if (   this_numbering.get(this_layer).intValue()
-            != that_numbering.get(that_layer).intValue())
-        {
-          return false;
-        }
-        if (!Layer.layerDeepEquals(this_layer, that_layer))
+        if (!Layer.layerDeepEquals(this_layer, this_numbering,
+                                   that_layer, that_numbering))
         {
           return false;
         }
@@ -160,18 +155,44 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
       return true;
     }
 
-    /** Bijection between layers and the number of actual layers.
-     * However, it is stored in a map although it is a bijection, since
-     * it should be used only to get the layer number for a layer. */
-    private Map<Layer,Integer> getNumbering() {
-        Map<Layer,Integer> numbering = new HashMap<Layer,Integer>();
+    /**
+       Return link numbers for FitValues that are linked.
+
+       @return Link numbers for FitValues that are linked.
+     */
+    private Map<FitValue,Integer> getFitValueNumbering() {
+        Map<FitValue,Integer> counts = new HashMap<FitValue,Integer>();
+        Map<FitValue,Integer> links = new HashMap<FitValue,Integer>();
         int id = 0;
-        for(Layer l: layers) {
-            if(!numbering.containsKey(l)) {
-                numbering.put(l,id++);
+        for (Layer l: layers)
+        {
+            FitValue[] vals = {l.getThickness(), l.getComposition(),
+                               l.getRelaxation(), l.getSuscFactor()};
+            for (FitValue val: vals)
+            {
+                if (counts.containsKey(val))
+                {
+                    counts.put(val, counts.get(val)+1);
+                }
+                else
+                {
+                    counts.put(val, 1);
+                }
             }
         }
-        return Collections.unmodifiableMap(numbering);
+        for (Layer l: layers)
+        {
+            FitValue[] vals = {l.getThickness(), l.getComposition(),
+                               l.getRelaxation(), l.getSuscFactor()};
+            for (FitValue val: vals)
+            {
+                if (counts.get(val) > 1 && !links.containsKey(val))
+                {
+                    links.put(val, ++id);
+                }
+            }
+        }
+        return links;
     }
 
     /* Returns a copy of the list of layers. */
@@ -229,13 +250,12 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
         /* map from layers to integers in order to make references to
          * same layer distinguishable from identical different layers.
          *
-         * The caching could be implemented in getNumbering.
+         * The caching could be implemented in getFitValueNumbering.
          * */
         public String getElementAt(int i) {
-            Map<Layer,Integer> numbering = getNumbering();
+            Map<FitValue,Integer> fitValueNumbering = getFitValueNumbering();
             Layer l = layers.get(i);
-            int j = numbering.get(l);
-            return "Layer "+(j+1)+" pos " + (i+1) + ": " + l.toString();
+            return l.toString(fitValueNumbering);
         }
     };
 
@@ -451,17 +471,12 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
      */
     public LayerStack deepCopy() {
         LayerStack result = new LayerStack(this.lambda, /*substrate,*/ this.table);
-        Map<Layer,Layer> copies = new HashMap<Layer,Layer>();
-        /* we need to copy duplicate layers correctly */
+        Map<FitValue, Integer> fitValueNumbering = getFitValueNumbering();
+        Map<Integer, FitValue> newFitValues = new HashMap<Integer, FitValue>();
         for(Layer l: layers) {
-            if(!copies.containsKey(l)) {
-                Layer l2 = l.deepCopy();
-                result.layerAdded(l2);
-                copies.put(l, l2);
-            }
-        }
-        for(Layer l: layers) {
-            result.layers.add(copies.get(l));
+            Layer l2 = l.deepCopy(fitValueNumbering, newFitValues);
+            result.layers.add(l2);
+            result.layerAdded(l2);
         }
         result.stddev.deepCopyFrom(this.stddev);
         result.offset.deepCopyFrom(this.offset);
@@ -470,19 +485,11 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
         return result;
     }
 
-    private boolean has_duplicates() {
-        Set<Layer> set = new HashSet<Layer>();
-        for(Layer l: layers) {
-            if(set.contains(l))
-                return true;
-            set.add(l);
-        }
-        return false;
-    }
-
     public void toXMLRow(DocumentFragment f)
     {
         DocumentFragment fl;
+        Map<FitValue, Integer> fitValueNumbering = getFitValueNumbering();
+        Set<FitValue> alreadyAdded = new HashSet<FitValue>();
         f.setAttrDouble("lambda", lambda);
         f.set("sum").setRow("fitvalue", sum);
         f.set("prod").setRow("fitvalue", prod);
@@ -490,28 +497,8 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
         f.set("offset").setRow("fitvalue", offset);
         fl = f.set("layers");
 
-        if(!has_duplicates()) {
-            for(Layer l: this.layers)
-                fl.add("layer").setThisRow(l);
-        } else {
-            int free_id = 0;
-            DocumentFragment order = f.add("order");
-            Map<Layer,String> ids = new HashMap<Layer,String>();
-            for(Layer l: this.layers) {
-                if(!ids.containsKey(l)) {
-                    ids.put(l, "layer"+(free_id++));
-                }
-            }
-            for(Layer l: ids.keySet()) {
-                DocumentFragment layer = fl.add("layer");
-                layer.setThisRow(l);
-                layer.setAttrString("id",ids.get(l));
-            }
-            for(Layer l: this.layers) {
-                DocumentFragment layerRef = order.add("layerref");
-                layerRef.setAttrString("layerid",ids.get(l));
-            }
-        }
+        for(Layer l: this.layers)
+            fl.add("layer").setThisRow(l.xmlRowable(fitValueNumbering, alreadyAdded));
     }
 
     public LayerStack(DocumentFragment f, LookupTable table)
@@ -548,15 +535,20 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
 
         Map<String,Layer> layersById = new HashMap<String,Layer>();
         List<Layer> order = new ArrayList<Layer>();
+        Map<String, FitValue> fitValueById = new HashMap<String, FitValue>();
 
         for(DocumentFragment layerNode: layersNode.getMulti("layer")) {
-            Layer l = new Layer(layerNode, table);
+            Layer l = new Layer(layerNode, table, fitValueById);
             if(layerNode.getAttrStringObject("id") != null) {
                 String id = layerNode.getAttrStringNotNull("id");
                 layersById.put(id, l);
             }
             order.add(l);
         }
+        /*
+           Support for reading old file format: in the old format, only linkin
+           all parameters at once was supported.
+         */
         if (f.get("order") != null) {
             DocumentFragment orderNode = f.getNotNull("order");
             order = new ArrayList<Layer>(); /* don't use the default order since the order is explicitly specified */
@@ -566,13 +558,10 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
                 order.add(l);
             }
         }
-        Set<Layer> added = new HashSet<Layer>();
         for(Layer l: order) {
-            this.layers.add(l);
-            if(!added.contains(l)) {
-                added.add(l);
-                layerAdded(l);
-            }
+            Layer l2 = l.getAllLinked();
+            this.layers.add(l2);
+            layerAdded(l2);
         }
     }
 
@@ -650,14 +639,10 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
             signalStackChange(new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, 0, getSize()-1));
         this.layers = temp.layers;
 
-        /* there may be multiple references to the same layer */
         Set<Layer> processed = new HashSet<Layer>();
         for(Layer l: this.layers) {
-            if(!processed.contains(l)) {
-                processed.add(l);
-                temp.layerRemoved(l);
-                this.layerAdded(l);
-            }
+            temp.layerRemoved(l);
+            this.layerAdded(l);
         }
         this.lambda = temp.lambda;
 
@@ -749,18 +734,12 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
      * @see #getElementAt
      */
     public void add(Layer l, int i) /*throws ElementNotFound*/ {
-        boolean multiple_refs = false;
         if(l == null)
             throw new NullPointerException();
 
-        for(Layer l2: this.layers) {
-            if(l2 == l)
-                multiple_refs = true;
-        }
         //l.updateWlData(this.table, this.lambda);
         this.layers.add(i, l);
-        if(!multiple_refs)
-            layerAdded(l);
+        layerAdded(l);
         signalStackChange(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, i, i));
     }
     /** Removes a layer from this stack.
@@ -769,14 +748,7 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
      */
     public void remove(int i) {
         Layer l = this.layers.remove(i);
-        boolean multiple_refs = false;
-
-        for(Layer l2: this.layers) {
-            if(l2 == l)
-                multiple_refs = true;
-        }
-        if(!multiple_refs)
-            layerRemoved(l);
+        layerRemoved(l);
         signalStackChange(new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, i, i));
     }
 

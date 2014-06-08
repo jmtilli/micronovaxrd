@@ -42,13 +42,18 @@ import fi.iki.jmtilli.javaxmlfrag.*;
  *
  */
 
-public class Layer implements ValueListener, XMLRowable {
+public class Layer implements ValueListener {
     private String name;
 
-    /* the following FitValues are "owned" by this object and are never
-     * actually changed (their new values are set by deepCopyFrom */
-    private final FitValue d, p, r; /* thickness (in SI units), composition */
-    private final FitValue wh;
+    /* the following FitValues are "owned" by this object and are not
+       usually actually changed (their new values are set by deepCopyFrom)
+
+       However, the setXXXObject() methods do change these values. Calling
+       the setXXXObject() method is allowed only for layers that are not
+       owned by any layer stack
+     */
+    private FitValue d, p; /* thickness (in SI units), composition */
+    private FitValue r, wh; /* degree of relaxation, susceptibility factor */
 
     private Material mat1, mat2;
     //private Mixture mixture; /* this must be changed whenever mat1 and mat2 are */
@@ -77,8 +82,18 @@ public class Layer implements ValueListener, XMLRowable {
        This method here does deep equality comparison, ie. it compares the
        contents of the objects.
      */
-    public static boolean layerDeepEquals(Layer l1, Layer l2)
+    public static boolean layerDeepEquals(Layer l1,
+                                          Map<FitValue,Integer> l1_numbering,
+                                          Layer l2,
+                                          Map<FitValue,Integer> l2_numbering)
     {
+      if (   l1_numbering.get(l1.d) != l2_numbering.get(l2.d)
+          || l1_numbering.get(l1.p) != l2_numbering.get(l2.p)
+          || l1_numbering.get(l1.r) != l2_numbering.get(l2.r)
+          || l1_numbering.get(l1.wh) != l2_numbering.get(l2.wh))
+      {
+        return false;
+      }
       if (   !utilEquals(l1.name, l2.name)
           || !utilEquals(l1.d, l2.d)
           || !utilEquals(l1.p, l2.p)
@@ -100,16 +115,39 @@ public class Layer implements ValueListener, XMLRowable {
         listeners.remove(listener);
     }
 
-    public Layer(DocumentFragment frag, LookupTable table)
+    private FitValue getFitValue(DocumentFragment f,
+                                 Map<String, FitValue> fitValueById)
+    {
+        if (f.getNotNull("fitvalue").getAttrStringObject("fitvalrefid") != null)
+        {
+            FitValue result = fitValueById.get(
+                f.getNotNull("fitvalue").getAttrStringNotNull("fitvalrefid"));
+            if (result == null)
+            {
+                throw new NullPointerException();
+            }
+            return result;
+        }
+        FitValue result = new FitValue(f.getNotNull("fitvalue"));
+        String id = f.getNotNull("fitvalue").getAttrStringObject("fitvalid");
+        if (id != null)
+        {
+            fitValueById.put(id, result);
+        }
+        return result;
+    }
+
+    public Layer(DocumentFragment frag, LookupTable table,
+                 Map<String, FitValue> fitValueById)
       throws ElementNotFound, InvalidMixtureException
     {
         List<Material> materials = new ArrayList<Material>();
         this.name = frag.getAttrStringNotNull("name");
-        d = new FitValue(frag.getNotNull("d").getNotNull("fitvalue"));
-        p = new FitValue(frag.getNotNull("p").getNotNull("fitvalue"));
+        d = getFitValue(frag.getNotNull("d"), fitValueById);
+        p = getFitValue(frag.getNotNull("p"), fitValueById);
         if (frag.get("r") != null)
         {
-            r = new FitValue(frag.getNotNull("r").getNotNull("fitvalue"));
+            r = getFitValue(frag.getNotNull("r"), fitValueById);
         }
         else
         {
@@ -117,7 +155,7 @@ public class Layer implements ValueListener, XMLRowable {
         }
         if (frag.get("wh") != null)
         {
-            wh = new FitValue(frag.getNotNull("wh").getNotNull("fitvalue"));
+            wh = getFitValue(frag.getNotNull("wh"), fitValueById);
         }
         else
         {
@@ -142,15 +180,45 @@ public class Layer implements ValueListener, XMLRowable {
         mix(mat1, mat2, p);
     }
 
-    public void toXMLRow(DocumentFragment f) {
-        f.setAttrString("name", name);
-        f.set("d").setRow("fitvalue", d);
-        f.set("p").setRow("fitvalue", p);
-        f.set("r").setRow("fitvalue", r);
-        f.set("wh").setRow("fitvalue", wh);
-        // NB: these may have the same tag name (mixture or mat):
-        f.add(mat1.toXMLRow());
-        f.add(mat2.toXMLRow());
+    public XMLRowable xmlRowable(final Map<FitValue, Integer> fitValueNumbering,
+                                 final Set<FitValue> alreadyAdded)
+    {
+        return new XMLRowable() {
+            public void setFitValue(DocumentFragment f, String name,
+                                    FitValue val)
+            {
+                if (fitValueNumbering.containsKey(val))
+                {
+                    if (alreadyAdded.contains(val))
+                    {
+                        f.set(name).setRow("fitvalue", val);
+                        f.get(name).get("fitvalue").setAttrInt(
+                            "fitvalrefid", fitValueNumbering.get(val));
+                    }
+                    else
+                    {
+                        f.set(name).setRow("fitvalue", val);
+                        f.get(name).get("fitvalue").setAttrInt(
+                            "fitvalid", fitValueNumbering.get(val));
+                        alreadyAdded.add(val);
+                    }
+                }
+                else
+                {
+                    f.set(name).setRow("fitvalue", val);
+                }
+            }
+            public void toXMLRow(DocumentFragment f) {
+                f.setAttrString("name", name);
+                setFitValue(f, "d", d);
+                setFitValue(f, "p", p);
+                setFitValue(f, "r", r);
+                setFitValue(f, "wh", wh);
+                // NB: these may have the same tag name (mixture or mat):
+                f.add(mat1.toXMLRow());
+                f.add(mat2.toXMLRow());
+            }
+        };
     }
 
     /** This can be sent by a FitValue */
@@ -161,10 +229,10 @@ public class Layer implements ValueListener, XMLRowable {
     /* The mixture is a dummy parameter: it is used to distinguish between different constructors */
     private Layer(String name, FitValue d, FitValue p, FitValue r, FitValue wh, Material mat1, Material mat2, Mixture mixture) {
         this.name = name;
-        this.d = d.deepCopy();
-        this.p = p.deepCopy();
-        this.r = r.deepCopy();
-        this.wh = wh.deepCopy();
+        this.d = d;
+        this.p = p;
+        this.r = r;
+        this.wh = wh;
         this.d.addValueListener(this);
         this.p.addValueListener(this);
         this.r.addValueListener(this);
@@ -182,11 +250,41 @@ public class Layer implements ValueListener, XMLRowable {
     }
 
     public Layer(String name, FitValue d, FitValue p, FitValue r, FitValue wh, Material mat1, Material mat2) throws InvalidMixtureException {
-        this(name, d, p, r, wh, mat1, mat2, mix(mat1, mat2, p));
+        this(name, d.deepCopy(), p.deepCopy(), r.deepCopy(), wh.deepCopy(), mat1, mat2, mix(mat1, mat2, p));
     }
 
-    public Layer deepCopy() {
-        return new Layer(name, d.deepCopy(), p.deepCopy(), r.deepCopy(), wh.deepCopy(), mat1, mat2, null);
+    private static FitValue newFitValue(
+        Map<FitValue, Integer> fitValueNumbering,
+        Map<Integer, FitValue> newFitValues,
+        FitValue old)
+    {
+        if (fitValueNumbering.containsKey(old))
+        {
+            int i = fitValueNumbering.get(old);
+            if (newFitValues.containsKey(i))
+            {
+                return newFitValues.get(i);
+            }
+            FitValue val = old.deepCopy();
+            newFitValues.put(i, val);
+            return val;
+        }
+        else
+        {
+          return old.deepCopy();
+        }
+    }
+
+    public Layer deepCopy(Map<FitValue, Integer> fitValueNumbering,
+                          Map<Integer, FitValue> newFitValues)
+    {
+        return new Layer(
+            name,
+            newFitValue(fitValueNumbering, newFitValues, d),
+            newFitValue(fitValueNumbering, newFitValues, p),
+            newFitValue(fitValueNumbering, newFitValues, r),
+            newFitValue(fitValueNumbering, newFitValues, wh),
+            mat1, mat2, null);
     }
 
     /** Changes the two compounds.
@@ -264,6 +362,74 @@ public class Layer implements ValueListener, XMLRowable {
         this.r.deepCopyFrom(r);
         //signalEvent(null);
     };
+
+    public Layer getAllLinked() {
+        Layer result = this.deepCopy(new HashMap<FitValue,Integer>(),
+                                     new HashMap<Integer,FitValue>());
+        result.setThicknessObject(this.getThickness());
+        result.setCompositionObject(this.getComposition());
+        result.setRelaxationObject(this.getRelaxation());
+        result.setSuscFactorObject(this.getSuscFactor());
+        return result;
+    }
+
+    /**
+       Change the thickness object to be the same object as the parameter.
+      
+       Calling this is only allowed for layers that are not owned by a layer
+       stack!
+      
+       @param d The new thickness object
+     */
+    public void setThicknessObject(FitValue d)
+    {
+        this.d.removeValueListener(this);
+        this.d = d;
+        this.d.addValueListener(this);
+    }
+    /**
+       Change the composition object to be the same object as the parameter.
+      
+       Calling this is only allowed for layers that are not owned by a layer
+       stack!
+      
+       @param p The new composition object
+     */
+    public void setCompositionObject(FitValue p)
+    {
+        this.p.removeValueListener(this);
+        this.p = p;
+        this.p.addValueListener(this);
+    }
+    /**
+       Change the relaxation object to be the same object as the parameter.
+      
+       Calling this is only allowed for layers that are not owned by a layer
+       stack!
+      
+       @param r The new relaxation object
+     */
+    public void setRelaxationObject(FitValue r)
+    {
+        this.r.removeValueListener(this);
+        this.r = r;
+        this.r.addValueListener(this);
+    }
+    /**
+       Change the susceptibility factor object to be the same object as the
+       parameter.
+      
+       Calling this is only allowed for layers that are not owned by a layer
+       stack!
+      
+       @param wh The new susceptibility factor object
+     */
+    public void setSuscFactorObject(FitValue wh)
+    {
+        this.wh.removeValueListener(this);
+        this.wh = wh;
+        this.wh.addValueListener(this);
+    }
 
     /** Changes the FitValue object of layer thickness.
      *
@@ -375,19 +541,43 @@ public class Layer implements ValueListener, XMLRowable {
     }
 
     /** String representation.
-     *
-     * <p>
-     *
-     * The methods returns a string representation for the layer which is shown
-     * in layer stack lists.
-     *
+      
+       <p>
+      
+       The methods returns a string representation for the layer which is shown
+       in layer stack lists.
+      
+       @return String representation
+      
      */
     public String toString() {
+        return toString(new HashMap<FitValue, Integer>());
+    }
+    /** String representation.
+      
+       <p>
+      
+       The methods returns a string representation for the layer which is shown
+       in layer stack lists.
+      
+       @param fitValueNumbering Link numbers for linked FitValues
+       @return String representation
+     */
+    public String toString(Map<FitValue, Integer> fitValueNumbering) {
+        final Map<FitValue, Integer> n = fitValueNumbering;
         return this.name +
-	", d = " + String.format(Locale.US,"%.6g",this.d.getExpected()*1e9) + " nm " + (this.d.getEnabled() ? "(fit)" : "(no fit)") +
-	", p = " + String.format(Locale.US,"%.6g",this.p.getExpected()) + " " + (this.p.getEnabled() ? "(fit)" : "(no fit)") +
-	", r = " + String.format(Locale.US,"%.6g",this.r.getExpected()) + " " + (this.r.getEnabled() ? "(fit)" : "(no fit)") +
-	", wh = " + String.format(Locale.US,"%.6g",this.wh.getExpected()) + " " + (this.wh.getEnabled() ? "(fit)" : "(no fit)");
+        ", d = " + String.format(Locale.US,"%.6g",this.d.getExpected()*1e9) + " nm " +
+          (n.containsKey(this.d) ? "[L" + n.get(this.d) + "] " : "") +
+          (this.d.getEnabled() ? "(fit)" : "(no fit)") +
+        ", p = " + String.format(Locale.US,"%.6g",this.p.getExpected()) + " " +
+          (n.containsKey(this.p) ? "[L" + n.get(this.p) + "] " : "") +
+          (this.p.getEnabled() ? "(fit)" : "(no fit)") +
+        ", r = " + String.format(Locale.US,"%.6g",this.r.getExpected()) + " " +
+          (n.containsKey(this.r) ? "[L" + n.get(this.r) + "] " : "") +
+          (this.r.getEnabled() ? "(fit)" : "(no fit)") +
+        ", wh = " + String.format(Locale.US,"%.6g",this.wh.getExpected()) + " " +
+          (n.containsKey(this.wh) ? "[L" + n.get(this.wh) + "] " : "") +
+          (this.wh.getEnabled() ? "(fit)" : "(no fit)");
     }
 
 };

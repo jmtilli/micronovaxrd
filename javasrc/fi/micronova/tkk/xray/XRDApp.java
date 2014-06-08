@@ -404,38 +404,120 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             public void actionPerformed(ActionEvent e) {
                 int[] i2 = layeredList.getSelectedIndices();
                 for(int i: i2) {
-                    Layer l = layers.getElementAt(i).deepCopy();
+                    Layer l = layers.getElementAt(i).deepCopy(
+                        new HashMap<FitValue, Integer>(),
+                        new HashMap<Integer, FitValue>());
                     layers.add(l,layers.getSize());
                 }
             }
         });
         layerButtonPanel.add(b);
 
-        b = new JButton("Duplicate");
+        b = new JButton("Link params...");
         b.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 int[] i2 = layeredList.getSelectedIndices();
-                for(int i: i2) {
-                    Layer l = layers.getElementAt(i);
-                    layers.add(l,layers.getSize());
+                if (i2.length < 2)
+                {
+                    JOptionPane.showMessageDialog(
+                      null,
+                      "Select more than two layers by holding the CTRL\n" +
+                      "button down while clicking the layers on the list\n" +
+                      "to use the parameter linking feature",
+                      "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
-            }
-        });
-        layerButtonPanel.add(b);
-
-        b = new JButton("Separate");
-        b.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e) {
-                int[] i2 = layeredList.getSelectedIndices();
-                for(int i: i2) {
-                    Layer l = layers.getElementAt(i).deepCopy();
-                    layers.remove(i);
-                    layers.add(l,i);
+                LinkDialog d = new LinkDialog(thisFrame, "Unlink parameters");
+                d.call();
+                if (!d.ok())
+                {
+                    return;
                 }
                 layeredList.clearSelection();
+                Layer firstLayer = layers.getElementAt(i2[0]);
+                for(int i: i2) {
+                    Layer oldLayer = layers.getElementAt(i);
+                    Layer newLayer = oldLayer.deepCopy(
+                        new HashMap<FitValue, Integer>(),
+                        new HashMap<Integer, FitValue>());
+                    layers.remove(i);
+                    if (d.d())
+                    {
+                        newLayer.setThicknessObject(firstLayer.getThickness());
+                    }
+                    else
+                    {
+                        newLayer.setThicknessObject(oldLayer.getThickness());
+                    }
+                    if (d.p())
+                    {
+                        newLayer.setCompositionObject(firstLayer.getComposition());
+                    }
+                    else
+                    {
+                        newLayer.setCompositionObject(oldLayer.getComposition());
+                    }
+                    if (d.r())
+                    {
+                        newLayer.setRelaxationObject(firstLayer.getRelaxation());
+                    }
+                    else
+                    {
+                        newLayer.setRelaxationObject(oldLayer.getRelaxation());
+                    }
+                    if (d.wh())
+                    {
+                        newLayer.setSuscFactorObject(firstLayer.getSuscFactor());
+                    }
+                    else
+                    {
+                        newLayer.setSuscFactorObject(oldLayer.getSuscFactor());
+                    }
+                    layers.add(newLayer,i);
+                }
             }
         });
         layerButtonPanel.add(b);
+
+        b = new JButton("Unlink params...");
+        b.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                int[] i2 = layeredList.getSelectedIndices();
+                LinkDialog d = new LinkDialog(thisFrame, "Unlink parameters");
+                d.call();
+                if (!d.ok())
+                {
+                    return;
+                }
+                layeredList.clearSelection();
+                for(int i: i2) {
+                    Layer oldLayer = layers.getElementAt(i);
+                    Layer newLayer = oldLayer.deepCopy(
+                        new HashMap<FitValue, Integer>(),
+                        new HashMap<Integer, FitValue>());
+                    if (!d.d())
+                    {
+                        newLayer.setThicknessObject(oldLayer.getThickness());
+                    }
+                    if (!d.p())
+                    {
+                        newLayer.setCompositionObject(oldLayer.getComposition());
+                    }
+                    if (!d.r())
+                    {
+                        newLayer.setRelaxationObject(oldLayer.getRelaxation());
+                    }
+                    if (!d.wh())
+                    {
+                        newLayer.setSuscFactorObject(oldLayer.getSuscFactor());
+                    }
+                    layers.remove(i);
+                    layers.add(newLayer,i);
+                }
+            }
+        });
+        layerButtonPanel.add(b);
+
 
         b = new JButton("Optics...");
         b.addActionListener(new ActionListener(){
