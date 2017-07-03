@@ -2,8 +2,6 @@ package fi.micronova.tkk.xray;
 import java.util.*;
 import java.io.*;
 import fi.micronova.tkk.xray.xrdmodel.*;
-import org.uncommons.maths.random.PoissonGenerator;
-import org.uncommons.maths.number.NumberGenerator;
 
 
 
@@ -47,10 +45,67 @@ public class GraphData {
         this(alpha_0, meas, simul, false);
     }
 
-    private class FieldNumberGenerator implements NumberGenerator<Double> {
-        double mean;
-        public Double nextValue() {
-            return mean;
+    private static class PoissonApproxGenerator {
+        private final Random rand = new Random();
+        /**
+         * Calculate natural logarithm of the gamma function.
+         *
+         * @param xx Argument of the gamma function
+         * @return gamma function value
+         */
+        private static double log_gamma(double xx)
+        {
+            double xx2 = xx*xx;
+            double xx3 = xx2*xx;
+            double xx5 = xx3*xx2;
+            double xx7 = xx5*xx2;
+            double xx9 = xx7*xx2;
+            double xx11 = xx9*xx2;
+            return xx*Math.log(xx) - xx - 0.5*Math.log(xx/(2*Math.PI)) + 
+                   1/(12*xx) - 1/(360*xx3) + 1/(1260*xx5) - 1/(1680*xx7) +
+                   1/(1188*xx9) - 691/(360360*xx11);
+        }
+        /**
+         * Create next random Poisson-distributed value.
+         *
+         * @param mean Mean of the Poisson distribution
+         * @return Random Poisson-distributed value
+         */
+        public int nextValue(double mean) {
+            int result = 0;
+            if (mean < 12.0)
+            {
+                double L = Math.exp(-mean);
+                double p = 1;
+                do
+                {
+                    result++;
+                    p *= rand.nextDouble();
+                }
+                while (p > L);
+                result--;
+            }
+            else
+            {
+                double sqrt = Math.sqrt(2.0*mean);
+                double log_mean = Math.log(mean);
+                double g = mean*log_mean - log_gamma(mean+1.0);
+                double y, em, t;
+                do
+                {
+                    do
+                    {
+                        y = Math.tan(Math.PI*rand.nextDouble());
+                        em = sqrt*y + mean;
+                    }
+                    while (em < 0.0);
+                    em = Math.floor(em);
+                    t = 0.9*(1.0+y*y)*Math.exp(em*log_mean-log_gamma(em+1.0)-g);
+                }
+                while (rand.nextDouble() > t);
+                result = (int)em;
+            }
+            return result;
         };
     }
     /** Adds noise to the measured data.
@@ -59,12 +114,10 @@ public class GraphData {
      */
     public GraphData addNoise(double photon) {
         GraphData lin = convertToLinear();
-        FieldNumberGenerator mean = new FieldNumberGenerator();
-        PoissonGenerator gen = new PoissonGenerator(mean, new Random());
+        PoissonApproxGenerator gen = new PoissonApproxGenerator();
         for(int i=0; i<lin.meas.length; i++) {
             lin.meas[i] /= photon;
-            mean.mean = lin.meas[i];
-            lin.meas[i] = gen.nextValue();
+            lin.meas[i] = gen.nextValue(lin.meas[i]);
             lin.meas[i] *= photon;
         }
         return lin;

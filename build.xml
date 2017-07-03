@@ -18,7 +18,6 @@
   <path id="classpath">
     <!--<pathelement path="${classpath}"/>-->
     <pathelement location="jfreechart-1.0.1.jar"/>
-    <pathelement location="uncommons-maths-1.2.3.jar"/>
     <pathelement location="javafastcomplex.jar"/>
     <pathelement location="javaxmlfrag.jar"/>
     <pathelement location="Jama-1.0.3.jar"/>
@@ -35,7 +34,6 @@
 
   <patternset id="libdeps">
       <include name="jfreechart-1.0.1.jar"/>
-      <include name="uncommons-maths-1.2.3.jar"/>
       <include name="javafastcomplex.jar"/>
       <include name="javaxmlfrag.jar"/>
       <include name="Jama-1.0.3.jar"/>
@@ -111,7 +109,7 @@
           </fileset>
           <manifest>
               <!--<attribute name="Built-By" value="${user.name}"/>-->
-              <attribute name="Class-Path" value="jfreechart-1.0.1.jar uncommons-maths-1.2.3.jar javafastcomplex.jar javaxmlfrag.jar Jama-1.0.3.jar"/>
+              <attribute name="Class-Path" value="jfreechart-1.0.1.jar javafastcomplex.jar javaxmlfrag.jar Jama-1.0.3.jar"/>
               <attribute name="Main-Class" value="fi.micronova.tkk.xray.XRDApp"/>
           </manifest>
       </jar>
