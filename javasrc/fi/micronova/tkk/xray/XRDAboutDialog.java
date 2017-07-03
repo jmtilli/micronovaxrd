@@ -24,7 +24,7 @@ public class XRDAboutDialog extends GenericAboutDialog {
 "All rights reserved.\n"+
 "\n"+
 "Author:\n"+
-"  Juha-Matti Tilli <juha-matti.tilli@tkk.fi>\n"+
+"  Juha-Matti Tilli <juha-matti.tilli@iki.fi>\n"+
 "\n"+
 "Redistribution and use in source and binary forms, with or without\n"+
 "modification, are permitted provided that the following conditions\n"+
