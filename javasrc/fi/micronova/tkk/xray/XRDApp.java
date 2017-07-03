@@ -759,8 +759,8 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         final JButton startFitButton = new JButton("Start");
         final JButton stopFitButton = new JButton("Stop");
         final JButton advancedButton = new JButton("Opts");
-        final SpinnerNumberModel popSizeModel = new SpinnerNumberModel(30,20,2000,1);
-        final SpinnerNumberModel iterationsModel = new SpinnerNumberModel(100,1,10000,1);
+        final SpinnerNumberModel popSizeModel = new SpinnerNumberModel(60,20,2000,1);
+        final SpinnerNumberModel iterationsModel = new SpinnerNumberModel(500,1,10000,1);
         final SpinnerNumberModel pModel = new SpinnerNumberModel(2,1,10,1);
         final SpinnerNumberModel firstAngleModel = new SpinnerNumberModel(0,0,90,0.01);
         final SpinnerNumberModel lastAngleModel = new SpinnerNumberModel(90,0,90,0.01);
