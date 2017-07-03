@@ -1029,12 +1029,12 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
                     /*
                        eta = (-4*(sin(theta)-sin(theta_B))*sin(theta_B)*b + 2*chi0)
                            / (2*C*sqrt(|b|)*sqrt(chih*chihneg))
-                       VIRHE!
-                       Pitäisi olla:
+                       ERROR!
+                       Should be:
                        eta = (-(sin(theta)-sin(theta_B))*sin(theta_B)*b + 0.5*chi0*(1-b))
                            / (C*sqrt(|b|)*sqrt(chih*chihneg))
-                           <- eli 2*chi0:n tilalle (1-b)*chi0
-                           Täytynee tarkistaa gamma0:n ja gammah:n kaavat.
+                           <- so 2*chi0:n replaced by (1-b)*chi0
+                           Should check formulas of gamma0 and gammah.
                      */
                     double b_times_alphah = -4*(sin_theta_plus_thetaoffset[i] - sin_theta_B)*sin_theta_B_times_b;
                     //assert(!Double.isNaN(b_times_alphah));
@@ -1266,12 +1266,12 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
                     /*
                        eta = (-4*(sin(theta)-sin(theta_B))*sin(theta_B)*b + 2*chi0)
                            / (2*C*sqrt(|b|)*sqrt(chih*chihneg))
-                       VIRHE!
-                       Pitäisi olla:
+                       ERROR!
+                       Should be:
                        eta = (-(sin(theta)-sin(theta_B))*sin(theta_B)*b + 0.5*chi0*(1-b))
                            / (C*sqrt(|b|)*sqrt(chih*chihneg))
-                           <- eli 2*chi0:n tilalle (1-b)*chi0
-                           Täytynee tarkistaa gamma0:n ja gammah:n kaavat.
+                           <- so 2*chi0:n replaced by (1-b)*chi0
+                           Should check formulas for gamma0 and gammah.
                      */
                     double b_times_alphah = -4*(sin_theta_plus_thetaoffset[i] - sin_theta_B)*sin_theta_B_times_b;
                     //assert(!Double.isNaN(b_times_alphah));
