@@ -11,6 +11,7 @@ import fi.micronova.tkk.xray.xrdmodel.*;
 import fi.micronova.tkk.xray.util.*;
 import fi.micronova.tkk.xray.chart.*;
 import fi.micronova.tkk.xray.xrdde.*;
+import fi.micronova.tkk.xray.de.*;
 
 import org.jfree.data.xy.*;
 import org.jfree.chart.*;
@@ -84,7 +85,8 @@ public class JavaFitter implements FitterInterface {
      */
 
     public JavaFitter(JPlotArea light, GraphData data, LayerTask endTask, LayerTask plotTask, Runnable errTask, LayerStack stack, int popsize, int iterations, double firstAngle, double lastAngle, Image green, Image yellow,
-            Algorithm algo, FitnessFunction func, double dBthreshold, int pNorm) throws SimulationException
+            Algorithm algo, FitnessFunction func, double dBthreshold, int pNorm,
+            AdvancedFitOptions opts) throws SimulationException
     {
         FittingErrorFunc func2;
         stack = stack.deepCopy();
@@ -151,7 +153,7 @@ public class JavaFitter implements FitterInterface {
         this.ctx = new XRDFittingCtx(stack, data,
                                      algo == Algorithm.JavaCovDE,
                                      algo != Algorithm.JavaEitherOrDE,
-                                     popsize, func2, exec);
+                                     popsize, func2, exec, opts);
         t.start();
     }
 

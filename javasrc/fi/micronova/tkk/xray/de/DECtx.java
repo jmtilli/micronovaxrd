@@ -175,13 +175,14 @@ public class DECtx {
 
   public DECtx(CostFunc func, double[] p_min, double[] p_max,
                double[] p, boolean cov_on, boolean traditional_recombination_on,
-               int npop, ExecutorService executor_service)
+               int npop, ExecutorService executor_service,
+               AdvancedFitOptions opts)
   {
-    this.km = 0.7;
-    this.kr = 0.5*(this.km + 1); // recommended as a good first choice for kr
-    this.pm = 0.5;
-    this.cr = 0.5;
-    this.lambda = 1.0;
+    this.km = opts.km;
+    this.kr = opts.kr;
+    this.pm = opts.pm;
+    this.cr = opts.cr;
+    this.lambda = opts.lambda;
     this.cycle = 0;
     this.traditional_recombination_on = traditional_recombination_on;
     this.func = func;
@@ -442,7 +443,8 @@ public class DECtx {
         return p[0]*p[0] + p[1]*p[1];
       }
     };
-    DECtx ctx = new DECtx(func, p_min, p_max, p, true, true, 20, exec);
+    DECtx ctx = new DECtx(func, p_min, p_max, p, true, true, 20, exec,
+                          new AdvancedFitOptions());
     for (int i=0; i<100; i++)
     {
       ctx.iteration();

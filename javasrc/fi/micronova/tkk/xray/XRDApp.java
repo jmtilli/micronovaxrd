@@ -17,6 +17,7 @@ import fi.micronova.tkk.xray.xrdmodel.*;
 import fi.micronova.tkk.xray.util.*;
 import fi.micronova.tkk.xray.measimport.*;
 import fi.micronova.tkk.xray.dialogs.*;
+import fi.micronova.tkk.xray.de.*;
 
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
@@ -103,6 +104,8 @@ public class XRDApp extends JFrame implements ChooserWrapper {
     private double dbMin = -5, dbMax = 50;
 
     private enum PlotStyle {LIN, LOG, SQRT};
+
+    private AdvancedFitOptions opts = new AdvancedFitOptions();
 
 
 
@@ -743,8 +746,8 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(3,3,3,3);
         c.gridwidth = 1;
-        final JButton exportButton = new JButton("Export model");
-        final JButton importButton = new JButton("Import model");
+        final JButton exportButton = new JButton("Export");
+        final JButton importButton = new JButton("Import");
         importButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
                 fitLayers.deepCopyFrom(layers);
@@ -753,8 +756,9 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         plotControls.add(importButton,c);
         //c.gridwidth = GridBagConstraints.REMAINDER;
 
-        final JButton startFitButton = new JButton("Start fit");
-        final JButton stopFitButton = new JButton("Stop fit");
+        final JButton startFitButton = new JButton("Start");
+        final JButton stopFitButton = new JButton("Stop");
+        final JButton advancedButton = new JButton("Opts");
         final SpinnerNumberModel popSizeModel = new SpinnerNumberModel(30,20,2000,1);
         final SpinnerNumberModel iterationsModel = new SpinnerNumberModel(100,1,10000,1);
         final SpinnerNumberModel pModel = new SpinnerNumberModel(2,1,10,1);
@@ -802,7 +806,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                     f = new JavaFitter(fitLight, data, endTask, plotTask, errTask2, fitLayers,
                                        (Integer)popSizeModel.getNumber(), (Integer)iterationsModel.getNumber(),
                                        (Double)firstAngleModel.getNumber(), (Double)lastAngleModel.getNumber(),
-                                       green, yellow, algo, (FitnessFunction)funcBox.getSelectedItem(), (Double)thresholdModel.getNumber(), (Integer)pModel.getNumber());//, nonlinBox.isSelected());
+                                       green, yellow, algo, (FitnessFunction)funcBox.getSelectedItem(), (Double)thresholdModel.getNumber(), (Integer)pModel.getNumber(), opts);//, nonlinBox.isSelected());
                     startFitButton.setEnabled(false);
                     stopFitButton.setEnabled(true);
                     stopFitButton.addActionListener(new ActionListener() {
@@ -832,6 +836,12 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                 }
             }
         });
+        advancedButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ev) {
+                AdvancedFitDialog diag = new AdvancedFitDialog(thisFrame);
+                diag.call(opts);
+            }
+        });
         plotControls.add(startFitButton,c);
         c.gridwidth = 1;
         exportButton.addActionListener(new ActionListener() {
@@ -840,9 +850,13 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             }
         });
         plotControls.add(exportButton,c);
-        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.gridwidth = 1;
         stopFitButton.setEnabled(false);
         plotControls.add(stopFitButton,c);
+
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        stopFitButton.setEnabled(false);
+        plotControls.add(advancedButton,c);
 
 
         c.gridwidth = 1;
@@ -884,7 +898,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
 
         c.gridwidth = 1;
-        plotControls.add(new JLabel("Threshold rel.f. (dB)"),c);
+        plotControls.add(new JLabel("Thres. rel.f. (dB)"),c);
         c.gridwidth = 1;
         plotControls.add(new JSpinner(thresholdModel),c);
 
