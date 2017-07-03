@@ -62,22 +62,6 @@
       <include name="build.xml"/>
   </patternset>
 
-  <patternset id="xrdlab">
-      <include name="xrdlab/"/>
-  </patternset>
-
-  <patternset id="matlabfiles">
-      <include name="*.m"/>
-
-      <!-- Matlab databases -->
-      <include name="B_table2.txt"/>
-      <include name="atomic_weights.txt"/>
-      <include name="fp1_table.txt"/>
-      <include name="fp2_table.txt"/>
-      <include name="fp_wavelength.txt"/>
-      <include name="sf_table.txt"/>
-  </patternset>
-
   <patternset id="javadb">
       <!-- java databases -->
       <include name="matdb.xml"/>
@@ -122,7 +106,6 @@
           <zipfileset dir="." prefix="xrd-bin">
               <patternset refid="javadb" />
               <patternset refid="javaaux" />
-              <patternset refid="matlabfiles" />
               <patternset refid="examples" />
               <patternset refid="libdeps" />
               <patternset refid="doc" />
@@ -134,15 +117,6 @@
       </zip>
   </target>
 
-  <target name="xrdlab" depends="jar" description="make xrdlab distfile">
-      <zip destfile="xrdlab.zip">
-          <!--<zipfileset dir="." prefix="xrdlab">-->
-          <zipfileset dir=".">
-              <patternset refid="xrdlab" />
-          </zipfileset>
-      </zip>
-  </target>
-
   <target name="srcdist" depends="jar" description="make distfile">
       <zip destfile="xrd-src.zip">
           <zipfileset dir="." prefix="xrd-src">
@@ -150,11 +124,8 @@
               <patternset refid="javaaux" />
               <patternset refid="examples" />
               <patternset refid="doc" />
-              <patternset refid="matlabfiles" />
               <patternset refid="libdeps" />
               <patternset refid="shellscripts" />
-
-              <patternset refid="xrdlab" />
 
               <patternset refid="src" />
               <patternset refid="srcaux" />
@@ -163,7 +134,7 @@
           </zipfileset>
       </zip>
   </target>
-  <target name="dist" depends="srcdist,bindist,xrdlab" description="make distfiles" />
+  <target name="dist" depends="srcdist,bindist" description="make distfiles" />
 
   <target name="clean" description="clean up" >
     <delete>
@@ -179,7 +150,6 @@
         <fileset dir=".">
             <include name="xrd-src.zip" />
             <include name="xrd-bin.zip" />
-            <include name="xrdlab.zip" />
             <include name="xrd.jar" />
         </fileset>
     </delete>
