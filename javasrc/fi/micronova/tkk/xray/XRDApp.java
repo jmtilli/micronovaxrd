@@ -147,6 +147,23 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         */
     }
 
+    private static String getDir()
+    {
+        try {
+            String path = XRDApp.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+            File f = new File(path);
+            if (!f.isDirectory())
+            {
+                path = f.getParent();
+            }
+            return path;
+        }
+        catch (java.net.URISyntaxException ex)
+        {
+            return ".";
+        }
+    }
+
     public void useSimulationAsMeasurement()
     {
         try {
@@ -219,7 +236,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
     private boolean construct() {
         /* Load atomic masses and scattering factors */
         try {
-            table = SFTables.defaultLookup();
+            table = SFTables.defaultLookup(getDir());
         }
         catch(Exception ex) {
             JOptionPane.showMessageDialog(null,
@@ -228,7 +245,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             return false;
         }
         try {
-            db = new MatDB(new File("matdb.xml"),table);
+            db = new MatDB(new File(getDir(), "matdb.xml"),table);
         }
         catch(Exception ex) {
             ex.printStackTrace();
@@ -1333,9 +1350,9 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
 
         try {
-            File f = new File("default.layers");
+            File f = new File(getDir(), "default.layers");
             if(f.exists())
-                loadLayers(new File("default.layers"),false);
+                loadLayers(new File(getDir(), "default.layers"),false);
         }
         catch(LayerLoadException ex) {
             JOptionPane.showMessageDialog(null, "There was an error in the file default.layers:\n"+ex.getMessage(), "Error in default.layers", JOptionPane.ERROR_MESSAGE);

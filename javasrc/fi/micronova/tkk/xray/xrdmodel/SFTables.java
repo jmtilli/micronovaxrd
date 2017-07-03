@@ -228,12 +228,15 @@ public class SFTables implements LookupTable {
         return atom;
     }
     public static SFTables defaultLookup() throws FileFormatException, IOException {
+        return defaultLookup(".");
+    }
+    public static SFTables defaultLookup(String dir) throws FileFormatException, IOException {
         File s, m, b, cm, d;
-        s = new File("atomic_symbols.txt");
-        m = new File("atomic_masses.txt");
-        b = new File("atomic_B.txt");
-        cm = new File("atomic_sf.txt");
-        d = new File("henke");
+        s = new File(dir, "atomic_symbols.txt");
+        m = new File(dir, "atomic_masses.txt");
+        b = new File(dir, "atomic_B.txt");
+        cm = new File(dir, "atomic_sf.txt");
+        d = new File(dir, "henke");
         return new SFTables(s, m, b, cm, d);
     }
 
