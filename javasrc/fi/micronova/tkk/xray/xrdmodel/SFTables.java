@@ -159,11 +159,36 @@ public class SFTables implements LookupTable {
         Map<Integer,Double> bFactors;
         Map<Integer,ASF> sfs;
         Map<Integer,Atom> atoms = new HashMap<Integer,Atom>();
+        FileInputStream fstr;
 
-        this.symbols = new AtomicSymbols(new FileInputStream(s)).symbols;
-        masses = new AtomicValues(new FileInputStream(m), symbols).valueMap;
-        bFactors = new AtomicValues(new FileInputStream(b), null).valueMap;
-        sfs = new AtomicSFs(new FileInputStream(cm), null).asfMap;
+        fstr = new FileInputStream(s);
+        try {
+            this.symbols = new AtomicSymbols(fstr).symbols;
+        }
+        finally {
+            fstr.close();
+        }
+        fstr = new FileInputStream(m);
+        try {
+            masses = new AtomicValues(fstr, symbols).valueMap;
+        }
+        finally {
+            fstr.close();
+        }
+        fstr = new FileInputStream(b);
+        try {
+            bFactors = new AtomicValues(fstr, null).valueMap;
+        }
+        finally {
+            fstr.close();
+        }
+        fstr = new FileInputStream(cm);
+        try {
+            sfs = new AtomicSFs(fstr, null).asfMap;
+        }
+        finally {
+            fstr.close();
+        }
          
         for(Map.Entry<String,Integer> e: symbols.entrySet()) {
             int Z = e.getValue();
@@ -171,7 +196,7 @@ public class SFTables implements LookupTable {
             SortedMap<Double,Complex> fMap;
             double mass, B;
             ASF asf;
-            InputStream is = null;
+            FileInputStream is = null;
 
             if(!(masses.containsKey(Z) && sfs.containsKey(Z) && bFactors.containsKey(Z)))
                 continue;
@@ -186,8 +211,13 @@ public class SFTables implements LookupTable {
             catch(IOException ex) {}
             if(is == null)
                 continue;
-            fMap = readHenke(is);
-            atoms.put(Z, new TableAtom(Z, mass, B, asf, fMap));
+            try {
+                fMap = readHenke(is);
+                atoms.put(Z, new TableAtom(Z, mass, B, asf, fMap));
+            }
+            finally {
+                is.close();
+            }
         }
 
         this.atoms = Collections.unmodifiableMap(atoms);

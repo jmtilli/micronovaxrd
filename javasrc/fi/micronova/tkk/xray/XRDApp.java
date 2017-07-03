@@ -118,12 +118,17 @@ public class XRDApp extends JFrame implements ChooserWrapper {
     private void loadLayers(File f, boolean enable_hint) throws LayerLoadException {
         try {
             FileInputStream fstr = new FileInputStream(f);
-            BufferedInputStream bs = new BufferedInputStream(fstr);
-            DocumentFragment doc_frag =
-                DocumentFragmentHandler.parseWhole(bs);
-            doc_frag.assertTag("model");
-            LayerStack newLayers = new LayerStack(doc_frag, table);
-            layers.deepCopyFrom(newLayers);
+            try {
+                BufferedInputStream bs = new BufferedInputStream(fstr);
+                DocumentFragment doc_frag =
+                    DocumentFragmentHandler.parseWhole(bs);
+                doc_frag.assertTag("model");
+                LayerStack newLayers = new LayerStack(doc_frag, table);
+                layers.deepCopyFrom(newLayers);
+            }
+            finally {
+                fstr.close();
+            }
         }
         catch(IOException ex) {
             throw new LayerLoadException("I/O error");
@@ -986,7 +991,13 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                     chooserDirectory = chooser.getCurrentDirectory();
                     try {
                         PANImport.Data importdat;
-                        importdat = PANImport.PANImport(new FileInputStream(chooser.getSelectedFile()));
+                        FileInputStream fstr = new FileInputStream(chooser.getSelectedFile());
+                        try {
+                            importdat = PANImport.PANImport(fstr);
+                        }
+                        finally {
+                            fstr.close();
+                        }
 
                         assert(importdat.alpha_0.length == importdat.meas.length);
                         assert(importdat.alpha_0.length > 0);
@@ -1056,7 +1067,13 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                     chooserDirectory = chooser.getCurrentDirectory();
                     try {
                         AsciiImport.AsciiData importdat;
-                        importdat = AsciiImport.AsciiImport(new FileInputStream(chooser.getSelectedFile()));
+                        FileInputStream fstr = new FileInputStream(chooser.getSelectedFile());
+                        try {
+                            importdat = AsciiImport.AsciiImport(fstr);
+                        }
+                        finally {
+                            fstr.close();
+                        }
 
                         assert(importdat.alpha_0.length == importdat.meas.length);
                         assert(importdat.alpha_0.length > 0);
@@ -1154,14 +1171,19 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                     chooserDirectory = chooser.getCurrentDirectory();
                     try {
                         FileOutputStream fstr = new FileOutputStream(chooser.getSelectedFile());
-                        /*
-                        additional_data.put("measPath",measPath == null ? "" : measPath);
-                        Fcode.fencode(layers.structExport(additional_data), fstr);
-                        */
-
-                        DocumentFragment doc = new DocumentFragment("model");
-                        doc.setThisRow(layers);
-                        doc.unparse(XMLDocumentType.WHOLE, fstr);
+                        try {
+                            /*
+                            additional_data.put("measPath",measPath == null ? "" : measPath);
+                            Fcode.fencode(layers.structExport(additional_data), fstr);
+                            */
+    
+                            DocumentFragment doc = new DocumentFragment("model");
+                            doc.setThisRow(layers);
+                            doc.unparse(XMLDocumentType.WHOLE, fstr);
+                        }
+                        finally {
+                            fstr.close();
+                        }
                     }
                     catch(IOException ex) {
                         JOptionPane.showMessageDialog(null, "I/O error", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1207,16 +1229,21 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                 if(chooser.showSaveDialog(thisFrame) == JFileChooser.APPROVE_OPTION) {
                     chooserDirectory = chooser.getCurrentDirectory();
                     try {
-                        OutputStream fstr = new FileOutputStream(chooser.getSelectedFile());
-                        Writer rw = new OutputStreamWriter(fstr);
-                        BufferedWriter bw = new BufferedWriter(rw);
-                        PrintWriter w = new PrintWriter(bw);
-                        ListModel model = layers.listModel;
-                        w.println("Layer stack");
-                        for(int i=0; i<model.getSize(); i++)
-                            w.println(model.getElementAt(i).toString());
-                        if(w.checkError())
-                          throw new IOException();
+                        FileOutputStream fstr = new FileOutputStream(chooser.getSelectedFile());
+                        try {
+                            Writer rw = new OutputStreamWriter(fstr);
+                            BufferedWriter bw = new BufferedWriter(rw);
+                            PrintWriter w = new PrintWriter(bw);
+                            ListModel model = layers.listModel;
+                            w.println("Layer stack");
+                            for(int i=0; i<model.getSize(); i++)
+                                w.println(model.getElementAt(i).toString());
+                            if(w.checkError())
+                              throw new IOException();
+                        }
+                        finally {
+                            fstr.close();
+                        }
                     }
                     catch(IOException ex) {
                         JOptionPane.showMessageDialog(null, "I/O error", "Error", JOptionPane.ERROR_MESSAGE);

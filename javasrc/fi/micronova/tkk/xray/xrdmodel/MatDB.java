@@ -9,8 +9,20 @@ import fi.iki.jmtilli.javaxmlfrag.*;
 public class MatDB {
     public final List<SimpleMaterial> materials;
     public MatDB(File f, LookupTable lookup) throws IOException, ElementNotFound, ParserConfigurationException, SAXException {
-        this(DocumentFragmentHandler.parseWhole(new FileInputStream(f)), lookup);
+        this(parseClose(f), lookup);
     }
+    private static DocumentFragment parseClose(File f) throws IOException, ParserConfigurationException, SAXException
+    {
+        FileInputStream fstr = new FileInputStream(f);
+        try {
+            DocumentFragment frag = DocumentFragmentHandler.parseWhole(fstr);
+            return frag;
+        }
+        finally {
+            fstr.close();
+        }
+    }
+
     public MatDB(DocumentFragment f, LookupTable lookup)
       throws IOException, ElementNotFound
     {

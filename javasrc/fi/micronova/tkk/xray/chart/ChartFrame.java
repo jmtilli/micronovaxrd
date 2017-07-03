@@ -138,19 +138,24 @@ public class ChartFrame extends JFrame {
                           cols[i+1] = ydata.get(i).array;
 
                         OutputStream fstr = new FileOutputStream(file);
-                        Writer rw = new OutputStreamWriter(fstr);
-                        BufferedWriter bw = new BufferedWriter(rw);
-                        PrintWriter w = new PrintWriter(bw);
-                        for(int i=0; i<cols[0].length; i++) {
-                            for(int j=0; j<cols.length; j++) {
-                                w.print(cols[j][i]);
-                                if(j != cols.length-1)
-                                    w.print(" ");
+                        try {
+                            Writer rw = new OutputStreamWriter(fstr);
+                            BufferedWriter bw = new BufferedWriter(rw);
+                            PrintWriter w = new PrintWriter(bw);
+                            for(int i=0; i<cols[0].length; i++) {
+                                for(int j=0; j<cols.length; j++) {
+                                    w.print(cols[j][i]);
+                                    if(j != cols.length-1)
+                                        w.print(" ");
+                                }
+                                w.println();
                             }
-                            w.println();
+                            if(w.checkError())
+                              throw new IOException();
                         }
-                        if(w.checkError())
-                          throw new IOException();
+                        finally {
+                            fstr.close();
+                        }
                     }
                     catch(IOException ex) {
                         JOptionPane.showMessageDialog(null, "I/O error", "Error", JOptionPane.ERROR_MESSAGE);
