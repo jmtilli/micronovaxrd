@@ -42,10 +42,10 @@ public class SliderPanel extends JPanel {
         super();
         GridBagConstraints c = new GridBagConstraints();
         setLayout(new GridBagLayout());
-        dUpdater = new SingleScrollbarUpdater(l.getThickness(), "d (nm)", 1e9);
-        pUpdater = new SingleScrollbarUpdater(l.getComposition(), "p", 1);
-        rUpdater = new SingleScrollbarUpdater(l.getRelaxation(), "r", 1);
-        whUpdater = new SingleScrollbarUpdater(l.getSuscFactor(), "wh", 1);
+        dUpdater = new SingleScrollbarUpdater(l.getThickness(), "d (nm)", 1e9, true);
+        pUpdater = new SingleScrollbarUpdater(l.getComposition(), "p", 1, true);
+        rUpdater = new SingleScrollbarUpdater(l.getRelaxation(), "r", 1, true);
+        whUpdater = new SingleScrollbarUpdater(l.getSuscFactor(), "wh", 1, true);
         dUpdater.addToGridBag(this);
         pUpdater.addToGridBag(this);
         rUpdater.addToGridBag(this);

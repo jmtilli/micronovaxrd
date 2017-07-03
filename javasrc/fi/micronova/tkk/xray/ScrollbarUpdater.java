@@ -118,7 +118,7 @@ public class ScrollbarUpdater {
 
         /*
         this.convolutionSlider = new JSlider(0,1000);
-        this.convolutionLabel = new JLabel("FWHM (degrees) = 0.000000");
+        this.convolutionLabel = new JLabel("FWHM (\u00B0) = 0.000000");
 
         this.normalSlider = new JSlider(0,1000);
         this.normalLabel = new JLabel("normalization (dB) = -00.000");

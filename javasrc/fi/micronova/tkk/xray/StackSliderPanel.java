@@ -8,10 +8,10 @@ public class StackSliderPanel extends JPanel {
         super();
         GridBagConstraints c = new GridBagConstraints();
         setLayout(new GridBagLayout());
-        new SingleScrollbarUpdater(ls.getSum(), "sum (dB)", 1).addToGridBag(this);
-        new SingleScrollbarUpdater(ls.getProd(), "norm (dB)", 1).addToGridBag(this);
-        new SingleScrollbarUpdater(ls.getOffset(), "offset (degrees)", 180/Math.PI).addToGridBag(this);
-        new SingleScrollbarUpdater(ls.getStdDev(), "FWHM (degrees)", 180/Math.PI * (2*Math.sqrt(2*Math.log(2)))).addToGridBag(this);
+        new SingleScrollbarUpdater(ls.getSum(), "sum (dB)", 1, false).addToGridBag(this);
+        new SingleScrollbarUpdater(ls.getProd(), "norm (dB)", 1, false).addToGridBag(this);
+        new SingleScrollbarUpdater(ls.getOffset(), "offset (\u00B0)", 180/Math.PI, false).addToGridBag(this);
+        new SingleScrollbarUpdater(ls.getStdDev(), "FWHM (\u00B0)", 180/Math.PI * (2*Math.sqrt(2*Math.log(2))), true).addToGridBag(this);
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.weighty = 1;

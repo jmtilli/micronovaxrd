@@ -720,7 +720,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                 final double FWHM_SCALE = 2*Math.sqrt(2*Math.log(2));
 
                 fitWlLabel.setText(String.format(Locale.US,"%.6f",fitLayers.getLambda()*1e9)+" nm");
-                fitConvLabel.setText(String.format(Locale.US,"%.6f",fitLayers.getStdDev().getExpected()*FWHM_SCALE*180/Math.PI)+" degrees");
+                fitConvLabel.setText(String.format(Locale.US,"%.6f",fitLayers.getStdDev().getExpected()*FWHM_SCALE*180/Math.PI)+"\u00B0");
                 fitNormLabel.setText(String.format(Locale.US,"%.3f",fitLayers.getProd().getExpected())+" dB "+(fitLayers.getProd().getEnabled()?"(fit)":"(no fit)"));
                 fitSumLabel.setText(String.format(Locale.US,"%.3f",fitLayers.getSum().getExpected())+" dB "+(fitLayers.getSum().getEnabled()?"(fit)":"(no fit)"));
             }

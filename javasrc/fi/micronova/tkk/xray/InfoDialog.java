@@ -233,7 +233,7 @@ public class InfoDialog extends JDialog {
         gridPanel.add(new JPanel(),c);
 
         c.gridwidth = 1;
-        gridPanel.add(new JLabel("Bragg's angle (degrees)"),c);
+        gridPanel.add(new JLabel("Bragg's angle (\u00B0)"),c);
         //c.gridwidth = GridBagConstraints.REMAINDER;
         braggField = new JTextField("",12);
         braggField.setEditable(false);

@@ -19,10 +19,12 @@ public class SingleScrollbarUpdater implements ValueListener {
 
     private JLabel valLabel;
     private JButton minButton;
+    private JButton minx2Button;
     private JLabel minLabel;
     private JSlider slider;
     private JLabel maxLabel;
     private JButton maxButton;
+    private JButton maxx2Button;
     private JButton rangeButton;
     private JCheckBox enableCheck;
 
@@ -33,13 +35,16 @@ public class SingleScrollbarUpdater implements ValueListener {
 
     private boolean noRecursion = false;
 
-    public SingleScrollbarUpdater(final FitValue val, final String prefix, final double multiplier) {
+    private final boolean minIsZero;
+
+    public SingleScrollbarUpdater(final FitValue val, final String prefix, final double multiplier, final boolean minIsZero) {
         this.val = val;
         this.prefix = prefix;
         this.multiplier = multiplier;
         this.valLabel = new JLabel("");
         this.minLabel = new JLabel("");
         this.maxLabel = new JLabel("");
+        this.minIsZero = minIsZero;
 
         this.valLabel.setText(prefix + " = " + String.format(Locale.US,"%.6g",-1e-4)+" ");
         this.minLabel.setText(String.format(Locale.US,"%.6g",-1e-4)+" ");
@@ -51,19 +56,45 @@ public class SingleScrollbarUpdater implements ValueListener {
 
         this.enableCheck = new JCheckBox("fit");
         this.enableCheck.setEnabled(val.isSupported());
-        this.minButton = new JButton("Min");
+        this.minButton = new JButton("<");
         this.minButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
                 val.setValues(val.getExpected(),val.getExpected(),val.getMax(),val.getEnabled());
             }
         });
-        this.maxButton = new JButton("Max");
+        this.minx2Button = new JButton("2");
+        this.minx2Button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ev) {
+                double newMin = val.getMin()-(val.getMax()-val.getMin());
+                if (val.getMax() == val.getMin())
+                {
+                    newMin = val.getMin() - 1/multiplier;
+                }
+                if (minIsZero && newMin < 0)
+                {
+                    newMin = 0;
+                }
+                val.setValues(newMin,val.getExpected(),val.getMax(),val.getEnabled());
+            }
+        });
+        this.maxButton = new JButton(">");
         this.maxButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
                 val.setValues(val.getMin(),val.getExpected(),val.getExpected(),val.getEnabled());
             }
         });
-        this.rangeButton = new JButton("Edit...");
+        this.maxx2Button = new JButton("2");
+        this.maxx2Button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ev) {
+                double newMax = val.getMax()+(val.getMax()-val.getMin());
+                if (val.getMax() == val.getMin())
+                {
+                    newMax = val.getMax() + 1/multiplier;
+                }
+                val.setValues(val.getMin(),val.getExpected(),newMax,val.getEnabled());
+            }
+        });
+        this.rangeButton = new JButton("Edit");
         this.rangeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
                 Dialog ownerDialog = DialogUtil.getOwnerDialog(rangeButton);
@@ -171,6 +202,7 @@ public class SingleScrollbarUpdater implements ValueListener {
         c.anchor = GridBagConstraints.WEST;
         c.gridwidth = 1;
         sliders.add(valLabel,c);
+        sliders.add(minx2Button,c);
         sliders.add(minButton,c);
         sliders.add(minLabel,c);
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -185,6 +217,7 @@ public class SingleScrollbarUpdater implements ValueListener {
         c.weightx = 0;
         sliders.add(maxLabel,c);
         sliders.add(maxButton,c);
+        sliders.add(maxx2Button,c);
         sliders.add(rangeButton,c);
         c.gridwidth = GridBagConstraints.REMAINDER;
         sliders.add(enableCheck,c);
