@@ -38,6 +38,8 @@
       <include name="javaxmlfrag.jar"/>
       <include name="Jama-1.0.3.jar"/>
       <include name="lib/jcommon-1.0.0.jar"/>
+      <include name="librarysrc/jcommon-1.0.0.zip"/>
+      <include name="librarysrc/jfreechart-1.0.1.zip"/>
   </patternset>
 
   <patternset id="srcdoc">
