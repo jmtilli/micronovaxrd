@@ -129,10 +129,6 @@
                   <include name="xrd.jar" />
               </patternset>
           </zipfileset>
-          <zipfileset dir="${src}/jmatlink" prefix="xrd-bin">
-              <include name="JMatLink.dll" />
-              <include name="nativelib/" />
-          </zipfileset>
       </zip>
   </target>
 
