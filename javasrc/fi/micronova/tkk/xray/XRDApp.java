@@ -302,13 +302,9 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
 
         final Runnable errTask = new Runnable() {
-            boolean alreadyRun = false;
             public void run() {
-                if(alreadyRun)
-                    return;
-                alreadyRun = true;
                 JOptionPane.showMessageDialog(null,
-                    "There was an error with fitting.\nPlease save your layer model and restart the program.",
+                    "There was an error with fitting.",
                     "Fitting error", JOptionPane.ERROR_MESSAGE);
             }
         };
@@ -797,7 +793,16 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                     final Runnable errTask2 = new Runnable() {
                         public void run() {
                             f = null;
+                            startFitButton.setEnabled(true);
                             stopFitButton.setEnabled(false);
+                            importButton.setEnabled(true);
+                            //exportButton.setEnabled(true);
+                            fileLoadMeas.setEnabled(true);
+                            fileLoadAscii.setEnabled(true);
+                            fileLoadEmpty.setEnabled(true);
+                            fileSwap.setEnabled(true);
+                            pfit.setAdditionalTitle("");
+                            pfit.draw();
                             errTask.run();
                         }
                     };

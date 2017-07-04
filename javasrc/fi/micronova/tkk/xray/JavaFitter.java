@@ -86,12 +86,18 @@ public class JavaFitter implements FitterInterface {
 
     public JavaFitter(JPlotArea light, GraphData data, LayerTask endTask, LayerTask plotTask, Runnable errTask, LayerStack stack, int popsize, int iterations, double firstAngle, double lastAngle, Image green, Image yellow,
             Algorithm algo, FitnessFunction func, double dBthreshold, int pNorm,
-            AdvancedFitOptions opts) throws SimulationException
+            AdvancedFitOptions opts)
+            throws SimulationException, FittingNotStartedException
     {
         FittingErrorFunc func2;
+        boolean ok = false;
         stack = stack.deepCopy();
         data = data.convertToLinear();
         data = data.crop(firstAngle, lastAngle);
+        if (data.alpha_0.length < 2)
+        {
+            throw new FittingNotStartedException();
+        }
         this.green = green;
         this.yellow = yellow;
         this.light = light;
@@ -101,6 +107,11 @@ public class JavaFitter implements FitterInterface {
         this.iterations = iterations;
         this.stack = stack;
         closing = false;
+        if (stack.getLayers().isEmpty())
+        {
+            throw new FittingNotStartedException();
+        }
+
         t = new Thread(new Runnable() {
             public void run() {
                 runThread();
@@ -150,10 +161,20 @@ public class JavaFitter implements FitterInterface {
           default:
             throw new IllegalArgumentException();
         }
-        this.ctx = new XRDFittingCtx(stack, data,
-                                     algo == Algorithm.JavaCovDE,
-                                     algo != Algorithm.JavaEitherOrDE,
-                                     popsize, func2, exec, opts);
+        try {
+            this.ctx = new XRDFittingCtx(stack, data,
+                                         algo == Algorithm.JavaCovDE,
+                                         algo != Algorithm.JavaEitherOrDE,
+                                         popsize, func2, exec, opts);
+            ok = true;
+        }
+        finally
+        {
+            if (!ok)
+            {
+                exec.shutdown();
+            }
+        }
         t.start();
     }
 
