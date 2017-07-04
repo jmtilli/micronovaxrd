@@ -876,8 +876,7 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
         final double stddevs = 4;
         double[] sin_theta_plus_thetaoffset = new double[theta.length];
 
-        // XXX: can throw if theta.length == 0 or theta.length == 1
-        double dtheta = (theta[theta.length-1] - theta[0])/(theta.length-1);
+        double dtheta = theta.length > 1 ? (theta[theta.length-1] - theta[0])/(theta.length-1) : 1;
 
         double thetaoffset = offset.getExpected();
         double[] filter = null;
@@ -1115,8 +1114,7 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
         final double stddevs = 4;
         double[] sin_theta_plus_thetaoffset = new double[theta.length];
 
-        // XXX: can throw if theta.length == 0 or theta.length == 1
-        double dtheta = (theta[theta.length-1] - theta[0])/(theta.length-1);
+        double dtheta = theta.length > 1 ? (theta[theta.length-1] - theta[0])/(theta.length-1) : 1;
 
         double thetaoffset = offset.getExpected();
         double[] filter = null;
@@ -1349,8 +1347,7 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
         Complex[] chi_h_neg_ar = new Complex[nlayers];
         final double stddevs = 4;
 
-        // XXX: can throw if theta.length == 0 or theta.length == 1
-        double dtheta = (theta[theta.length-1] - theta[0])/(theta.length-1);
+        double dtheta = theta.length > 1 ? (theta[theta.length-1] - theta[0])/(theta.length-1) : 1;
 
         double thetaoffset = offset.getExpected();
         double[] filter = null;
