@@ -35,7 +35,7 @@ values of wavelength and FWHM are used in most setups.
 If you want to have a specific layer model loaded automatically when the
 program starts, save the layer model to a file named "default.layers". On Unix
 systems, the name is case sensitive. The file should be saved to the directory
-that contains the files atomic_masses.txt and octave_path.txt.
+that contains the file atomic_masses.txt.
 
 You might want to set the wavelength and FWHM to correct values and add a
 substrate layer to the default layer model.
