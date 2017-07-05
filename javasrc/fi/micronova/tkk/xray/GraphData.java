@@ -65,6 +65,64 @@ public class GraphData {
                    1/(12*xx) - 1/(360*xx3) + 1/(1260*xx5) - 1/(1680*xx7) +
                    1/(1188*xx9) - 691/(360360*xx11);
         }
+        private int nextValueSmall(double mean)
+        {
+            int result = 0;
+            double L = Math.exp(-mean);
+            double p = 1;
+            do
+            {
+                result++;
+                p *= rand.nextDouble();
+            }
+            while (p > L);
+            result--;
+            return result;
+        }
+        private int nextValueLarge(double mean)
+        {
+            double r;
+            double x, m;
+            double sqrt_mean = Math.sqrt(mean);
+            double log_mean = Math.log(mean);
+            /*
+             * Ok, this requires a bit of an explanation. First, we are
+             * generating random numbers from the Cauchy distribution:
+             * f(x) = 1/(pi*gamma)*(gamma^2/((x-x0)^2+gamma^2))
+             * y = F(x) = 1/pi*arctan((x-x0)/gamma) + 1/2
+             * x = x0 + gamma*tan(pi*(y-1/2))
+             * We select x0 = mean and gamma = sqrt(mean).
+             * Now, the distribution has negative values as well, so they need
+             * to be filtered out.
+             * We evaluate the expression mean^m*exp(-mean)/m! at
+             * m = floor(x), so the expression becomes
+             * g(x) = exp(m*log(mean) - mean - lgamma(m + 1))
+             *      = exp(floor(x)*log(mean) - mean - lgamma(floor(x) + 1))
+             * We then calculate the ratio g(x) / f(x) / 2.0. Why 2.0, you ask?
+             * Well, that's to make the ratio always smaller than 1.0 given that
+             * the mean value is at least 10 (smaller values are handled by
+             * special-purpose code that is fast for small values).
+             * Then we reject if a uniform random number is larger than
+             * g(x) / f(x) / 2.0, otherwise we accept.
+             */
+            if (mean < 10 || Double.isInfinite(mean) || Double.isNaN(mean))
+            {
+                // We haven't verified with mean < 10 that the ratio is below 1
+                throw new IllegalArgumentException();
+            }
+            do
+            {
+                do
+                {
+                    x = mean + sqrt_mean*Math.tan(Math.PI*(rand.nextDouble()-1/2.0));
+                }
+                while (x < 0 || Double.isInfinite(x) || Double.isNaN(x));
+                m = Math.floor(x);
+                r = Math.exp(m*log_mean - mean - log_gamma(m + 1)) * ((x-mean)*(x-mean) + mean) * Math.PI/2 / sqrt_mean;
+            }
+            while (rand.nextDouble() > r || m > (double)Integer.MAX_VALUE);
+            return (int)m;
+        }
         /**
          * Create next random Poisson-distributed value.
          *
@@ -72,41 +130,15 @@ public class GraphData {
          * @return Random Poisson-distributed value
          */
         public int nextValue(double mean) {
-            int result = 0;
-            if (mean < 12.0)
+            if (mean < 60.0)
             {
-                double L = Math.exp(-mean);
-                double p = 1;
-                do
-                {
-                    result++;
-                    p *= rand.nextDouble();
-                }
-                while (p > L);
-                result--;
+                return nextValueSmall(mean);
             }
             else
             {
-                double sqrt = Math.sqrt(2.0*mean);
-                double log_mean = Math.log(mean);
-                double g = mean*log_mean - log_gamma(mean+1.0);
-                double y, em, t;
-                do
-                {
-                    do
-                    {
-                        y = Math.tan(Math.PI*rand.nextDouble());
-                        em = sqrt*y + mean;
-                    }
-                    while (em < 0.0);
-                    em = Math.floor(em);
-                    t = 0.9*(1.0+y*y)*Math.exp(em*log_mean-log_gamma(em+1.0)-g);
-                }
-                while (rand.nextDouble() > t);
-                result = (int)em;
+                return nextValueLarge(mean);
             }
-            return result;
-        };
+        }
     }
     /** Adds noise to the measured data.
      *
