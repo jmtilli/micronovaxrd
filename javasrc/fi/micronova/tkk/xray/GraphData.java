@@ -98,12 +98,11 @@ public class GraphData {
              * m = floor(x), so the expression becomes
              * g(x) = exp(m*log(mean) - mean - lgamma(m + 1))
              *      = exp(floor(x)*log(mean) - mean - lgamma(floor(x) + 1))
-             * We then calculate the ratio g(x) / f(x) / 2.0. Why 2.0, you ask?
-             * Well, that's to make the ratio always smaller than 1.0 given that
-             * the mean value is at least 10 (smaller values are handled by
-             * special-purpose code that is fast for small values).
+             * We then calculate the ratio g(x) / f(x) / 2.4. Why 2.4, you ask?
+             * Well, that's to make the ratio always smaller than 1.0 given any
+             * mean value.
              * Then we reject if a uniform random number is larger than
-             * g(x) / f(x) / 2.0, otherwise we accept.
+             * g(x) / f(x) / 2.4, otherwise we accept.
              */
             if (mean < 10 || Double.isInfinite(mean) || Double.isNaN(mean))
             {
@@ -118,7 +117,7 @@ public class GraphData {
                 }
                 while (x < 0 || Double.isInfinite(x) || Double.isNaN(x));
                 m = Math.floor(x);
-                r = Math.exp(m*log_mean - mean - log_gamma(m + 1)) * ((x-mean)*(x-mean) + mean) * Math.PI/2 / sqrt_mean;
+                r = Math.exp(m*log_mean - mean - log_gamma(m + 1)) * ((x-mean)*(x-mean) + mean) * Math.PI/2.4 / sqrt_mean;
             }
             while (rand.nextDouble() > r || m > (double)Integer.MAX_VALUE);
             return (int)m;
