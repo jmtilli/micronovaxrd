@@ -8,9 +8,10 @@
   <!--<property name="build" location="build"/>-->
   <!--<property name="dist"  location="dist"/>-->
 
-  <target name="init">
+  <target name="init" depends="maybeclean">
     <!-- Create the time stamp -->
     <tstamp/>
+    <touch file=".tstamp"/>
     <!-- Create the build directory structure used by compile -->
     <!-- <mkdir dir="${build}"/> -->
   </target>
@@ -136,9 +137,24 @@
   </target>
   <target name="dist" depends="srcdist,bindist" description="make distfiles" />
 
+  <target name="chkclean">
+    <uptodate property="xmlBuild.notRequired" targetfile=".tstamp">
+      <srcfiles dir="." includes="build.xml"/>
+    </uptodate>
+  </target>
+
+  <target name="maybeclean" depends="chkclean" unless="xmlBuild.notRequired">
+    <ant target="clean"/>
+  </target>
+
   <target name="clean" description="clean up" >
     <delete>
         <fileset dir="${src}" includes="**/*.class"/>
+    </delete>
+    <delete>
+        <fileset dir=".">
+            <include name=".tstamp" />
+        </fileset>
     </delete>
     <!-- Delete the ${build} and ${dist} directory trees -->
     <!-- <delete dir="${build}"/> -->

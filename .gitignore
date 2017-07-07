@@ -1,1 +1,6 @@
 *.class
+/.tstamp
+/xrd.jar
+/xrdlog0.txt
+/xrd-bin.zip
+/xrd-src.zip
