@@ -1,5 +1,9 @@
 package fi.micronova.tkk.xray.measimport;
 import java.io.*;
+import fi.iki.jmtilli.javaxmlfrag.*;
+import javax.xml.parsers.*;
+import org.xml.sax.*;
+
 
 /** Measurement importing code.
  *
@@ -25,7 +29,7 @@ public class PANImport {
      * @throws IOException if an I/O error occurs
      * @throws ImportException if the file format is invalid
      * */
-    public static Data PANImport(InputStream s) throws ImportException, IOException {
+    public static Data X00Import(InputStream s) throws ImportException, IOException {
         double[] alpha_0;
         double[] meas;
         Boolean is_2theta_omega = null;
@@ -109,5 +113,117 @@ public class PANImport {
             throw new ImportException();
         }
         return new Data(alpha_0, meas);
+    }
+    public static Data XRDMLImport(InputStream s) throws ImportException, IOException
+    {
+        try {
+            DocumentFragment doc_frag =
+                DocumentFragmentHandler.parseWhole(s);
+            DocumentFragment measurement;
+            DocumentFragment scan;
+            DocumentFragment dataPoints;
+            DocumentFragment commonCountingTime;
+            DocumentFragment intensities;
+            String axis, unit;
+            String[] counts;
+            double time;
+            double start = 0, end = 90, step;
+            boolean valid = false;
+            double[] alpha_0, meas;
+            doc_frag.assertTag("xrdMeasurements");
+            measurement = doc_frag.getNotNull("xrdMeasurement");
+            if (!measurement.getAttrStringNotNull("measurementType").equals("Scan"))
+            {
+                throw new ImportException();
+            }
+            if (!measurement.getAttrStringNotNull("status").equals("Completed"))
+            {
+                throw new ImportException();
+            }
+            scan = measurement.getNotNull("scan");
+            axis = scan.getAttrStringNotNull("scanAxis");
+            if (!axis.equals("Omega-2Theta") &&
+                !axis.equals("2Theta-Omega"))
+            {
+                throw new ImportException();
+            }
+            dataPoints = scan.getNotNull("dataPoints");
+            commonCountingTime = dataPoints.getNotNull("commonCountingTime");
+            unit = commonCountingTime.getAttrStringNotNull("unit");
+            if (!unit.equals("seconds"))
+            {
+                throw new ImportException();
+            }
+            time = dataPoints.getDoubleNotNull("commonCountingTime");
+            intensities = dataPoints.getNotNull("intensities");
+            unit = intensities.getAttrStringNotNull("unit");
+            if (!unit.equals("counts"))
+            {
+                throw new ImportException();
+            }
+            counts = dataPoints.getStringNotNull("intensities").split(" ", 0);
+            for (DocumentFragment positions: dataPoints.getMulti("positions"))
+            {
+                if (!positions.getAttrStringNotNull("axis").equals("2Theta"))
+                {
+                    continue;
+                }
+                if (!positions.getAttrStringNotNull("unit").equals("deg"))
+                {
+                    throw new ImportException();
+                }
+                start = positions.getDoubleNotNull("startPosition")/2.0;
+                end = positions.getDoubleNotNull("endPosition")/2.0;
+                valid = true;
+            }
+            if (!valid || counts.length <= 1)
+            {
+                throw new ImportException();
+            }
+            step = (end-start)/(counts.length-1);
+            meas = new double[counts.length];
+            alpha_0 = new double[counts.length];
+            for (int i = 0; i < meas.length; i++)
+            {
+                meas[i] = Double.parseDouble(counts[i])/time;
+                alpha_0[i] = start + i*step;
+            }
+            return new Data(alpha_0, meas);
+        }
+        catch(ParserConfigurationException ex)
+        {
+            throw new ImportException();
+        }
+        catch(NumberFormatException ex)
+        {
+            throw new ImportException();
+        }
+        catch(SAXException ex)
+        {
+            throw new ImportException();
+        }
+        catch(XMLException ex)
+        {
+            throw new ImportException();
+        }
+    }
+    /** Imports measurement file from an InputStream.
+     *
+     * @param s the stream to import the measurement from
+     * @return the imported data points
+     * @throws IOException if an I/O error occurs
+     * @throws ImportException if the file format is invalid
+     * */
+    public static Data PANImport(InputStream s) throws ImportException, IOException {
+        BufferedInputStream bs = new BufferedInputStream(s);
+        byte[] header = new byte[10];
+        bs.mark(16);
+        bs.read(header, 0, 10);
+        bs.reset();
+        if (new String(header).equals("HR-XRDScan"))
+        {
+            return X00Import(bs);
+        }
+        return XRDMLImport(bs);
     }
 };
