@@ -7,6 +7,7 @@ import java.awt.event.*;
 import java.io.*;
 import javax.imageio.*;
 import java.util.logging.*;
+import java.util.zip.*;
 import org.jfree.data.xy.*;
 import org.jfree.chart.*;
 import org.jfree.chart.plot.*;
@@ -120,8 +121,19 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             FileInputStream fstr = new FileInputStream(f);
             try {
                 BufferedInputStream bs = new BufferedInputStream(fstr);
+                byte[] bytes = new byte[2];
+                InputStream str = bs;
+                bs.mark(2);
+                bs.read(bytes, 0, 2);
+                bs.reset();
+                if (bytes[0] == (byte) (GZIPInputStream.GZIP_MAGIC&0xFF) &&
+                    bytes[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8))
+                {
+                  GZIPInputStream gz = new GZIPInputStream(bs);
+                  str = gz;
+                }
                 DocumentFragment doc_frag =
-                    DocumentFragmentHandler.parseWhole(bs);
+                    DocumentFragmentHandler.parseWhole(str);
                 doc_frag.assertTag("model");
                 LayerStack newLayers = new LayerStack(doc_frag, table);
                 layers.deepCopyFrom(newLayers);
