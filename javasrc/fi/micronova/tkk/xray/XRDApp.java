@@ -1187,7 +1187,14 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                 if(chooser.showSaveDialog(thisFrame) == JFileChooser.APPROVE_OPTION) {
                     chooserDirectory = chooser.getCurrentDirectory();
                     try {
-                        FileOutputStream fstr = new FileOutputStream(chooser.getSelectedFile());
+                        File f = chooser.getSelectedFile();
+                        String fs = f.getPath();
+                        FileOutputStream fstr = new FileOutputStream(f);
+                        OutputStream str = fstr;
+                        if (fs.endsWith(".gz"))
+                        {
+                            str = new GZIPOutputStream(fstr, true);
+                        }
                         try {
                             /*
                             additional_data.put("measPath",measPath == null ? "" : measPath);
@@ -1196,9 +1203,14 @@ public class XRDApp extends JFrame implements ChooserWrapper {
     
                             DocumentFragment doc = new DocumentFragment("model");
                             doc.setThisRow(layers);
-                            doc.unparse(XMLDocumentType.WHOLE, fstr);
+                            doc.unparse(XMLDocumentType.WHOLE, str);
                         }
                         finally {
+                            str.flush();
+                            if (str != fstr)
+                            {
+                                str.close();
+                            }
                             fstr.close();
                         }
                     }
