@@ -5,6 +5,21 @@ USAGE
 1. Measurements
 
 
+Measurements are loaded by File -> Load measurement. The number of data points
+is divided by the modulo parameter. Usually 500 - 1000 is a good number of data
+poins. You can also set which data points are imported by the settings "angle
+min" and "angle max".
+
+Only measurements exported from PANalytical's software are supported. In order
+to import other file formats, you need to edit PANImport.java, which requires
+Java programming skills. Specifically, the file format is the .x00 file format.
+PANalytical's software may support other file formats as well, but this
+software doesn't.
+
+The wavelength of the measurement must be entered manually on the layer editor
+tab. The default wavelength is 1.54 nm (Cu K-alpha line). Scattering factors
+for other wavelengths are not included in this distribution. Instructions for
+installing complete scattering factor databases are in the file README-1st.txt.
 
 If you want to test the program without using a real measurement, choose
 File -> Load empty measurement and enter the desired angular range and the
@@ -36,6 +51,7 @@ The default wavelength is Cu K_alpha, which is 0.154056 nm. The wavelength can
 be changed with the edit button. The wavelength is stored in the layer file
 along with the layer model and the fitting parameters.
 
+
 3. Fitting parameters
 
 The three fitting parameters for each layer are thickness, composition and
@@ -46,6 +62,10 @@ values. If you have too small fitting range, the optimal solution might be out
 of the fitting range, which makes it unable to find the solution. If you have
 too large fitting range, the fit might not converge or if it does, it
 converges slowly.
+
+An additional parameter, multiplicative susceptibility factor, wh, is provided.
+It is recommended that this factor is set to 1 and is not fitted. Fitting with
+it may provide a better fit, but it has no sound theoretical basis.
 
 The expected values are the best guesses for the fitting parameters. You
 should start by entering the most probable value as the expected value. After
@@ -146,30 +166,31 @@ and click duplicate, which makes a linked copy of the selected layers.
 Finally, add the substrate to the bottom of the stack. You should have the
 following layer stack:
 
-Layer 1 pos 1: GaAs, d = 18.5000 nm (fit), p = 0.00000 (no fit), r = 0.00000 (no fit)
-Layer 2 pos 2: InGaAs, d = 7.00000 nm (fit), p = 0.250000 (fit), r = 0.00000 (no fit)
-Layer 1 pos 3: GaAs, d = 18.5000 nm (fit), p = 0.00000 (no fit), r = 0.00000 (no fit)
-Layer 2 pos 4: InGaAs, d = 7.00000 nm (fit), p = 0.250000 (fit), r = 0.00000 (no fit)
-Layer 1 pos 5: GaAs, d = 18.5000 nm (fit), p = 0.00000 (no fit), r = 0.00000 (no fit)
-Layer 2 pos 6: InGaAs, d = 7.00000 nm (fit), p = 0.250000 (fit), r = 0.00000 (no fit)
-Layer 3 pos 7: GaAs substrate, d = 0.00000 nm (no fit), p = 0.00000 (no fit), r = 0.00000 (no fit)
+GaAs, d = 18.5000 nm [L1] (fit), p = 0.00000 [L2] (no fit), r = 0.00000 [L3] (no fit), wh = 1.00000 [L4] (no fit)
+InGaAs, d = 7.00000 nm [L5] (fit), p = 0.250000 [L6] (fit), r = 0.00000 [L7] (no fit), wh = 1.00000 [L8] (no fit)
+GaAs, d = 18.5000 nm [L1] (fit), p = 0.00000 [L2] (no fit), r = 0.00000 [L3] (no fit), wh = 1.00000 [L4] (no fit)
+InGaAs, d = 7.00000 nm [L5] (fit), p = 0.250000 [L6] (fit), r = 0.00000 [L7] (no fit), wh = 1.00000 [L8] (no fit)
+GaAs, d = 18.5000 nm [L1] (fit), p = 0.00000 [L2] (no fit), r = 0.00000 [L3] (no fit), wh = 1.00000 [L4] (no fit)
+InGaAs, d = 7.00000 nm [L5] (fit), p = 0.250000 [L6] (fit), r = 0.00000 [L7] (no fit), wh = 1.00000 [L8] (no fit)
+GaAs substrate, d = 0.00000 nm (no fit), p = 0.00000 (no fit), r = 0.00000 (no fit)
 
-Layers 1 and 2 occur in 3 different places. All the occurrences use the same
-fitting parameters, so the total number of fitting parameters is 3. If you
-want to fit all layers separately, you must make the following stack by using
-the copy button instead of the duplicate button:
+The L means the fitting parameter is linked, meaning there are 8 fitting
+parameters of which 3 are fitted. If you want to fit all layers separately, you
+must make the following stack by using the copy button instead of the duplicate
+button:
 
-Layer 1 pos 1: GaAs, d = 18.5000 nm (fit), p = 0.00000 (no fit), r = 0.00000 (no fit)
-Layer 2 pos 2: InGaAs, d = 7.00000 nm (fit), p = 0.250000 (fit), r = 0.00000 (no fit)
-Layer 3 pos 3: GaAs, d = 18.5000 nm (fit), p = 0.00000 (no fit), r = 0.00000 (no fit)
-Layer 4 pos 4: InGaAs, d = 7.00000 nm (fit), p = 0.250000 (fit), r = 0.00000 (no fit)
-Layer 5 pos 5: GaAs, d = 18.5000 nm (fit), p = 0.00000 (no fit), r = 0.00000 (no fit)
-Layer 6 pos 6: InGaAs, d = 7.00000 nm (fit), p = 0.250000 (fit), r = 0.00000 (no fit)
-Layer 7 pos 7: GaAs substrate, d = 0.00000 nm (no fit), p = 0.00000 (no fit), r = 0.00000 (no fit)
+GaAs, d = 18.5000 nm (fit), p = 0.00000 (no fit), r = 0.00000 (no fit), wh = 1.00000 (no fit)
+InGaAs, d = 7.00000 nm (fit), p = 0.250000 (fit), r = 0.00000 (no fit), wh = 1.00000 (no fit)
+GaAs, d = 18.5000 nm (fit), p = 0.00000 (no fit), r = 0.00000 (no fit), wh = 1.00000 (no fit)
+InGaAs, d = 7.00000 nm (fit), p = 0.250000 (fit), r = 0.00000 (no fit), wh = 1.00000 (no fit)
+GaAs, d = 18.5000 nm (fit), p = 0.00000 (no fit), r = 0.00000 (no fit), wh = 1.00000 (no fit)
+InGaAs, d = 7.00000 nm (fit), p = 0.250000 (fit), r = 0.00000 (no fit), wh = 1.00000 (no fit)
+GaAs substrate, d = 0.00000 nm (no fit), p = 0.00000 (no fit), r = 0.00000 (no fit)
 
 If you have fitted the first structure with linked layers and want to refine
 the fit by fitting all layers independently of the others, you can select the
-layers and click separate, which makes all selected layers independent.
+layers and click Unlink params..., which makes all selected layers independent.
+Also, individual parameters may be linked by the Link params... button.
 
 
 
@@ -192,19 +213,18 @@ might help. FWHM can't be fitted.
 
 The sliders have the following structure: first, there is the name of the
 parameter, its unit and the value used to calculate the simulated curve.  Then
-there is the min button which allows setting the minimum value quickly to the
-current value. The minimum value is shown after the min button. Then there is
-the slider to adjust the current value between min and max. After the slider
-there is the maximum value and the max button to set the maximum value
-quickly. You can set the minimum and maximum values (and the current value)
-manually by clicking the edit button. You need the edit button eg. when you
-need to decrease the minimum value or increase the maximum value. The value
-will be fitted only when the fit checkbox is enabled.
+there are the "2" and "<" buttons which allows extending the range and setting
+the minimum value quickly to the current value. The minimum value is shown
+after the "<" button. Then there is the slider to adjust the current value
+between min and max. After the slider there is the maximum value and the ">"
+and "2" buttons to adjust the maximum value quickly. You can set the minimum
+and maximum values (and the current value) manually by clicking the edit
+button. The value will be fitted only when the fit checkbox is enabled.
 
 
 For example, the following slider
 
-r = 0.0000 [Min] 0.0000 [Slider] 1.0000 [Max] [Edit...]  [ ]Fit
+r = 0.0000 [2] [<] 0.0000 [Slider] 1.0000 [>] [2] [Edit]  [ ]Fit
 
 means that the parameter is r (degree of relaxation) and it is unitless. The
 current value is 0 which means that the layer is fully strained. The minimum
@@ -243,14 +263,17 @@ complete.
 
 To fit a model automatically, load a measurement and build a layer model with
 sensible fitting ranges for the parameters using the layer editor and manual
-fit tabs. Then push the import model button on the automatic fit tab. The
-model in the layer editor and manual fit tabs is copied to the automatic fit
-tab.
+fit tabs. Then push the "Import" button on the automatic fit tab. The model in
+the layer editor and manual fit tabs is copied to the automatic fit tab.
 
-Currently only two algorithms are provided: DE and CovDE. DE is differential
-evolution, a simple but efficient genetic algorithm variant. CovDE is a DE
-which uses the population covariance matrix to transform fitting parameters
-during recombination to reduce interparameter correlation.
+Currently only three algorithms are provided: JavaDE, JavaCovDE and
+JavaEitherOrDE. JavaDE is differential evolution, a simple but efficient
+genetic algorithm variant. JavaCovDE is a differential evolution which uses the
+population covariance matrix to transform fitting parameters during
+recombination to reduce interparameter correlation. JavaEitherOrDE uses the
+either/or recombination/mutation feature with slightly different recombination
+than usual to converge better in hard multilayer cases. However, JavaCovDE is
+usually better for hard multilayer cases than JavaEitherOrDE.
 
 The population size should be about 3-10 times the number of fitting
 parameters. To small population size makes the algorithm fast but increases
@@ -271,9 +294,70 @@ the fitting by clicking the stop fit button.
 
 
 Once the maximum number of iterations is reached or you clicked the stop fit
-button, the fitting stops. You can export the fitting results to the manual
-fit tab by clicking the export model button. After you have exported the
-results, they may be saved to a layer file by choosing File -> Save layers.
-When saving the layer model, the model on the layer editor and manual fit tabs
-is always used, so remember to export the model to these tabs after fitting if
-you want to save the fitting results, not the initial layer model.
+button, the fitting stops. You can export the fitting results to the manual fit
+tab by clicking the "Export" model button. After you have exported the results,
+they may be saved to a layer file by choosing File -> Save layers.  When saving
+the layer model, the model on the layer editor and manual fit tabs is always
+used, so remember to export the model to these tabs after fitting if you want
+to save the fitting results, not the initial layer model. If you add the file
+suffix ".gz", it means the file is compressed so it uses less disk space but
+cannot be read by older software versions. So, for example "xrd.layers.gz" is
+compressed, "xrd.gz" is compressed but "xrd.layers" is not compressed.
+
+
+There are several fitting error functions: p-norm in logarithmic space, p-norm
+in sqrt space, chi-squared and mixed relative/chi-squared. Of these, the
+recommended is the default mixed relative/chi-squared but if you want to fit
+interference fringes in low-intensity areas, p-norm in logarithmic space may
+result in a better fit.
+
+Iterations and population size are options of the genetic algorithm. Higher
+values are slower but may help find better fits.  It is usually recommended
+that population size is about ten times the number of fitting parameters. The
+default 60 is good for 6 fitting parameters. Iteration count should be
+preferably higher rather than lower, as the fit can be interrupted early but
+the fit cannot be continued once the iteration count is reached. For this
+reason, the default iteration count is as high as 500.
+
+The parameters p-norm and threshold rel.f (dB) are parameters of the fitting
+error functions. p-norm is used by p-norm in logarithmic space and p-norm in
+sqrt space. Threshold rel.f (dB) on the other hand is used by mixed relative /
+chi-squared and tells where the regime of relative fitting error function
+begins and the regime of chi-squared fitting error function ends.
+
+There are several adjustable fitting parameters that can be changed by the Opts
+button:
+- Mutation strength (k_m): 0.7
+- Recombination probability to take from second gene (c_r): 0.5
+- Mutation individual parameter lambda: 1.0
+  - 1.0 means use best individual (DE/best/1/bin)
+  - 0.5 means move random individual halfway to best individual
+  - 0.0 means use random individual (DE/rand/1/bin)
+- JavaEitherOrDE mutation probability (p_m): 0.5
+  - not used by JavaDE or JavaCovDE
+- JavaEitherOrDE recombination strength (k_r): 0.5*(k_m+1)
+  - not used by JavaDE or JavaCovDE
+
+Probably the only parameter worth adjusting is mutation strength. Lower
+mutation strength means convergence is fast, but there is a risk of
+misconvergence. Higher mutation strength slows down convergence but reduces the
+risk of misconvergence. Recommended values are k_m = 0.5 .. 0.75. The default
+is 0.7, but if you want faster convergence, try 0.6.
+
+
+8. ASCII exports
+
+Measured and simulated data can also be saved to a text file by Data -> Linear
+plot -> File -> Export. The file can be imported to other applications with the
+instructions in README-export.txt. The program doesn't add an extension
+automatically, so you should use "myxrd.txt" instead of "myxrd". ASCII exports
+contain only measured and simulated data, so if you need to be able to load the
+layer model again, use the Save layers command.
+
+Measured or simulated data from ASCII exports can be imported later from File
+-> Load ASCII export. The data to import must be in linear format. The
+imported data is used as measurement data even if you import simulated data.
+The option to import simulated data as measurement data can be used to test
+the fitting algorithm. If the simulation you want to use as measurement is the
+active layer model, you can use the simulated data directly as measurement
+data by choosing File -> Use simulation as measurement.
