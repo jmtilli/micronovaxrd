@@ -3,6 +3,7 @@ import java.io.*;
 import fi.iki.jmtilli.javaxmlfrag.*;
 import javax.xml.parsers.*;
 import org.xml.sax.*;
+import java.util.*;
 
 
 /** Measurement importing code.
@@ -16,10 +17,9 @@ public class PANImport {
     private PANImport() {}
     /** The imported data */
     public static class Data {
-        public final double[] alpha_0, meas;
-        public Data(double[] alpha_0, double[] meas) {
-            this.alpha_0 = alpha_0;
-            this.meas = meas;
+        public final double[][] arrays;
+        public Data(double[][] arrays) {
+            this.arrays = arrays;
         }
     };
     /** Imports measurement file from an InputStream.
@@ -112,13 +112,24 @@ public class PANImport {
         catch(NumberFormatException ex) {
             throw new ImportException();
         }
-        return new Data(alpha_0, meas);
+        return new Data(new double[][]{alpha_0, meas});
     }
     public static Data XRDMLImport(InputStream s) throws ImportException, IOException
     {
+        DocumentFragment doc_frag;
+        try
+        {
+            doc_frag = DocumentFragmentHandler.parseWhole(s);
+        }
+        catch(ParserConfigurationException ex)
+        {
+            return null;
+        }
+        catch(SAXException ex)
+        {
+            return null;
+        }
         try {
-            DocumentFragment doc_frag =
-                DocumentFragmentHandler.parseWhole(s);
             DocumentFragment measurement;
             DocumentFragment scan;
             DocumentFragment dataPoints;
@@ -188,17 +199,9 @@ public class PANImport {
                 meas[i] = Double.parseDouble(counts[i])/time;
                 alpha_0[i] = start + i*step;
             }
-            return new Data(alpha_0, meas);
-        }
-        catch(ParserConfigurationException ex)
-        {
-            throw new ImportException();
+            return new Data(new double[][]{alpha_0, meas});
         }
         catch(NumberFormatException ex)
-        {
-            throw new ImportException();
-        }
-        catch(SAXException ex)
         {
             throw new ImportException();
         }
@@ -206,6 +209,56 @@ public class PANImport {
         {
             throw new ImportException();
         }
+    }
+    public static Data asciiImport(InputStream is) throws ImportException, IOException {
+        ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double>>();
+        double[][] arrays;
+        int cols = -1;
+        BufferedReader r = new BufferedReader(new InputStreamReader(is));
+        try {
+            String line;
+            while((line = r.readLine()) != null) {
+                StringTokenizer t = new StringTokenizer(line);
+                int curcols = 0;
+                ArrayList<Double> list = new ArrayList<Double>();
+                while (t.hasMoreTokens())
+                {
+                    String s = t.nextToken();
+                    double d = Double.parseDouble(s);
+                    if (curcols == 0 && (d < 0 || d > 90))
+                    {
+                        throw new ImportException();
+                    }
+                    curcols++;
+                    list.add(d);
+                }
+                if ((cols >= 0 && cols != curcols) || curcols < 2)
+                {
+                    throw new ImportException();
+                }
+                if (cols < 0)
+                {
+                    cols = curcols;
+                }
+                data.add(list);
+            }
+        }
+        catch(NumberFormatException ex) {
+            throw new ImportException();
+        }
+        catch(NoSuchElementException ex) {
+            throw new ImportException();
+        }
+        arrays = new double[cols][];
+        for (int i = 0; i < cols; i++)
+        {
+            arrays[i] = new double[data.size()];
+            for (int j = 0; j < data.size(); j++)
+            {
+                arrays[i][j] = data.get(j).get(i);
+            }
+        }
+        return new Data(arrays);
     }
     /** Imports measurement file from an InputStream.
      *
@@ -216,6 +269,7 @@ public class PANImport {
      * */
     public static Data PANImport(InputStream s) throws ImportException, IOException {
         BufferedInputStream bs = new BufferedInputStream(s);
+        Data data;
         byte[] header = new byte[10];
         bs.mark(16);
         bs.read(header, 0, 10);
@@ -224,6 +278,13 @@ public class PANImport {
         {
             return X00Import(bs);
         }
-        return XRDMLImport(bs);
+        bs.mark(16*1024*1024);
+        data = XRDMLImport(bs);
+        if (data == null)
+        {
+            bs.reset();
+            return asciiImport(bs);
+        }
+        return data;
     }
 };

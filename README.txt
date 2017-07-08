@@ -355,9 +355,11 @@ contain only measured and simulated data, so if you need to be able to load the
 layer model again, use the Save layers command.
 
 Measured or simulated data from ASCII exports can be imported later from File
--> Load ASCII export. The data to import must be in linear format. The
-imported data is used as measurement data even if you import simulated data.
-The option to import simulated data as measurement data can be used to test
-the fitting algorithm. If the simulation you want to use as measurement is the
-active layer model, you can use the simulated data directly as measurement
-data by choosing File -> Use simulation as measurement.
+-> Load measurement. The data to import must be in linear format. The imported
+data is used as measurement data even if you import simulated data. As default,
+if there are three columns, column 3 is used for measurement, otherwise column
+2 is used for measurement. This can be changed. However, the first column is
+always the angle of incidence data points in degrees. If the simulation you
+want to use as measurement is the active layer model, you can use the simulated
+data directly as measurement data by choosing File -> Use simulation as
+measurement.

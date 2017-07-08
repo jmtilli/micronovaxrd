@@ -10,20 +10,21 @@ import java.util.*;
 
 public class ImportDialog extends JDialog {
     private JTextField minAngleF, maxAngleF, moduloF,
-                       minNormalF, maxNormalF;
+                       minNormalF, maxNormalF,
+                       meascolF;
     private JCheckBox importSimul, normalizeCheck;
     ImportOptions options;
 
-    public ImportDialog(Frame f, int nmeas, double min, double max, boolean includeSimul, boolean normalize) {
+    public ImportDialog(Frame f, int nmeas, double min, double max, int numCols, boolean normalize) {
         super(f,"Import options",true);
-        init(nmeas, min, max, includeSimul, normalize);
+        init(nmeas, min, max, numCols, normalize);
     }
-    public ImportDialog(Dialog f, int nmeas, double min, double max, boolean includeSimul, boolean normalize) {
+    public ImportDialog(Dialog f, int nmeas, double min, double max, int numCols, boolean normalize) {
         super(f,"Import options",true);
-        init(nmeas, min, max, includeSimul, normalize);
+        init(nmeas, min, max, numCols, normalize);
     }
 
-    private void init(int nmeas, double min, double max, boolean includeSimul, boolean normalize)
+    private void init(int nmeas, double min, double max, final int numCols, boolean normalize)
     {
         Container dialog;
 
@@ -38,12 +39,20 @@ public class ImportDialog extends JDialog {
         c.ipadx = c.ipady = 1;
 
         c.gridwidth = GridBagConstraints.REMAINDER;
+        c.fill = GridBagConstraints.HORIZONTAL;
         gridPanel.add(new JLabel("The file containts "+nmeas+" measurement points between angles "+
                                   String.format(Locale.US,"%.4f",min)
                                   +" and "+
                                   String.format(Locale.US,"%.4f",max)
                                   +"."),c);
+        if (numCols > 0)
+        {
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.gridwidth = GridBagConstraints.REMAINDER;
+            gridPanel.add(new JLabel("The file contains " + numCols + " columns"), c);
+        }
 
+        c.fill = GridBagConstraints.NONE;
         c.gridwidth = 1;
         gridPanel.add(new JLabel("modulo"),c);
         moduloF = new JTextField("1",7);
@@ -98,9 +107,10 @@ public class ImportDialog extends JDialog {
                     double maxAngle = Double.parseDouble(maxAngleF.getText());
                     double minNormal = Double.parseDouble(minNormalF.getText());
                     double maxNormal = Double.parseDouble(maxNormalF.getText());
-                    if(minNormal > maxNormal || minAngle > maxAngle || modulo <= 0)
+                    int meascol = Integer.parseInt(meascolF.getText());
+                    if(minNormal > maxNormal || minAngle > maxAngle || modulo <= 0 || meascol <= 1 || meascol > numCols)
                         throw new IllegalArgumentException();
-                    options = new ImportOptions(modulo, minAngle, maxAngle, minNormal, maxNormal, importSimul.isSelected(), normalizeCheck.isSelected());
+                    options = new ImportOptions(modulo, minAngle, maxAngle, minNormal, maxNormal, meascol, normalizeCheck.isSelected());
                     setVisible(false);
                 }
                 catch(NumberFormatException e) {
@@ -121,11 +131,25 @@ public class ImportDialog extends JDialog {
         });
         btnPanel.add(btn);
         btnPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,btnPanel.getPreferredSize().height));
-        importSimul = new JCheckBox("Import simulation instead of measurement");
+        //importSimul = new JCheckBox("Import simulation instead of measurement");
+        meascolF = new JTextField("123456");
+        meascolF.setMinimumSize(meascolF.getPreferredSize());
+        meascolF.setPreferredSize(meascolF.getPreferredSize());
+        if (numCols == 3)
+        {
+            meascolF.setText("3");
+        }
+        else
+        {
+            meascolF.setText("2");
+        }
+
         JPanel importSimulPanel = new JPanel();
-        importSimulPanel.add(importSimul);
+        //importSimulPanel.add(importSimul);
+        importSimulPanel.add(new JLabel("Measurement column (counts)"));
+        importSimulPanel.add(meascolF);
         importSimulPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,importSimulPanel.getPreferredSize().height));
-        if(includeSimul)
+        if(numCols > 2)
             dialog.add(importSimulPanel);
         dialog.add(Box.createVerticalGlue());
         dialog.add(btnPanel);
