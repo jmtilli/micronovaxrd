@@ -1420,12 +1420,18 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
 
         try {
-            File f = new File(getDir(), "default.layers");
+            File f = new File(getDir(), "default.layers.gz");
             if(f.exists())
-                loadLayers(new File(getDir(), "default.layers"),false);
+                loadLayers(new File(getDir(), "default.layers.gz"),false);
+            else
+            {
+                f = new File(getDir(), "default.layers");
+                if(f.exists())
+                    loadLayers(new File(getDir(), "default.layers"),false);
+            }
         }
         catch(LayerLoadException ex) {
-            JOptionPane.showMessageDialog(null, "There was an error in the file default.layers:\n"+ex.getMessage(), "Error in default.layers", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "There was an error in the file default.layers(.gz):\n"+ex.getMessage(), "Error in default.layers(.gz)", JOptionPane.ERROR_MESSAGE);
         }
 
 
