@@ -137,7 +137,8 @@ public class PANImport {
             DocumentFragment intensities;
             String axis, unit;
             String[] counts;
-            double time;
+            double time = 1.0;
+            double[] times = null;
             double start = 0, end = 90, step;
             boolean valid = false;
             double[] alpha_0, meas;
@@ -159,13 +160,33 @@ public class PANImport {
                 throw new ImportException();
             }
             dataPoints = scan.getNotNull("dataPoints");
-            commonCountingTime = dataPoints.getNotNull("commonCountingTime");
-            unit = commonCountingTime.getAttrStringNotNull("unit");
-            if (!unit.equals("seconds"))
+            commonCountingTime = dataPoints.get("commonCountingTime");
+            if (commonCountingTime == null)
             {
-                throw new ImportException();
+                String[] strtimes;
+                DocumentFragment countingTimes;
+                countingTimes = dataPoints.getNotNull("countingTimes");
+                unit = countingTimes.getAttrStringNotNull("unit");
+                if (!unit.equals("seconds"))
+                {
+                    throw new ImportException();
+                }
+                strtimes = dataPoints.getStringNotNull("countingTimes").split(" ", 0);
+                times = new double[strtimes.length];
+                for (int i = 0; i < times.length; i++)
+                {
+                    times[i] = Double.parseDouble(strtimes[i]);
+                }
             }
-            time = dataPoints.getDoubleNotNull("commonCountingTime");
+            else
+            {
+                unit = commonCountingTime.getAttrStringNotNull("unit");
+                if (!unit.equals("seconds"))
+                {
+                    throw new ImportException();
+                }
+                time = dataPoints.getDoubleNotNull("commonCountingTime");
+            }
             intensities = dataPoints.getNotNull("intensities");
             unit = intensities.getAttrStringNotNull("unit");
             if (!unit.equals("counts"))
@@ -194,9 +215,20 @@ public class PANImport {
             step = (end-start)/(counts.length-1);
             meas = new double[counts.length];
             alpha_0 = new double[counts.length];
+            if (times != null && times.length != counts.length)
+            {
+                throw new ImportException();
+            }
             for (int i = 0; i < meas.length; i++)
             {
-                meas[i] = Double.parseDouble(counts[i])/time;
+                if (times == null)
+                {
+                    meas[i] = Double.parseDouble(counts[i])/time;
+                }
+                else
+                {
+                    meas[i] = Double.parseDouble(counts[i])/times[i];
+                }
                 alpha_0[i] = start + i*step;
             }
             return new Data(new double[][]{alpha_0, meas});
