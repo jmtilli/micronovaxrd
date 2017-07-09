@@ -4,6 +4,7 @@ import fi.iki.jmtilli.javaxmlfrag.*;
 import javax.xml.parsers.*;
 import org.xml.sax.*;
 import java.util.*;
+import java.util.zip.*;
 
 
 /** Measurement importing code.
@@ -379,6 +380,15 @@ outer:
         bs.mark(16);
         bs.read(header, 0, 10);
         bs.reset();
+        if (header[0] == (byte) (GZIPInputStream.GZIP_MAGIC&0xFF) &&
+            header[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8))
+        {
+            GZIPInputStream gz = new GZIPInputStream(bs);
+            bs = new BufferedInputStream(gz);
+            bs.mark(16);
+            bs.read(header, 0, 10);
+            bs.reset();
+        }
         if (new String(header).equals("HR-XRDScan"))
         {
             return X00Import(bs);
