@@ -18,8 +18,14 @@ public class PANImport {
     /** The imported data */
     public static class Data {
         public final double[][] arrays;
+        public final boolean[] valid;
         public Data(double[][] arrays) {
             this.arrays = arrays;
+            this.valid = new boolean[arrays.length];
+            for (int i = 0; i < arrays.length; i++)
+            {
+                this.valid[i] = (arrays[i] != null);
+            }
         }
     };
     /** Imports measurement file from an InputStream.
@@ -246,6 +252,7 @@ public class PANImport {
         ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double>>();
         double[][] arrays;
         int cols = -1;
+        int validCols = 0;
         BufferedReader r = new BufferedReader(new InputStreamReader(is));
         try {
             String line;
@@ -255,13 +262,30 @@ public class PANImport {
                 {
                     continue;
                 }
-                StringTokenizer t = new StringTokenizer(line, " \t\n\r\f;|:");
+                StringTokenizer t = new StringTokenizer(line,  " \t\n\r\f;|:");
                 int curcols = 0;
                 ArrayList<Double> list = new ArrayList<Double>();
                 while (t.hasMoreTokens())
                 {
                     String s = t.nextToken().replace(",",".");
-                    double d = Double.parseDouble(s);
+                    double d;
+                    try
+                    {
+                        d = Double.parseDouble(s);
+                    }
+                    catch (NumberFormatException ex)
+                    {
+                        if (curcols == 0)
+                        {
+                            throw ex;
+                        }
+                        else
+                        {
+                            curcols++;
+                            list.add(null);
+                            continue;
+                        }
+                    }
                     if (curcols == 0 && (d < 0 || d > 90))
                     {
                         throw new ImportException();
@@ -289,11 +313,32 @@ public class PANImport {
         arrays = new double[cols][];
         for (int i = 0; i < cols; i++)
         {
-            arrays[i] = new double[data.size()];
+            boolean ok = true;
             for (int j = 0; j < data.size(); j++)
             {
-                arrays[i][j] = data.get(j).get(i);
+                if (data.get(j).get(i) == null)
+                {
+                    ok = false;
+                    break;
+                }
             }
+            if (ok)
+            {
+                validCols++;
+                arrays[i] = new double[data.size()];
+                for (int j = 0; j < data.size(); j++)
+                {
+                    arrays[i][j] = data.get(j).get(i);
+                }
+            }
+            else
+            {
+                arrays[i] = null;
+            }
+        }
+        if (validCols < 2 || arrays[0] == null)
+        {
+            throw new ImportException();
         }
         return new Data(arrays);
     }
