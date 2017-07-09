@@ -250,17 +250,17 @@ public class PANImport {
         try {
             String line;
             while((line = r.readLine()) != null) {
-                line = line.trim().replaceAll("#.*$", "").trim();
+                line = line.trim().replaceAll("[#%].*$", "").trim();
                 if (line.equals(""))
                 {
                     continue;
                 }
-                StringTokenizer t = new StringTokenizer(line);
+                StringTokenizer t = new StringTokenizer(line, " \t\n\r\f;");
                 int curcols = 0;
                 ArrayList<Double> list = new ArrayList<Double>();
                 while (t.hasMoreTokens())
                 {
-                    String s = t.nextToken();
+                    String s = t.nextToken().replace(",",".");
                     double d = Double.parseDouble(s);
                     if (curcols == 0 && (d < 0 || d > 90))
                     {
