@@ -5,6 +5,7 @@ import javax.xml.parsers.*;
 import org.xml.sax.*;
 import java.util.*;
 import java.util.zip.*;
+import fi.micronova.tkk.xray.ZipOneInputStream;
 
 
 /** Measurement importing code.
@@ -384,6 +385,15 @@ outer:
             header[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8))
         {
             GZIPInputStream gz = new GZIPInputStream(bs);
+            bs = new BufferedInputStream(gz);
+            bs.mark(16);
+            bs.read(header, 0, 10);
+            bs.reset();
+        }
+        else if (header[0] == 'P' && header[1] == 'K' &&
+                 header[2] == 3 && header[3] == 4)
+        {
+            ZipOneInputStream gz = new ZipOneInputStream(bs);
             bs = new BufferedInputStream(gz);
             bs.mark(16);
             bs.read(header, 0, 10);

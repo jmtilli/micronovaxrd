@@ -121,16 +121,22 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             FileInputStream fstr = new FileInputStream(f);
             try {
                 BufferedInputStream bs = new BufferedInputStream(fstr);
-                byte[] bytes = new byte[2];
+                byte[] bytes = new byte[4];
                 InputStream str = bs;
-                bs.mark(2);
-                bs.read(bytes, 0, 2);
+                bs.mark(4);
+                bs.read(bytes, 0, 4);
                 bs.reset();
                 if (bytes[0] == (byte) (GZIPInputStream.GZIP_MAGIC&0xFF) &&
                     bytes[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8))
                 {
                   GZIPInputStream gz = new GZIPInputStream(bs);
                   str = gz;
+                }
+                else if (bytes[0] == 'P' && bytes[1] == 'K' &&
+                         bytes[2] == 3 && bytes[3] == 4)
+                {
+                    ZipOneInputStream gz = new ZipOneInputStream(bs);
+                    str = new BufferedInputStream(gz);
                 }
                 DocumentFragment doc_frag =
                     DocumentFragmentHandler.parseWhole(str);
@@ -1154,6 +1160,11 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                         if (fs.endsWith(".gz"))
                         {
                             str = new GZIPOutputStream(fstr, true);
+                        }
+                        else if (fs.endsWith(".gz"))
+                        {
+                            String plain = fs.substring(0, fs.length()-4);
+                            str = new ZipOneOutputStream(fstr, plain);
                         }
                         try {
                             /*
