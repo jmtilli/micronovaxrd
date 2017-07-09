@@ -255,7 +255,7 @@ public class PANImport {
                 {
                     continue;
                 }
-                StringTokenizer t = new StringTokenizer(line, " \t\n\r\f;");
+                StringTokenizer t = new StringTokenizer(line, " \t\n\r\f;|:");
                 int curcols = 0;
                 ArrayList<Double> list = new ArrayList<Double>();
                 while (t.hasMoreTokens())
