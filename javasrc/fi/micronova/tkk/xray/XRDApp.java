@@ -194,7 +194,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
     {
         try {
             GraphData d = data.simulate(layers);
-            loadMeasurement(d.alpha_0, d.simul, new ImportOptions(1, 0, 90, 0, 90, 2, false)); /* no normalization */
+            loadMeasurement(d.alpha_0, d.simul, new ImportOptions(1, 0, 90, 0, 90, 2, false, false)); /* no normalization */
             measPath = null;
             setTitle("XRD");
         }
@@ -218,6 +218,12 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
     private void loadMeasurement(double[] alpha_0, double[] meas, ImportOptions opts) {
         double max = 0;
+        if (opts.divAngleByTwo)
+        {
+            for(int i=0; i<alpha_0.length; i++) {
+                alpha_0[i] /= 2;
+            }
+        }
         for(int i=0; i<meas.length; i++) {
             if(alpha_0[i] >= opts.minNormal
                     && alpha_0[i] <= opts.maxNormal

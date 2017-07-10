@@ -85,6 +85,8 @@ public class ImportDialog extends JDialog {
         gridPanel.add(maxNormalF,c);
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridPanel.add(new JPanel(),c);
+        final JCheckBox divideAngleByTwo = new JCheckBox("divide angle by two (angle in file is 2Theta instead of Theta)");
+        gridPanel.add(divideAngleByTwo,c);
 
 
         gridPanel.setMaximumSize(new Dimension(Short.MAX_VALUE,gridPanel.getPreferredSize().height));
@@ -113,7 +115,7 @@ public class ImportDialog extends JDialog {
                         throw new IllegalArgumentException();
                     if (!valid[meascol-1])
                         throw new NotValidException();
-                    options = new ImportOptions(modulo, minAngle, maxAngle, minNormal, maxNormal, meascol, normalizeCheck.isSelected());
+                    options = new ImportOptions(modulo, minAngle, maxAngle, minNormal, maxNormal, meascol, normalizeCheck.isSelected(), divideAngleByTwo.isSelected());
                     setVisible(false);
                 }
                 catch(NumberFormatException e) {

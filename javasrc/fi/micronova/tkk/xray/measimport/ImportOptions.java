@@ -7,9 +7,11 @@ public class ImportOptions {
     public final double minAngle, maxAngle, minNormal, maxNormal;
     public final int meascol;
     public final boolean normalize;
+    public final boolean divAngleByTwo;
     public ImportOptions(int modulo, double minAngle, double maxAngle,
                          double minNormal, double maxNormal,
-                         int meascol, boolean normalize) {
+                         int meascol, boolean normalize,
+                         boolean divAngleByTwo) {
         this.modulo = modulo;
         this.minAngle = minAngle;
         this.maxAngle = maxAngle;
@@ -17,5 +19,6 @@ public class ImportOptions {
         this.maxNormal = maxNormal;
         this.meascol = meascol;
         this.normalize = normalize;
+        this.divAngleByTwo = divAngleByTwo;
     }
 }
