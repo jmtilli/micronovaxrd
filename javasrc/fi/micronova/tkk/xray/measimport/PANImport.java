@@ -8,6 +8,7 @@ import java.util.zip.*;
 import fi.micronova.tkk.xray.ZipOneInputStream;
 
 
+
 /** Measurement importing code.
  *
  * <p>
@@ -249,6 +250,135 @@ public class PANImport {
         {
             throw new ImportException();
         }
+    }
+    public static Data rigakuImport(InputStream is) throws ImportException, IOException {
+        double[] alpha_0 = null, meas = null;
+        double start = Double.NaN;
+        double step = Double.NaN;
+        int count = -1;
+        boolean begun = false;
+        boolean ended = false;
+        int i = 0;
+        BufferedReader r = new BufferedReader(new InputStreamReader(is));
+        try
+        {
+            String line;
+            while((line = r.readLine()) != null)
+            {
+                line = line.replaceAll("#.*$", "");
+                if (line.trim().equals(""))
+                {
+                    continue;
+                }
+                if (line.startsWith("*TYPE"))
+                {
+                    String[] vals = line.split("=", 2);
+                    if (vals.length != 2)
+                    {
+                        throw new ImportException();
+                    }
+                }
+                else if (line.startsWith("*START"))
+                {
+                    String[] vals = line.split("=", 2);
+                    if (vals.length != 2)
+                    {
+                        throw new ImportException();
+                    }
+                    start = Double.parseDouble(vals[1].trim());
+                }
+                else if (line.startsWith("*STEP"))
+                {
+                    String[] vals = line.split("=", 2);
+                    if (vals.length != 2)
+                    {
+                        throw new ImportException();
+                    }
+                    step = Double.parseDouble(vals[1].trim());
+                }
+                else if (line.startsWith("*GROUP_COUNT"))
+                {
+                    String[] vals = line.split("=", 2);
+                    if (vals.length != 2)
+                    {
+                        throw new ImportException();
+                    }
+                    if (Integer.parseInt(vals[1].trim()) != 1)
+                    {
+                        throw new ImportException();
+                    }
+                }
+                else if (line.startsWith("*GROUP"))
+                {
+                    String[] vals = line.split("=", 2);
+                    if (vals.length != 2)
+                    {
+                        throw new ImportException();
+                    }
+                    if (Integer.parseInt(vals[1].trim()) != 0)
+                    {
+                        throw new ImportException();
+                    }
+                }
+                else if (line.startsWith("*COUNT"))
+                {
+                    String[] vals = line.split("=", 2);
+                    if (vals.length != 2)
+                    {
+                        throw new ImportException();
+                    }
+                    count = Integer.parseInt(vals[1].trim());
+                    if (count < 0)
+                    {
+                        throw new ImportException();
+                    }
+                    alpha_0 = new double[count];
+                    meas = new double[count];
+                }
+                else if (line.startsWith("*BEGIN"))
+                {
+                    begun = true;
+                }
+                else if (line.startsWith("*END"))
+                {
+                    ended = true;
+                }
+                else if (line.startsWith("*EOF"))
+                {
+                    ended = true;
+                }
+                else if (line.startsWith("*"))
+                {
+                }
+                else
+                {
+                    String[] vals = line.split(",");
+                    if (!begun || ended)
+                    {
+                        throw new ImportException();
+                    }
+                    if (Double.isNaN(start) || Double.isNaN(step) ||
+                       meas == null || alpha_0 == null)
+                    {
+                        throw new ImportException();
+                    }
+                    for (String val: vals)
+                    {
+                        double d = Double.parseDouble(val.trim());
+                        meas[i] = d;
+                        alpha_0[i] = (start + i*step)/2.0;
+                        i++;
+                    }
+                }
+            }
+        }
+        catch(NumberFormatException ex) {
+            throw new ImportException();
+        }
+        catch(IndexOutOfBoundsException ex) {
+            throw new ImportException();
+        }
+        return new Data(new double[][]{alpha_0, meas});
     }
     public static Data asciiImport(InputStream is) throws ImportException, IOException {
         ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double>>();
@@ -612,7 +742,12 @@ outer:
         {
             return brukerImport1(bs);
         }
-        if (new String(header).equals("HR-XRDScan"))
+        if (header[0] == '*' && header[1] == 'T' &&
+            header[2] == 'Y' && header[3] == 'P' && header[4] == 'E')
+        {
+            return rigakuImport(bs);
+        }
+        if (new String(header).startsWith("HR-XRDScan"))
         {
             return X00Import(bs);
         }
