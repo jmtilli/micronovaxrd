@@ -657,6 +657,53 @@ outer:
         }
         return new Data(new double[][]{alpha_0, meas}, true);
     }
+
+    public static Data rdImport(InputStream s)
+        throws ImportException, IOException
+    {
+        byte[] header = new byte[4];
+        double[] alpha_0, meas;
+        int version;
+        s.read(header);
+        if (header[0] != 'V')
+        {
+            throw new ImportException();
+        }
+        version = header[1] - '0';
+        if (version != 3 && version != 5)
+        {
+            throw new ImportException();
+        }
+        s.skip(80);
+        s.skip(3);
+        s.skip(138 - 84 - 3);
+        s.skip(8);
+        s.skip(20);
+        s.skip(214 - 138 - 8 - 20);
+        double xStep = readLeDouble(s);
+        double xStart = readLeDouble(s);
+        double xEnd = readLeDouble(s);
+        // XXX good to add 0.5?
+        int count = (int)((xEnd - xStart) / xStep + 1.0 + 0.5);
+        alpha_0 = new double[count];
+        meas = new double[count];
+        if (version == 3)
+        {
+            s.skip(250 - 214 - 8*3);
+        }
+        else
+        {
+            s.skip(810 - 214 - 8*3);
+        }
+        for (int i = 0; i < count; i++)
+        {
+            int packedY = readLe16(s);
+            double y = Math.floor(0.01*packedY*packedY);
+            alpha_0[i] = xStart + i*xStep;
+            meas[i] = y;
+        }
+        return new Data(new double[][]{alpha_0, meas}, true);
+    }
         
     public static Data brukerImport101(InputStream s)
         throws ImportException, IOException
@@ -772,6 +819,16 @@ outer:
             header[2] == 'W' && header[3] == ' ')
         {
             return brukerImport1(bs);
+        }
+        if (header[0] == 'V' && header[1] == '3' &&
+            header[2] == 'R' && header[3] == 'D')
+        {
+            return rdImport(bs);
+        }
+        if (header[0] == 'V' && header[1] == '5' &&
+            header[2] == 'R' && header[3] == 'D')
+        {
+            return rdImport(bs);
         }
         if (header[0] == '*' && header[1] == 'T' &&
             header[2] == 'Y' && header[3] == 'P' && header[4] == 'E')
