@@ -1036,7 +1036,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
 
                         ImportDialog dialog = new ImportDialog(thisFrame,importdat.arrays[0].length,
-                            importdat.arrays[0][0], importdat.arrays[0][importdat.arrays[0].length-1], importdat.valid, false);
+                            importdat.arrays[0][0], importdat.arrays[0][importdat.arrays[0].length-1], importdat.valid, false, importdat.isTwoTheta);
                         ImportOptions opts = dialog.call();
                         dialog.dispose();
                         if(opts == null)

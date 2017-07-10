@@ -15,16 +15,16 @@ public class ImportDialog extends JDialog {
     private JCheckBox importSimul, normalizeCheck;
     ImportOptions options;
 
-    public ImportDialog(Frame f, int nmeas, double min, double max, boolean[] valid, boolean normalize) {
+    public ImportDialog(Frame f, int nmeas, double min, double max, boolean[] valid, boolean normalize, boolean isTwoTheta) {
         super(f,"Import options",true);
-        init(nmeas, min, max, valid, normalize);
+        init(nmeas, min, max, valid, normalize, isTwoTheta);
     }
-    public ImportDialog(Dialog f, int nmeas, double min, double max, boolean[] valid, boolean normalize) {
+    public ImportDialog(Dialog f, int nmeas, double min, double max, boolean[] valid, boolean normalize, boolean isTwoTheta) {
         super(f,"Import options",true);
-        init(nmeas, min, max, valid, normalize);
+        init(nmeas, min, max, valid, normalize, isTwoTheta);
     }
 
-    private void init(int nmeas, double min, double max, final boolean[] valid, boolean normalize)
+    private void init(int nmeas, double min, double max, final boolean[] valid, boolean normalize, boolean isTwoTheta)
     {
         Container dialog;
 
@@ -85,7 +85,7 @@ public class ImportDialog extends JDialog {
         gridPanel.add(maxNormalF,c);
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridPanel.add(new JPanel(),c);
-        final JCheckBox divideAngleByTwo = new JCheckBox("divide angle by two (angle in file is 2Theta instead of Theta)");
+        final JCheckBox divideAngleByTwo = new JCheckBox("divide angle by two (angle in file is 2Theta instead of Theta)", isTwoTheta);
         gridPanel.add(divideAngleByTwo,c);
 
 
