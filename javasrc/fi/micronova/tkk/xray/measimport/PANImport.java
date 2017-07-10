@@ -8,7 +8,6 @@ import java.util.zip.*;
 import fi.micronova.tkk.xray.ZipOneInputStream;
 
 
-
 /** Measurement importing code.
  *
  * <p>
@@ -251,6 +250,29 @@ public class PANImport {
             throw new ImportException();
         }
     }
+    public static Data UXDImport(BufferedReader in) throws ImportException, IOException {
+        String line;
+        for (;;)
+        {
+            in.mark(256*1024);
+            line = in.readLine();
+            if (line == null)
+            {
+                throw new ImportException();
+            }
+            if (!line.trim().startsWith(";") && !line.trim().startsWith("_"))
+            {
+                in.reset();
+                break;
+            }
+        }
+        Data dat = asciiImportReader(in);
+        for (int i = 0; i < dat.arrays[0].length; i++)
+        {
+            dat.arrays[0][i] /= 2.0;
+        }
+        return dat;
+    }
     public static Data rigakuImport(InputStream is) throws ImportException, IOException {
         double[] alpha_0 = null, meas = null;
         double start = Double.NaN;
@@ -380,12 +402,11 @@ public class PANImport {
         }
         return new Data(new double[][]{alpha_0, meas});
     }
-    public static Data asciiImport(InputStream is) throws ImportException, IOException {
+    public static Data asciiImportReader(BufferedReader r) throws ImportException, IOException {
         ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double>>();
         double[][] arrays;
         int cols = -1;
         int validCols = 0;
-        BufferedReader r = new BufferedReader(new InputStreamReader(is));
         try {
             String line;
             while((line = r.readLine()) != null) {
@@ -473,6 +494,10 @@ public class PANImport {
             throw new ImportException();
         }
         return new Data(arrays);
+    }
+    public static Data asciiImport(InputStream is) throws ImportException, IOException {
+        BufferedReader r = new BufferedReader(new InputStreamReader(is));
+        return asciiImportReader(r);
     }
     private static void readWhiteSpace(BufferedInputStream bs) throws IOException
     {
@@ -755,6 +780,40 @@ outer:
         bs.mark(16);
         ch = bs.read();
         bs.reset();
+        if (ch == '_')
+        {
+            String line;
+            BufferedReader r = new BufferedReader(new InputStreamReader(bs));
+            line = r.readLine();
+            if (line.trim().startsWith("_FILEVERSION"))
+            {
+                return UXDImport(r);
+            }
+            throw new ImportException();
+        }
+        if (ch == ';')
+        {
+            BufferedReader r = new BufferedReader(new InputStreamReader(bs));
+            String line;
+            r.readLine();
+            for (;;)
+            {
+                line = r.readLine();
+                if (line == null)
+                {
+                    throw new ImportException();
+                }
+                if (!line.trim().startsWith(";"))
+                {
+                    break;
+                }
+            }
+            if (line.trim().startsWith("_FILEVERSION"))
+            {
+                return UXDImport(r);
+            }
+            return asciiImportReader(r);
+        }
         if (ch == '<')
         {
             data = XRDMLImport(bs);
