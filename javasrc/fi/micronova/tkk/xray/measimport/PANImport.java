@@ -364,6 +364,79 @@ public class PANImport {
         */
         return dat;
     }
+    public static Data rasImport(InputStream is) throws ImportException, IOException {
+        double[] alpha_0 = null, meas = null;
+        int count = -1;
+        boolean begun = false;
+        boolean ended = false;
+        int i = 0;
+        BufferedReader r = new BufferedReader(new InputStreamReader(is));
+        try
+        {
+            String line;
+            while((line = r.readLine()) != null)
+            {
+                if (line.trim().equals(""))
+                {
+                    continue;
+                }
+                else if (line.startsWith("*RAS_INT_START"))
+                {
+                    begun = true;
+                }
+                else if (line.startsWith("*RAS_INT_END"))
+                {
+                    ended = true;
+                }
+                else if (line.startsWith("*RAS_DATA_END"))
+                {
+                    ended = true;
+                }
+                else if (line.startsWith("*MEAS_DATA_COUNT"))
+                {
+                    line = line.replaceAll(
+                        "\\*MEAS_DATA_COUNT \"([0-9]+(.[0-9]+)?)\"$", "$1");
+                    count = (int)(Double.parseDouble(line) + 0.5);
+                    alpha_0 = new double[count];
+                    meas = new double[count];
+                }
+                else if (line.startsWith("*"))
+                {
+                }
+                else if (line.trim().equals(""))
+                {
+                }
+                else
+                {
+                    String[] vals = line.split(" ");
+                    if (!begun || ended)
+                    {
+                        throw new ImportException();
+                    }
+                    if (vals.length < 2)
+                    {
+                        throw new ImportException();
+                    }
+                    if (meas == null || alpha_0 == null)
+                    {
+                        throw new ImportException();
+                    }
+                    double d1 = Double.parseDouble(vals[0]);
+                    double d2 = Double.parseDouble(vals[1]);
+                    alpha_0[i] = d1;
+                    meas[i] = d2;
+                    i++;
+                }
+            }
+        }
+        catch(NumberFormatException ex) {
+            throw new ImportException();
+        }
+        catch(IndexOutOfBoundsException ex) {
+            throw new ImportException();
+        }
+        return new Data(new double[][]{alpha_0, meas}, false);
+    }
     public static Data rigakuImport(InputStream is) throws ImportException, IOException {
         double[] alpha_0 = null, meas = null;
         double start = Double.NaN;
@@ -433,6 +506,9 @@ public class PANImport {
                         throw new ImportException();
                     }
                 }
+                else if (line.startsWith("*COUNTER"))
+                {
+                }
                 else if (line.startsWith("*COUNT"))
                 {
                     String[] vals = line.split("=", 2);
@@ -461,6 +537,9 @@ public class PANImport {
                     ended = true;
                 }
                 else if (line.startsWith("*"))
+                {
+                }
+                else if (line.trim().equals(""))
                 {
                 }
                 else
@@ -958,6 +1037,11 @@ outer:
             header[2] == 'Y' && header[3] == 'P' && header[4] == 'E')
         {
             return rigakuImport(bs);
+        }
+        if (header[0] == '*' && header[1] == 'R' &&
+            header[2] == 'A' && header[3] == 'S')
+        {
+            return rasImport(bs);
         }
         if (new String(header).startsWith("HR-XRDScan"))
         {
