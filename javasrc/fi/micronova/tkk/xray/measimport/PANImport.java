@@ -73,7 +73,7 @@ public class PANImport {
                         throw new ImportException();
                     stepWidth = new Double(ar[0]);
                 }
-                if(line.equals("RawScan"))
+                if(line.matches("^RawScan[ \t\r]*$"))
                     break;
             }
             if(stepWidth == null || firstAngle == null || lastAngle == null)
@@ -338,31 +338,129 @@ public class PANImport {
             throw new ImportException();
         }
     }
-    public static Data UXDImport(BufferedReader in) throws ImportException, IOException {
+    public static Data UXDTwoThetaCountsImport(BufferedReader in) throws ImportException, IOException
+    {
+        Double interim = null;
         String line;
+        int i = 0;
+        ArrayList<double[]> vals = new ArrayList<double[]>();
         for (;;)
         {
-            in.mark(256*1024);
             line = in.readLine();
             if (line == null)
             {
-                throw new ImportException();
-            }
-            if (!line.trim().startsWith(";") && !line.trim().startsWith("_"))
-            {
-                in.reset();
+                if (interim != null)
+                    throw new ImportException();
                 break;
             }
+            for (String token: line.split("[ \t\r\n]+"))
+            {
+                if (interim != null)
+                {
+                    double y = Double.parseDouble(token);
+                    double x = interim;
+                    double[] both = new double[]{x, y};
+                    vals.add(both);
+                    i++;
+                    interim = null;
+                }
+                else
+                {
+                    interim = Double.parseDouble(token);
+                }
+            }
         }
-        Data dat = asciiImportReader(in);
-        dat.isTwoTheta = true;
-        /*
-        for (int i = 0; i < dat.arrays[0].length; i++)
+        double[] alpha_0 = new double[vals.size()];
+        double[] meas = new double[vals.size()];
+        for (i = 0; i < alpha_0.length; i++)
         {
-            dat.arrays[0][i] /= 2.0;
+            alpha_0[i] = vals.get(i)[0];
+            meas[i] = vals.get(i)[1];
         }
-        */
-        return dat;
+        return new Data(new double[][]{alpha_0, meas}, true);
+    }
+    public static Data UXDCountsImport(BufferedReader in, double start, double step) throws ImportException, IOException
+    {
+        int i = 0;
+        ArrayList<double[]> vals = new ArrayList<double[]>();
+        String line;
+        for (;;)
+        {
+            line = in.readLine();
+            if (line == null || line.trim().equals(""))
+            {
+                break;
+            }
+            line = line.trim();
+            for (String token: line.split("[ \t\r\n]+"))
+            {
+                double y = Double.parseDouble(token);
+                double x = start + step*i;
+                double[] both = new double[]{x, y};
+                vals.add(both);
+                i++;
+            }
+        }
+        double[] alpha_0 = new double[vals.size()];
+        double[] meas = new double[vals.size()];
+        for (i = 0; i < alpha_0.length; i++)
+        {
+            alpha_0[i] = vals.get(i)[0];
+            meas[i] = vals.get(i)[1];
+        }
+        return new Data(new double[][]{alpha_0, meas}, true);
+    }
+    public static Data UXDImport(BufferedReader in) throws ImportException, IOException {
+        String line;
+        Double start = null, step = null;
+        try
+        {
+            for (;;)
+            {
+                line = in.readLine();
+                if (line == null)
+                {
+                    throw new ImportException();
+                }
+                if (line.matches("^_2THETACOUNTS[ \t\r]*$"))
+                {
+                    /*
+                    Data dat = asciiImportReader(in);
+                    dat.isTwoTheta = true;
+                    return dat;
+                    */
+                    Data dat = UXDTwoThetaCountsImport(in);
+                    dat.isTwoTheta = true;
+                    return dat;
+                }
+                if (line.startsWith("_START="))
+                {
+                    start = Double.parseDouble(line.substring(7).trim());
+                }
+                if (line.startsWith("_STEPSIZE="))
+                {
+                    step = Double.parseDouble(line.substring(10).trim());
+                }
+                if (line.matches("^_COUNTS[ \t\r]*$"))
+                {
+                    if (start == null || step == null)
+                        throw new ImportException();
+                    Data dat = UXDCountsImport(in, start, step);
+                    dat.isTwoTheta = true;
+                    return dat;
+                }
+                if (!line.trim().startsWith(";") && !line.trim().startsWith("_"))
+                {
+                    throw new ImportException();
+                }
+            }
+        }
+        catch(NumberFormatException ex) {
+            throw new ImportException();
+        }
+        catch(IndexOutOfBoundsException ex) {
+            throw new ImportException();
+        }
     }
     public static Data rasImport(InputStream is) throws ImportException, IOException {
         double[] alpha_0 = null, meas = null;
