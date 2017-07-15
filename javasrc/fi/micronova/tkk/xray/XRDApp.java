@@ -960,6 +960,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                             f = null;
                             startFitButton.setEnabled(true);
                             stopFitButton.setEnabled(false);
+                            tabs.setTitleAt(2, "Automatic fit");
                             importButton.setEnabled(true);
                             //exportButton.setEnabled(true);
                             fileLoadMeas.setEnabled(true);
@@ -981,6 +982,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                             f = null;
                             startFitButton.setEnabled(true);
                             stopFitButton.setEnabled(false);
+                            tabs.setTitleAt(2, "Automatic fit");
                             importButton.setEnabled(true);
                             //exportButton.setEnabled(true);
                             fileLoadMeas.setEnabled(true);
@@ -1005,6 +1007,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                                        green, yellow, algo, (FitnessFunction)funcBox.getSelectedItem(), (Double)thresholdModel.getNumber(), (Integer)pModel.getNumber(), opts);//, nonlinBox.isSelected());
                     startFitButton.setEnabled(false);
                     stopFitButton.setEnabled(true);
+                    tabs.setTitleAt(2, "Automatic fit (*)");
                     stopFitButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent ev) {
                             f.closeWithoutWaiting();
