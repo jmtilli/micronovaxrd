@@ -47,12 +47,12 @@ public class SingleScrollbarUpdater implements ValueListener {
         this.minIsZero = minIsZero;
 
         this.valLabel.setText(prefix + " = " + String.format(Locale.US,"%.6g",-1e-4)+" ");
-        this.minLabel.setText(String.format(Locale.US,"%.6g",-1e-4)+" ");
-        this.maxLabel.setText(String.format(Locale.US,"%.6g",-1e-4)+" ");
+        //this.minLabel.setText(String.format(Locale.US,"%.6g",-1e-4)+" ");
+        //this.maxLabel.setText(String.format(Locale.US,"%.6g",-1e-4)+" ");
 
         this.valLabel.setPreferredSize(new Dimension(this.valLabel.getPreferredSize()));
-        this.minLabel.setPreferredSize(new Dimension(this.minLabel.getPreferredSize()));
-        this.maxLabel.setPreferredSize(new Dimension(this.maxLabel.getPreferredSize()));
+        //this.minLabel.setPreferredSize(new Dimension(this.minLabel.getPreferredSize()));
+        //this.maxLabel.setPreferredSize(new Dimension(this.maxLabel.getPreferredSize()));
 
         this.enableCheck = new JCheckBox("fit");
         this.enableCheck.setEnabled(val.isSupported());
@@ -109,6 +109,7 @@ public class SingleScrollbarUpdater implements ValueListener {
         });
 
         this.slider = new JSlider(0,SLIDER_STEPS);
+        this.slider.setPreferredSize(new Dimension(310, this.slider.getPreferredSize().height));
 
 
         this.slider.addChangeListener(new ChangeListener() {
@@ -197,7 +198,7 @@ public class SingleScrollbarUpdater implements ValueListener {
 
     public void addToGridBag(Container sliders) {
         GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(3,3,3,3);
+        c.insets = new Insets(1,1,1,1);
         c.ipadx = c.ipady = 1;
         c.anchor = GridBagConstraints.WEST;
         c.gridwidth = 1;
