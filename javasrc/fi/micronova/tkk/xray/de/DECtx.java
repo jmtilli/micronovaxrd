@@ -390,6 +390,10 @@ public class DECtx {
     sortAll();
     cycle += 1;
   }
+  private PopulationIndividual worst()
+  {
+    return pop[npop-1];
+  }
   private PopulationIndividual median()
   {
     return pop[npop/2];
@@ -397,6 +401,10 @@ public class DECtx {
   private PopulationIndividual best()
   {
     return pop[0];
+  }
+  public double worstFittingError()
+  {
+    return worst().E;
   }
   public double medianFittingError()
   {

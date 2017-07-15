@@ -59,6 +59,11 @@ public class XRDFittingCtx {
   {
     return this.de_ctx.medianFittingError();
   }
+  public double worstFittingError()
+  {
+    return this.de_ctx.worstFittingError();
+  }
+
   public static void main(String[] args) throws Throwable
   {
     SFTables tab = SFTables.defaultLookup();
