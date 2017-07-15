@@ -11,6 +11,10 @@ public class XRDFittingCtx {
   private ExecutorService exec;
   private DECtx.CostFunc cost_func;
   private DECtx de_ctx;
+  public boolean reportPerf()
+  {
+    return de_ctx.reportPerf();
+  }
   public XRDFittingCtx(LayerStack new_s, GraphData new_gd,
                        boolean cov_on, boolean traditional_recombination_on,
                        int npop, FittingErrorFunc new_func,

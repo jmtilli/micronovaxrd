@@ -22,6 +22,12 @@ public class DECtx {
   private double[] dp;
   private PopulationIndividual[] pop;
   private ExecutorService executor_service;
+  private boolean reportPerf;
+
+  public boolean reportPerf()
+  {
+    return reportPerf;
+  }
 
 
   public static double columnMean(Matrix m, int column)
@@ -183,6 +189,7 @@ public class DECtx {
     this.pm = opts.pm;
     this.cr = opts.cr;
     this.lambda = opts.lambda;
+    this.reportPerf = opts.reportPerf;
     this.cycle = 0;
     this.traditional_recombination_on = traditional_recombination_on;
     this.func = func;

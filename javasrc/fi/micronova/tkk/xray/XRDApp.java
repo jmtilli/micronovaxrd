@@ -414,7 +414,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             {
                 throw new NumberFormatException();
             }
-            //opts.reportPerf = Boolean.parseBoolean(props.getProperty("autofit.reportPerf"));
+            opts.reportPerf = Boolean.parseBoolean(props.getProperty("autofit.reportPerf"));
             dbMin = Double.parseDouble(props.getProperty("plot.dbMin"));
             dbMax = Double.parseDouble(props.getProperty("plot.dbMax"));
         }
@@ -967,6 +967,13 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                             fileLoadEmpty.setEnabled(true);
                             fileSwap.setEnabled(true);
                             pfit.setAdditionalTitle("");
+                            if (msg != null && !msg.isEmpty())
+                            {
+                                JOptionPane.showMessageDialog(null,
+                                    msg,
+                                    "Fitting performance",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                            }
                         }
                     };
                     final Runnable errTask2 = new Runnable() {
