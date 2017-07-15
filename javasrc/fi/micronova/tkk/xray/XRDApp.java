@@ -373,7 +373,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                     pfin.close();
                 }
             }
-            defaultProp("autofit.popsize", "60");
+            defaultProp("autofit.popsize", "-10");
             defaultProp("autofit.iters", "500");
             defaultProp("autofit.firstAngle", "0.00");
             defaultProp("autofit.lastAngle", "90.0");
@@ -937,7 +937,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         final JButton startFitButton = new JButton("Start");
         final JButton stopFitButton = new JButton("Stop");
         final JButton advancedButton = new JButton("Opts");
-        final SpinnerNumberModel popSizeModel = new SpinnerNumberModel(settingInt("autofit.popsize", 60, 20, 2000),20,2000,1);
+        final SpinnerNumberModel popSizeModel = new SpinnerNumberModel(settingInt("autofit.popsize", -10, -200, 2000),-200,2000,1);
         final SpinnerNumberModel iterationsModel = new SpinnerNumberModel(settingInt("autofit.iters", 500, 1, 10000),1,10000,1);
         final SpinnerNumberModel pModel = new SpinnerNumberModel(settingInt("autofit.pNorm", 2, 1, 10),1,10,1);
         final SpinnerNumberModel autostopModel = new SpinnerNumberModel(settingInt("autofit.autostopFigures", 6, 2, 10),2,10,1);

@@ -23,6 +23,14 @@ public class XRDFittingCtx {
     this.s = new_s.deepCopy();
     this.gd = new_gd;
     this.func = new_func;
+    if (npop < 0)
+    {
+        npop = (-npop)*this.s.getFittedValueCount();
+    }
+    if (npop >= 0 && npop < 20)
+    {
+        npop = 20;
+    }
     this.cost_func = new DECtx.CostFunc() {
       public double calculate(double[] p) throws Exception
       {
