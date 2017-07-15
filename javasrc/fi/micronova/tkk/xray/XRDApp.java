@@ -106,6 +106,8 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
     private enum PlotStyle {LIN, LOG, SQRT};
 
+    private Properties props = new Properties();
+
     private AdvancedFitOptions opts = new AdvancedFitOptions();
 
 
@@ -115,6 +117,72 @@ public class XRDApp extends JFrame implements ChooserWrapper {
     private LayerPlotter pfit;
     private LayerPlotter p;
     private LayerStack fitLayers;
+
+    private void defaultProp(String key, String value)
+    {
+        if (props.getProperty(key) == null)
+        {
+            props.setProperty(key, value);
+        }
+    }
+
+    private boolean settingBool(String key, boolean default_value)
+    {
+        try {
+            String val = props.getProperty(key);
+            if (val == null)
+            {
+                return default_value;
+            }
+            return Boolean.parseBoolean(val);
+        }
+        catch (NumberFormatException ex)
+        {
+            return default_value;
+        }
+    }
+
+    private int settingInt(String key, int default_value, int min, int max)
+    {
+        try {
+            String val = props.getProperty(key);
+            if (val == null)
+            {
+                return default_value;
+            }
+            int num = Integer.parseInt(val);
+            if (num < min || num > max)
+            {
+                return default_value;
+            }
+            return num;
+        }
+        catch (NumberFormatException ex)
+        {
+            return default_value;
+        }
+    }
+
+    private double settingDouble(String key, double default_value, double min, double max)
+    {
+        try {
+            String val = props.getProperty(key);
+            if (val == null)
+            {
+                return default_value;
+            }
+            double num = Double.parseDouble(val);
+            if (num < min || num > max)
+            {
+                return default_value;
+            }
+            return num;
+        }
+        catch (NumberFormatException ex)
+        {
+            return default_value;
+        }
+    }
 
     private void loadLayers(File f, boolean enable_hint) throws LayerLoadException {
         try {
@@ -292,6 +360,98 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                 "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
+
+        try {
+            File f = new File(getDir(), "default.properties");
+            if (f.exists())
+            {
+                FileInputStream pfin = new FileInputStream(f);
+                try {
+                    props.load(pfin);
+                }
+                finally {
+                    pfin.close();
+                }
+            }
+            defaultProp("autofit.popsize", "60");
+            defaultProp("autofit.iters", "500");
+            defaultProp("autofit.firstAngle", "0.00");
+            defaultProp("autofit.lastAngle", "90.0");
+            defaultProp("autofit.algorithm", "0");
+            defaultProp("autofit.fitnessFunc", "0");
+            defaultProp("autofit.thresRelF", "20");
+            defaultProp("autofit.pNorm", "2");
+            defaultProp("autofit.k_m", "0.7");
+            defaultProp("autofit.k_r", "0.85");
+            defaultProp("autofit.p_m", "0.5");
+            defaultProp("autofit.c_r", "0.5");
+            defaultProp("autofit.lambda", "1.0");
+            defaultProp("autofit.reportPerf", "false");
+            defaultProp("plot.dbMin", "-5");
+            defaultProp("plot.dbMax", "50");
+            opts.km = Double.parseDouble(props.getProperty("autofit.k_m"));
+            if (opts.km <= 0 || opts.km >= 1)
+            {
+                throw new NumberFormatException();
+            }
+            opts.kr = Double.parseDouble(props.getProperty("autofit.k_r"));
+            if (opts.kr <= 0 || opts.kr >= 1)
+            {
+                throw new NumberFormatException();
+            }
+            opts.pm = Double.parseDouble(props.getProperty("autofit.p_m"));
+            if (opts.pm <= 0 || opts.pm >= 1)
+            {
+                throw new NumberFormatException();
+            }
+            opts.cr = Double.parseDouble(props.getProperty("autofit.c_r"));
+            if (opts.cr <= 0 || opts.cr >= 1)
+            {
+                throw new NumberFormatException();
+            }
+            opts.lambda = Double.parseDouble(props.getProperty("autofit.lambda"));
+            if (opts.lambda < 0 || opts.lambda > 1)
+            {
+                throw new NumberFormatException();
+            }
+            //opts.reportPerf = Boolean.parseBoolean(props.getProperty("autofit.reportPerf"));
+            dbMin = Double.parseDouble(props.getProperty("plot.dbMin"));
+            dbMax = Double.parseDouble(props.getProperty("plot.dbMax"));
+        }
+        catch(NumberFormatException ex) {
+            StringWriter writer = new StringWriter();
+            PrintWriter printWriter = new PrintWriter( writer );
+            ex.printStackTrace( printWriter );
+            printWriter.flush();
+            String stackTrace = writer.toString();
+            JOptionPane.showMessageDialog(null,
+                "Can't load properties\n" + stackTrace,
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        catch(IllegalArgumentException ex) {
+            StringWriter writer = new StringWriter();
+            PrintWriter printWriter = new PrintWriter( writer );
+            ex.printStackTrace( printWriter );
+            printWriter.flush();
+            String stackTrace = writer.toString();
+            JOptionPane.showMessageDialog(null,
+                "Can't load properties\n" + stackTrace,
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        catch(IOException ex) {
+            StringWriter writer = new StringWriter();
+            PrintWriter printWriter = new PrintWriter( writer );
+            ex.printStackTrace( printWriter );
+            printWriter.flush();
+            String stackTrace = writer.toString();
+            JOptionPane.showMessageDialog(null,
+                "Can't load properties\n" + stackTrace,
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
 
 
 
@@ -777,14 +937,16 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         final JButton startFitButton = new JButton("Start");
         final JButton stopFitButton = new JButton("Stop");
         final JButton advancedButton = new JButton("Opts");
-        final SpinnerNumberModel popSizeModel = new SpinnerNumberModel(60,20,2000,1);
-        final SpinnerNumberModel iterationsModel = new SpinnerNumberModel(500,1,10000,1);
-        final SpinnerNumberModel pModel = new SpinnerNumberModel(2,1,10,1);
-        final SpinnerNumberModel firstAngleModel = new SpinnerNumberModel(0,0,90,0.01);
-        final SpinnerNumberModel lastAngleModel = new SpinnerNumberModel(90,0,90,0.01);
-        final SpinnerNumberModel thresholdModel = new SpinnerNumberModel(20,-500,500,0.1);
+        final SpinnerNumberModel popSizeModel = new SpinnerNumberModel(settingInt("autofit.popsize", 60, 20, 2000),20,2000,1);
+        final SpinnerNumberModel iterationsModel = new SpinnerNumberModel(settingInt("autofit.iters", 500, 1, 10000),1,10000,1);
+        final SpinnerNumberModel pModel = new SpinnerNumberModel(settingInt("autofit.pNorm", 2, 1, 10),1,10,1);
+        final SpinnerNumberModel firstAngleModel = new SpinnerNumberModel(settingDouble("autofit.firstAngle", 0, 0, 90),0,90,0.01);
+        final SpinnerNumberModel lastAngleModel = new SpinnerNumberModel(settingDouble("autofit.lastAngle", 90, 0, 90),0,90,0.01);
+        final SpinnerNumberModel thresholdModel = new SpinnerNumberModel(settingDouble("autofit.thresRelF", 20, -500, 500),-500,500,0.1);
         final JComboBox<Algorithm> algoBox = new JComboBox<Algorithm>(Algorithm.values());
+        algoBox.setSelectedItem(Algorithm.values()[settingInt("autofit.algorithm", 0, 0, Algorithm.values().length)]);
         final JComboBox<FitnessFunction> funcBox = new JComboBox<FitnessFunction>(FitnessFunction.values());
+        funcBox.setSelectedItem(FitnessFunction.values()[settingInt("autofit.fitnessFunc", 0, 0, FitnessFunction.values().length)]);
         /*
         final JCheckBox nonlinBox = new JCheckBox("Nonlinear fitness space estimation");
         nonlinBox.setSelected(true);
@@ -968,6 +1130,9 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         final JChartArea plotarea = new JChartArea();
 
         p = new LayerPlotter(plotarea, light, layers, data, green, yellow, red, dbMin, dbMax);
+
+        p.setDbRange(dbMin, dbMax);
+        pfit.setDbRange(dbMin, dbMax);
 
         plotarea.setPreferredSize(new Dimension(600,400));
         graph.add(plotarea,BorderLayout.CENTER);

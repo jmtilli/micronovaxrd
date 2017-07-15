@@ -1,11 +1,11 @@
 package fi.micronova.tkk.xray.de;
 
 public class AdvancedFitOptions {
-  double km;
-  double kr;
-  double pm;
-  double cr;
-  double lambda;
+  public double km;
+  public double kr;
+  public double pm;
+  public double cr;
+  public double lambda;
   public AdvancedFitOptions() {
     this.km = 0.7;
     this.kr = 0.5*(this.km + 1);

@@ -75,6 +75,7 @@
 
   <patternset id="javaaux">
       <include name="default.layers"/>
+      <include name="default.properties"/>
   </patternset>
 
   <target name="compile" depends="init" description="compile the source " >
