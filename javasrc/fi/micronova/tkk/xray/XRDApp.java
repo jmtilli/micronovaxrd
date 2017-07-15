@@ -940,10 +940,12 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         final SpinnerNumberModel popSizeModel = new SpinnerNumberModel(settingInt("autofit.popsize", 60, 20, 2000),20,2000,1);
         final SpinnerNumberModel iterationsModel = new SpinnerNumberModel(settingInt("autofit.iters", 500, 1, 10000),1,10000,1);
         final SpinnerNumberModel pModel = new SpinnerNumberModel(settingInt("autofit.pNorm", 2, 1, 10),1,10,1);
+        final SpinnerNumberModel autostopModel = new SpinnerNumberModel(settingInt("autofit.autostopFigures", 6, 2, 10),2,10,1);
         final SpinnerNumberModel firstAngleModel = new SpinnerNumberModel(settingDouble("autofit.firstAngle", 0, 0, 90),0,90,0.01);
         final SpinnerNumberModel lastAngleModel = new SpinnerNumberModel(settingDouble("autofit.lastAngle", 90, 0, 90),0,90,0.01);
         final SpinnerNumberModel thresholdModel = new SpinnerNumberModel(settingDouble("autofit.thresRelF", 20, -500, 500),-500,500,0.1);
         final JComboBox<Algorithm> algoBox = new JComboBox<Algorithm>(Algorithm.values());
+        final JCheckBox autostop = new JCheckBox("automatic fit stop with figures");
         algoBox.setSelectedItem(Algorithm.values()[settingInt("autofit.algorithm", 0, 0, Algorithm.values().length)]);
         final JComboBox<FitnessFunction> funcBox = new JComboBox<FitnessFunction>(FitnessFunction.values());
         funcBox.setSelectedItem(FitnessFunction.values()[settingInt("autofit.fitnessFunc", 0, 0, FitnessFunction.values().length)]);
@@ -1004,7 +1006,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                     f = new JavaFitter(fitLight, data, endTask, plotTask, errTask2, fitLayers,
                                        (Integer)popSizeModel.getNumber(), (Integer)iterationsModel.getNumber(),
                                        (Double)firstAngleModel.getNumber(), (Double)lastAngleModel.getNumber(),
-                                       green, yellow, algo, (FitnessFunction)funcBox.getSelectedItem(), (Double)thresholdModel.getNumber(), (Integer)pModel.getNumber(), opts);//, nonlinBox.isSelected());
+                                       green, yellow, algo, (FitnessFunction)funcBox.getSelectedItem(), (Double)thresholdModel.getNumber(), (Integer)pModel.getNumber(), autostop.isSelected(), (Integer)autostopModel.getNumber(), opts);//, nonlinBox.isSelected());
                     startFitButton.setEnabled(false);
                     stopFitButton.setEnabled(true);
                     tabs.setTitleAt(2, "Automatic fit (*)");
@@ -1115,6 +1117,13 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         plotControls.add(new JLabel("p-norm"),c);
         c.gridwidth = GridBagConstraints.REMAINDER;
         plotControls.add(new JSpinner(pModel),c);
+
+        c.gridwidth = 3;
+        autostop.setSelected(settingBool("autofit.autostop", true));
+        plotControls.add(autostop, c);
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        plotControls.add(new JSpinner(autostopModel),c);
+
 
 
         //c.gridwidth = 1;
