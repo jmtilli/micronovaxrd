@@ -212,6 +212,7 @@ public class JavaFitter implements FitterInterface {
     private void runThread() {
         int round = 0;
         double bestfit = 1e6;
+        long curTime = System.nanoTime();
         light.newImage(yellow);
         try {
             while (!closing) {
@@ -229,13 +230,17 @@ public class JavaFitter implements FitterInterface {
 
                 final String msg2 = msg;
 
-                final LayerStack stackToPlot = stack.deepCopy();
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        if(plotTask != null)
-                            plotTask.run(stackToPlot,msg2);
-                    }
-                });
+                if (System.nanoTime() > curTime + 500*1000*1000)
+                {
+                    curTime = System.nanoTime();
+                    final LayerStack stackToPlot = stack.deepCopy();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if(plotTask != null)
+                                plotTask.run(stackToPlot,msg2);
+                        }
+                    });
+                }
                 round++;
                 if (!autostop && round >= iterations)
                 {
