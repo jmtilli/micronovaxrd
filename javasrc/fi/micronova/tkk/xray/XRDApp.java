@@ -100,6 +100,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
     private static final double Cu_K_alpha = 1.5405620e-10; /* This is the default wavelength */
     private Image green, yellow, red;
+    private Image icon16, icon32, icon48, icon64, icon128;
     private LayerStack layers, emptyLayers;
     private JList<String> layeredList;
     private double dbMin = -5, dbMax = 50;
@@ -239,6 +240,16 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             throw new LayerLoadException("Invalid high-level file format");
         }
         */
+    }
+
+    private void maybeSetIconImages(java.util.List<? extends Image> icons)
+    {
+        try {
+            java.lang.reflect.Method m;
+            m = this.getClass().getMethod("setIconImages", java.util.List.class);
+            m.invoke(this, icons);
+        }
+        catch(Throwable t) {}
     }
 
     private static String getDir()
@@ -873,6 +884,11 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             green = ImageIO.read(fitLight.getClass().getClassLoader().getResourceAsStream("green.png"));
             yellow = ImageIO.read(fitLight.getClass().getClassLoader().getResourceAsStream("yellow.png"));
             red = ImageIO.read(fitLight.getClass().getClassLoader().getResourceAsStream("red.png"));
+            icon16 = ImageIO.read(fitLight.getClass().getClassLoader().getResourceAsStream("micronovaxrd16.png"));
+            icon32 = ImageIO.read(fitLight.getClass().getClassLoader().getResourceAsStream("micronovaxrd32.png"));
+            icon48 = ImageIO.read(fitLight.getClass().getClassLoader().getResourceAsStream("micronovaxrd48.png"));
+            icon64 = ImageIO.read(fitLight.getClass().getClassLoader().getResourceAsStream("micronovaxrd64.png"));
+            icon128 = ImageIO.read(fitLight.getClass().getClassLoader().getResourceAsStream("micronovaxrd128.png"));
         }
         catch(IOException ex) {
             JOptionPane.showMessageDialog(null, "can't read png files", "Error", JOptionPane.ERROR_MESSAGE);
@@ -882,6 +898,8 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         northWlPanel.add(wlPanel,BorderLayout.CENTER);
         northWlPanel.add(lightPanel,BorderLayout.EAST);
         fit.add(northWlPanel,BorderLayout.NORTH);
+
+        maybeSetIconImages(Arrays.asList(new Image[]{icon16, icon32, icon48, icon64, icon128}));
 
 
 
