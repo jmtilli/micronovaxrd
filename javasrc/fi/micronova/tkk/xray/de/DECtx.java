@@ -123,7 +123,9 @@ public class DECtx {
     for (;;)
     {
       try {
-        for (Future f: executor_service.invokeAll(Arrays.asList(pop)))
+        ArrayList<Callable<Void>> list = new ArrayList<Callable<Void>>();
+        list.addAll(Arrays.asList(pop));
+        for (Future f: executor_service.invokeAll(list))
         {
           try {
             f.get();
@@ -443,7 +445,7 @@ public class DECtx {
     ThreadPoolExecutor exec =
       new ThreadPoolExecutor(cpus, cpus,
                              1, TimeUnit.SECONDS,
-                             new LinkedBlockingDeque<Runnable>());
+                             new LinkedBlockingQueue<Runnable>());
     CostFunc func = new CostFunc() {
       public double calculate(double[] p)
       {

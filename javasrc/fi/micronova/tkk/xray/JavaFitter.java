@@ -151,7 +151,7 @@ public class JavaFitter implements FitterInterface {
         int cpus = Runtime.getRuntime().availableProcessors();
         this.exec = new ThreadPoolExecutor(cpus, cpus,
                                            1, TimeUnit.SECONDS,
-                                           new LinkedBlockingDeque<Runnable>());
+                                           new LinkedBlockingQueue<Runnable>());
         switch (func)
         {
           case relchi2:
