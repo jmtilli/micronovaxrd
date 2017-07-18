@@ -15,12 +15,17 @@ public class XChartArea extends JPlotArea {
     private XYChart chart;
     private int width;
     private int height;
+    private static final byte[] r = {(byte)255,(byte)0,(byte)0,(byte)20,(byte)39,(byte)59,(byte)78,(byte)98,(byte)118,(byte)137,(byte)157,(byte)177,(byte)196,(byte)216,(byte)235,(byte)255};
+    private static final byte[] g = {0,(byte)0,(byte)0,(byte)20,(byte)39,(byte)59,(byte)78,(byte)98,(byte)118,(byte)137,(byte)157,(byte)177,(byte)196,(byte)216,(byte)235,(byte)255};
+    private static final byte[] b = {0,(byte)255,(byte)0,(byte)20,(byte)39,(byte)59,(byte)78,(byte)98,(byte)118,(byte)137,(byte)157,(byte)177,(byte)196,(byte)216,(byte)235,(byte)255};
+    private static final IndexColorModel icm =
+        new IndexColorModel(4, 16, r, g, b);
 
     private void updateImage() {
         synchronized(this) {
             if(chart != null && width > 0 && height > 0) {
                 BufferedImage buf;
-                buf = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                buf = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, icm);
                 chart.paint(buf.createGraphics(), width, height);
                 newImage(buf);
             } else {
