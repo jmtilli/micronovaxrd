@@ -31,7 +31,7 @@ public class LayerPlotter extends Plotter {
      * @param yellow An image of a yellow light.
      *
      */
-    public LayerPlotter(JChartArea area, JPlotArea light, LayerStack stack, GraphData data, Image green, Image yellow, Image red, double dbMin, double dbMax) {
+    public LayerPlotter(XChartArea area, JPlotArea light, LayerStack stack, GraphData data, Image green, Image yellow, Image red, double dbMin, double dbMax) {
         super(area, light, green, yellow, red, dbMin, dbMax);
         this.stack = stack;
         this.data = data; /* we must be careful with thread safety */

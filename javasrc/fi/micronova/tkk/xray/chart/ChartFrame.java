@@ -1,14 +1,14 @@
 package fi.micronova.tkk.xray.chart;
+import fi.micronova.tkk.xray.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.io.*;
-import fi.micronova.tkk.xray.util.*;
-import org.jfree.data.xy.*;
-import org.jfree.chart.*;
-import org.jfree.chart.plot.*;
+import org.knowm.xchart.*;
+import org.knowm.xchart.style.*;
+import org.knowm.xchart.style.markers.*;
 
 
 
@@ -42,34 +42,54 @@ public class ChartFrame extends JFrame {
      * @param ymin minimum value of y-axis. this is ignored if ymin == ymax
      * @param ymax maximum value of y-axis. this is ignored if ymin == ymax
      */
-    public ChartFrame(final ChooserWrapper wrapper, String title, int w, int h, boolean legend, final DataArray xdata, String xtitle, final java.util.List<NamedArray> ydata, String ytitle, double ymin, double ymax)
+    public ChartFrame(final ChooserWrapper wrapper, String title, int w, int h, boolean legend, final DataArray xdata, String xtitle, final java.util.List<NamedArray> ydata, String ytitle, double ymin, double ymax, String legendFile)
     {
         super(title);
+        Color[] colors = new Color[]{Color.RED, Color.BLUE};
 
-        XYSeries series;
-        XYSeriesCollection dataset;
-        XYPlot xyplot;
-        JFreeChart chart;
+        double[] xar = new double[xdata.array.length];
+
+        XYChart xychart = new XYChartBuilder().width(w).height(h).title(title).xAxisTitle(xtitle).yAxisTitle(ytitle).build();
+
+        xychart.getStyler().setChartBackgroundColor(UIManager.getColor("Panel.background"));
+        //xychart.getStyler().setLegendPosition(Styler.LegendPosition.OutsideS);
+        xychart.getStyler().setDefaultSeriesRenderStyle(org.knowm.xchart.XYSeries.XYSeriesRenderStyle.Line);
+        xychart.getStyler().setYAxisLabelAlignment(Styler.TextAlignment.Right);
+        //xychart.getStyler().setYAxisDecimalPattern("$ #,###.##");
+        xychart.getStyler().setPlotMargin(0);
+        xychart.getStyler().setPlotContentSize(.99);
+        //xychart.getStyler().setLegendVisible(legend);
+        xychart.getStyler().setLegendVisible(false);
+        xychart.getStyler().setAntiAlias(false);
+
         int n = xdata.array.length;
 
-        dataset = new XYSeriesCollection();
-        for(int j=0; j<ydata.size(); j++) {
+        for (int i = 0; i < n; i++)
+        {
+            xar[i] = xdata.array[i]*xdata.scale;
+        }
+
+        for(int j=ydata.size()-1; j>=0; j--) {
             NamedArray y = ydata.get(j);
-            series = new XYSeries(y.name);
+            double[] yar = new double[y.array.length];
+            String name = y.name;
             for(int i=0; i<n; i++) {
-                series.add(xdata.scale*xdata.array[i], y.scale*y.array[i]);
+                yar[i] = y.array[i]*y.scale;
             }
-            dataset.addSeries(series);
+            if (name == null || name.equals(""))
+            {
+                name = "data";
+            }
+            org.knowm.xchart.XYSeries ser = xychart.addSeries(name, xar, yar);
+            ser.setLineColor(colors[j]);
+            ser.setLineWidth(1);
+            ser.setMarker(new None());
         }
 
 
-        chart = ChartFactory.createXYLineChart(title,xtitle,ytitle,dataset,PlotOrientation.VERTICAL,legend,true,false);
-        chart.setAntiAlias(false); 
-
-        xyplot = chart.getXYPlot();
         if(ymin != ymax) {
-            xyplot.getRangeAxis().setAutoRange(false);
-            xyplot.getRangeAxis().setRange(ymin,ymax);
+            xychart.getStyler().setYAxisMin(ymin);
+            xychart.getStyler().setYAxisMax(ymax);
         }
 
         Container cp;
@@ -84,10 +104,22 @@ public class ChartFrame extends JFrame {
         c.ipadx = c.ipady = 2;
         c.insets = new Insets(2, 2, 2, 2);
 
-        JChartArea a = new JChartArea();
-        a.newChart(chart);
-        a.setPreferredSize(new Dimension(w, h));
-        cp.add(a,c);
+        JPanel bpanel = new JPanel();
+        bpanel.setLayout(new BorderLayout());
+        XChartArea b = new XChartArea();
+        b.newChart(xychart);
+        b.setPreferredSize(new Dimension(w, h));
+        bpanel.add(b, BorderLayout.CENTER);
+        if (legendFile != null && legend)
+        {
+            bpanel.add(new JCenterImageArea(legendFile, 2), BorderLayout.SOUTH);
+        }
+        cp.add(bpanel,c);
+        ////cp.add(a,c);
+        ////cp.add(new SwingWrapper<XYChart>(xychart).getXChartPanel(), c);
+        //XChartPanel<XYChart> chartPanel = new XChartPanel<XYChart>(xychart);
+        ////new SwingWrapper<XYChart>(xychart).displayChart();
+        //cp.add(chartPanel, c);
 
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -137,7 +169,7 @@ public class ChartFrame extends JFrame {
                         for(int i=0; i<ydata.size(); i++)
                           cols[i+1] = ydata.get(i).array;
 
-                        OutputStream fstr = new FileOutputStream(file);
+                        FileOutputStream fstr = new FileOutputStream(file);
                         try {
                             Writer rw = new OutputStreamWriter(fstr);
                             BufferedWriter bw = new BufferedWriter(rw);
@@ -152,7 +184,7 @@ public class ChartFrame extends JFrame {
                             }
                             if(w.checkError())
                               throw new IOException();
-                        }
+                            }
                         finally {
                             fstr.close();
                         }

@@ -18,7 +18,7 @@
 
   <path id="classpath">
     <!--<pathelement path="${classpath}"/>-->
-    <pathelement location="jfreechart-1.0.1.jar"/>
+    <pathelement location="xchart-3.4.1-CUSTOM.jar"/>
     <pathelement location="javafastcomplex.jar"/>
     <pathelement location="javaxmlfrag.jar"/>
     <pathelement location="Jama-1.0.3.jar"/>
@@ -34,13 +34,10 @@
   </patternset>
 
   <patternset id="libdeps">
-      <include name="jfreechart-1.0.1.jar"/>
+      <include name="xchart-3.4.1-CUSTOM.jar"/>
       <include name="javafastcomplex.jar"/>
       <include name="javaxmlfrag.jar"/>
       <include name="Jama-1.0.3.jar"/>
-      <include name="lib/jcommon-1.0.0.jar"/>
-      <include name="librarysrc/jcommon-1.0.0.zip"/>
-      <include name="librarysrc/jfreechart-1.0.1.zip"/>
   </patternset>
 
   <patternset id="srcdoc">
@@ -49,6 +46,7 @@
   <patternset id="doc">
       <include name="README-1st.txt"/>
       <include name="README.txt"/>
+      <include name="APACHE-LICENSE-2.0.txt"/>
   </patternset>
 
   <patternset id="src">
@@ -97,7 +95,7 @@
           </fileset>
           <manifest>
               <!--<attribute name="Built-By" value="${user.name}"/>-->
-              <attribute name="Class-Path" value="jfreechart-1.0.1.jar javafastcomplex.jar javaxmlfrag.jar Jama-1.0.3.jar"/>
+              <attribute name="Class-Path" value="xchart-3.4.1-CUSTOM.jar javafastcomplex.jar javaxmlfrag.jar Jama-1.0.3.jar"/>
               <attribute name="Main-Class" value="fi.micronova.tkk.xray.XRDApp"/>
           </manifest>
       </jar>

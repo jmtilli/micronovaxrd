@@ -13,10 +13,6 @@ import fi.micronova.tkk.xray.chart.*;
 import fi.micronova.tkk.xray.xrdde.*;
 import fi.micronova.tkk.xray.de.*;
 
-import org.jfree.data.xy.*;
-import org.jfree.chart.*;
-import org.jfree.chart.plot.*;
-
 import java.util.List;
 
 

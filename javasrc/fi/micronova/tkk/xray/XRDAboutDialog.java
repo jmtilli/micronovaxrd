@@ -59,9 +59,10 @@ public class XRDAboutDialog extends GenericAboutDialog {
 "ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n"+
 "POSSIBILITY OF SUCH DAMAGE.\n"+
 "\n"+
-"This program uses JFreeChart, Copyright 2000-2006, by Object Refinery\n"+
-"Limited and Contributors. It is distributed under the GNU Lesser General\n"+
-"Public License: http://www.gnu.org/licenses/lgpl.html\n";
+"This program uses XChart, Copyright 2011-2015 Xeiam LLC (http://xeiam.com)\n"+
+"and contributors, and Copyright 2015-2017 Knowm Inc. (http://knowm.org) and\n"+
+"contributors. It is licensed under the Apache License, Version 2.0:\n"+
+"http://www.apache.org/licenses/LICENSE-2.0";
 
 
     public XRDAboutDialog(Frame f)

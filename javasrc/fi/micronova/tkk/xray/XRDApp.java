@@ -8,9 +8,6 @@ import java.io.*;
 import javax.imageio.*;
 import java.util.logging.*;
 import java.util.zip.*;
-import org.jfree.data.xy.*;
-import org.jfree.chart.*;
-import org.jfree.chart.plot.*;
 
 import fi.micronova.tkk.xray.chart.*;
 import fi.micronova.tkk.xray.chart.ChartFrame;
@@ -916,7 +913,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
         /* ------------------- automatic fit -------------------- */
         //final JPlotArea fitPlotArea = new JPlotArea();
-        final JChartArea fitPlotArea = new JChartArea();
+        final XChartArea fitPlotArea = new XChartArea();
         fitLayers = emptyLayers.deepCopy();
 
         pfit = new LayerPlotter(fitPlotArea, fitPlotLight, fitLayers, data, green, yellow, red, dbMin, dbMax);
@@ -941,7 +938,12 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
         fitPlotArea.setPreferredSize(new Dimension(600,400));
         fitPlotArea.setPreferredSize(new Dimension(600,400));
-        fit.add(fitPlotArea,BorderLayout.CENTER);
+        JPanel fitPlotWrapper = new JPanel();
+        fitPlotWrapper.setLayout(new BorderLayout());
+        fitPlotWrapper.add(fitPlotArea, BorderLayout.CENTER);
+        fitPlotWrapper.add(new JCenterImageArea("meassimullegend.png", 2),
+                           BorderLayout.SOUTH);
+        fit.add(fitPlotWrapper,BorderLayout.CENTER);
         JPanel plotControls = new JPanel();
         plotControls.setLayout(new GridBagLayout());
         final JButton exportButton = new JButton("Export");
@@ -1164,7 +1166,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         /* ------------------ manual fit -------------- */
 
         //final JPlotArea plotarea = new JPlotArea();
-        final JChartArea plotarea = new JChartArea();
+        final XChartArea plotarea = new XChartArea();
 
         p = new LayerPlotter(plotarea, light, layers, data, green, yellow, red, dbMin, dbMax);
 
@@ -1173,6 +1175,13 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
         plotarea.setPreferredSize(new Dimension(600,400));
         graph.add(plotarea,BorderLayout.CENTER);
+        //graph.add(plotarea,BorderLayout.CENTER);
+        JPanel plotWrapper = new JPanel();
+        plotWrapper.setLayout(new BorderLayout());
+        plotWrapper.add(plotarea, BorderLayout.CENTER);
+        plotWrapper.add(new JCenterImageArea("meassimullegend.png", 2),
+                           BorderLayout.SOUTH);
+        graph.add(plotWrapper,BorderLayout.CENTER);
         graph.add(sliderPanel,BorderLayout.SOUTH);
 
         //layers.invalidate(this);
@@ -1685,6 +1694,10 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                             ymax = meas[i];
                         if(simul[i] > ymax && !Double.isInfinite(simul[i]))
                             ymax = simul[i];
+                        if(Double.isInfinite(meas[i]))
+                            meas[i] = -100;
+                        if(Double.isInfinite(simul[i]))
+                            simul[i] = -100;
                     }
                     ytitle = "dB";
                     break;
@@ -1711,7 +1724,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             xyplot.getRangeAxis().setRange(-70,0);*/
             //chart.setAntiAlias(false); /* this is faster */
             new ChartFrame(this,"Reflectivity plot", 600, 400, true,
-                    new DataArray(1, d.alpha_0), "degrees", yarrays, ytitle, ymin, ymax).setVisible(true);
+                    new DataArray(1, d.alpha_0), "degrees", yarrays, ytitle, ymin, ymax, "meassimullegend.png").setVisible(true);
         }
         catch(UnsupportedWavelength ex) {
             JOptionPane.showMessageDialog(null, "Unsupported wavelength", "Error", JOptionPane.ERROR_MESSAGE);
