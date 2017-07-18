@@ -187,12 +187,30 @@ public class GraphData {
             if(meas != null) {
               newmeas = new double[meas.length];
               for(int i=0; i<meas.length; i++)
-                  newmeas[i] = 10*Math.log(meas[i])/Math.log(10);
+              {
+                  if (meas[i] == 0)
+                  {
+                      newmeas[i] = -200;
+                  }
+                  else
+                  {
+                      newmeas[i] = 10*Math.log(meas[i])/Math.log(10);
+                  }
+              }
             }
             if(simul != null) {
               newsimul = new double[simul.length];
               for(int i=0; i<simul.length; i++)
-                  newsimul[i] = 10*Math.log(simul[i])/Math.log(10);
+              {
+                  if (simul[i] == 0)
+                  {
+                      newsimul[i] = -200;
+                  }
+                  else
+                  {
+                      newsimul[i] = 10*Math.log(simul[i])/Math.log(10);
+                  }
+              }
             }
             return new GraphData(alpha_0, newmeas, newsimul, true);
         }
