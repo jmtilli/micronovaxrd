@@ -52,14 +52,16 @@ public class ChartFrame extends JFrame {
         XYChart xychart = new XYChartBuilder().width(w).height(h).title(title).xAxisTitle(xtitle).yAxisTitle(ytitle).build();
 
         xychart.getStyler().setChartBackgroundColor(UIManager.getColor("Panel.background"));
-        //xychart.getStyler().setLegendPosition(Styler.LegendPosition.OutsideS);
+        xychart.getStyler().setLegendPosition(Styler.LegendPosition.OutsideS);
+        xychart.getStyler().setLegendLayout(Styler.LegendLayout.Horizontal);
+        xychart.getStyler().setLegendPadding(3);
         xychart.getStyler().setDefaultSeriesRenderStyle(org.knowm.xchart.XYSeries.XYSeriesRenderStyle.Line);
         xychart.getStyler().setYAxisLabelAlignment(Styler.TextAlignment.Right);
         //xychart.getStyler().setYAxisDecimalPattern("$ #,###.##");
         xychart.getStyler().setPlotMargin(0);
         xychart.getStyler().setPlotContentSize(.99);
-        //xychart.getStyler().setLegendVisible(legend);
-        xychart.getStyler().setLegendVisible(false);
+        xychart.getStyler().setLegendVisible(legend);
+        //xychart.getStyler().setLegendVisible(false);
         xychart.getStyler().setAntiAlias(false);
 
         int n = xdata.array.length;
@@ -110,10 +112,12 @@ public class ChartFrame extends JFrame {
         b.newChart(xychart);
         b.setPreferredSize(new Dimension(w, h));
         bpanel.add(b, BorderLayout.CENTER);
+        /*
         if (legendFile != null && legend)
         {
             bpanel.add(new JCenterImageArea(legendFile, 2), BorderLayout.SOUTH);
         }
+        */
         cp.add(bpanel,c);
         ////cp.add(a,c);
         ////cp.add(new SwingWrapper<XYChart>(xychart).getXChartPanel(), c);

@@ -170,12 +170,14 @@ abstract public class Plotter {
 
         XYChart xychart = new XYChartBuilder().width(800).height(600).title("XRD "+additionalTitle).xAxisTitle("degrees").yAxisTitle("dB").build();
         xychart.getStyler().setChartBackgroundColor(UIManager.getColor("Panel.background"));
-        //xychart.getStyler().setLegendPosition(Styler.LegendPosition.OutsideS);
+        xychart.getStyler().setLegendPosition(Styler.LegendPosition.OutsideS);
+        xychart.getStyler().setLegendLayout(Styler.LegendLayout.Horizontal);
+        xychart.getStyler().setLegendPadding(3);
         xychart.getStyler().setDefaultSeriesRenderStyle(org.knowm.xchart.XYSeries.XYSeriesRenderStyle.Line);
         xychart.getStyler().setYAxisLabelAlignment(Styler.TextAlignment.Right);
         xychart.getStyler().setPlotMargin(0);
         xychart.getStyler().setPlotContentSize(.99);
-        xychart.getStyler().setLegendVisible(false);
+        xychart.getStyler().setLegendVisible(true);
         xychart.getStyler().setAntiAlias(false);
 
         assert(data.alpha_0.length == data.meas.length);

@@ -941,8 +941,8 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         JPanel fitPlotWrapper = new JPanel();
         fitPlotWrapper.setLayout(new BorderLayout());
         fitPlotWrapper.add(fitPlotArea, BorderLayout.CENTER);
-        fitPlotWrapper.add(new JCenterImageArea("meassimullegend.png", 2),
-                           BorderLayout.SOUTH);
+        //fitPlotWrapper.add(new JCenterImageArea("meassimullegend.png", 2),
+        //                   BorderLayout.SOUTH);
         fit.add(fitPlotWrapper,BorderLayout.CENTER);
         JPanel plotControls = new JPanel();
         plotControls.setLayout(new GridBagLayout());
@@ -1179,8 +1179,8 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         JPanel plotWrapper = new JPanel();
         plotWrapper.setLayout(new BorderLayout());
         plotWrapper.add(plotarea, BorderLayout.CENTER);
-        plotWrapper.add(new JCenterImageArea("meassimullegend.png", 2),
-                           BorderLayout.SOUTH);
+        //plotWrapper.add(new JCenterImageArea("meassimullegend.png", 2),
+        //                   BorderLayout.SOUTH);
         graph.add(plotWrapper,BorderLayout.CENTER);
         graph.add(sliderPanel,BorderLayout.SOUTH);
 
