@@ -303,7 +303,7 @@ public class GraphData {
             alpha0rad[i] = alpha_0[i]*Math.PI/180;
         }
 
-        simul = tempStack.xrdCurveFast(alpha0rad);
+        simul = tempStack.xrdCurveFaster(alpha0rad);
 
         return new GraphData(alpha_0, meas, simul);
     }
