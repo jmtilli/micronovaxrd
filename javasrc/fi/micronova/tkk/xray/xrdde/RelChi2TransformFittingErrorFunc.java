@@ -16,7 +16,7 @@ public class RelChi2TransformFittingErrorFunc implements FittingErrorFunc {
     this.B = Math.sqrt(threshold)-A*Math.log(threshold);
     this.p = p;
   }
-  private double transform(double datapoint)
+  public double transform(double datapoint)
   {
     if (datapoint <= threshold)
     {

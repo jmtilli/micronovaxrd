@@ -103,7 +103,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
     private JList<String> layeredList;
     private double dbMin = -5, dbMax = 50;
 
-    private enum PlotStyle {LIN, LOG, SQRT};
+    private enum PlotStyle {LIN, LOG, SQRT, MRCHI2};
 
     private Properties props = new Properties();
 
@@ -1622,6 +1622,32 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             }
         });
         dataMenu.add(dataPlot);
+        dataPlot = new JMenuItem("MRchi2-plot");
+        dataPlot.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ev) {
+                if (    tabs.getSelectedComponent() == fit
+                    &&  fitLayers != null
+                    && !fitLayers.equals(layers))
+                {
+                    if (JOptionPane.showConfirmDialog(
+                            null,
+                            "The model that's going to be plotted is the one " +
+                            "on the manual fit tab and that's different " +
+                            "from the model on the automatic fit tab.\n\n" +
+                            "You're on the automatic fit tab. To export " +
+                            "the model to the manual fit tab, press " +
+                            "\"Export model\".\n\nDo you still want to plot?",
+                            "Question", JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE)
+                      != JOptionPane.YES_OPTION)
+                    {
+                      return;
+                    }
+                }
+                thisFrame.plot(PlotStyle.MRCHI2);
+            }
+        });
+        dataMenu.add(dataPlot);
 
         dataMenu.addSeparator();
 
@@ -1728,6 +1754,9 @@ public class XRDApp extends JFrame implements ChooserWrapper {
             System.arraycopy(d.meas, 0, meas, 0, meas.length);
             System.arraycopy(d.simul, 0, simul, 0, simul.length);
 
+            double dBthreshold = (Double)thresholdModel.getNumber();
+            RelChi2TransformFittingErrorFunc func = new RelChi2TransformFittingErrorFunc(Math.exp(Math.log(10)*dBthreshold/10), (Integer)pModel.getNumber());
+
             switch(style) {
                 case LOG:
                     for(int i=0; i<meas.length; i++) {
@@ -1754,6 +1783,13 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                         simul[i] = Math.sqrt(simul[i]);
                     }
                     ytitle = "sqrt(reflectivity)";
+                    break;
+                case MRCHI2:
+                    for(int i=0; i<meas.length; i++) {
+                        meas[i] = func.transform(meas[i]);
+                        simul[i] = func.transform(simul[i]);
+                    }
+                    ytitle = "MRchi2(reflectivity)";
                     break;
                 default:
                     ytitle = "reflectivity";
