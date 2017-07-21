@@ -37,6 +37,7 @@ public class ScrollbarUpdater {
     private static final double maxSum = -30;
     */
     //private static final double FWHM_SCALE = 2*Math.sqrt(2*Math.log(2));
+    private XRDApp xrd;
 
     /** Constructor.
      *
@@ -52,7 +53,7 @@ public class ScrollbarUpdater {
     private void addTabs(int i0, int i1) {
         for(int i=i0; i<i1; i++) {
             Layer l = ls.getElementAt(i);
-            final SliderPanel sliders = new SliderPanel(l);
+            final SliderPanel sliders = new SliderPanel(xrd, ls, l);
             sliderPane.insertTab(sliders.getTitle(),null,sliders,/*l.getName()*//*tip*/null,i+1);
             sliders.addTitleListener(new SliderPanel.TitleListener() {
                 public void titleChanged() {
@@ -75,7 +76,7 @@ public class ScrollbarUpdater {
             p.cleanup(); /* cut listener structure to allow GC */
         }
     }
-    public ScrollbarUpdater(LayerStack ls, JComponent sliderPanel) {
+    public ScrollbarUpdater(XRDApp xrd, LayerStack ls, JComponent sliderPanel) {
         /*
         JPanel convolutionPanel = new JPanel();
         JPanel convLabelPanel = new JPanel();
@@ -84,6 +85,7 @@ public class ScrollbarUpdater {
         JPanel sumPanel = new JPanel();
         JPanel sumLabelPanel = new JPanel();
         */
+        this.xrd = xrd;
 
         sliderPanel.setLayout(new BorderLayout(5,5));
         //convLabelPanel.setLayout(new BorderLayout(5,5));
@@ -93,7 +95,7 @@ public class ScrollbarUpdater {
         this.ls = ls;
         this.sliderPane = new JTabbedPane();
 
-        JPanel global = new StackSliderPanel(ls);
+        JPanel global = new StackSliderPanel(xrd, ls);
         sliderPane.insertTab("Global",null,global,"Global settings",0);
 
         /* The code handles duplicates otherwise perfectly, but it shows

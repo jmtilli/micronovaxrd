@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.util.*;
 import fi.micronova.tkk.xray.xrdmodel.*;
 import fi.micronova.tkk.xray.util.*;
+import fi.micronova.tkk.xray.chart.*;
 
 
 
@@ -26,6 +27,7 @@ public class SingleScrollbarUpdater implements ValueListener {
     private JButton maxButton;
     private JButton maxx2Button;
     private JButton rangeButton;
+    private JButton errButton;
     private JCheckBox enableCheck;
 
     private boolean valueChangeLock = false;
@@ -36,8 +38,10 @@ public class SingleScrollbarUpdater implements ValueListener {
     private boolean noRecursion = false;
 
     private final boolean minIsZero;
+    private final XRDApp xrd;
 
-    public SingleScrollbarUpdater(final FitValue val, final String prefix, final double multiplier, final boolean minIsZero) {
+    public SingleScrollbarUpdater(final XRDApp xrd, final LayerStack ls, final FitValue val, final String prefix, final double multiplier, final boolean minIsZero) {
+        this.xrd = xrd;
         this.val = val;
         this.prefix = prefix;
         this.multiplier = multiplier;
@@ -92,6 +96,36 @@ public class SingleScrollbarUpdater implements ValueListener {
                     newMax = val.getMax() + 1/multiplier;
                 }
                 val.setValues(val.getMin(),val.getExpected(),newMax,val.getEnabled());
+            }
+        });
+        this.errButton = new JButton("E");
+        this.errButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ev) {
+                try {
+                    LayerStack.Pair pair = ls.deepCopy(val);
+                    LayerStack ls = pair.stack;
+                    FitValue val = pair.value;
+                    double min = val.getMin(), max = val.getMax();
+                    double[] mids = new double[1001];
+                    double[] errs = new double[1001];
+                    for (int i = 0; i <= 1000; i++)
+                    {
+                        double mid = min + (max-min)/1000.0 * i;
+                        val.setExpected(mid);
+                        //GraphData gd2 = xrd.croppedGd().simulate(ls).normalize(ls);
+                        GraphData gd2 = xrd.croppedGd().simulate(ls);
+                        double err = xrd.func().getError(gd2.meas, gd2.simul);
+                        mids[i] = mid;
+                        errs[i] = err;
+                    }
+                    ArrayList<NamedArray> yarrays = new ArrayList<NamedArray>();
+                    yarrays.add(new NamedArray(1, errs, ""));
+                    new ChartFrame(xrd,"Error scan", 600, 400, false,
+                        new DataArray(multiplier, mids), prefix, yarrays, "error", 0, 0, null).setVisible(true);
+                }
+                catch (SimulationException ex) {
+                    JOptionPane.showMessageDialog(null, "Simulation error", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
         this.rangeButton = new JButton("Edit");
@@ -219,6 +253,7 @@ public class SingleScrollbarUpdater implements ValueListener {
         sliders.add(maxLabel,c);
         sliders.add(maxButton,c);
         sliders.add(maxx2Button,c);
+        sliders.add(errButton,c);
         sliders.add(rangeButton,c);
         c.gridwidth = GridBagConstraints.REMAINDER;
         sliders.add(enableCheck,c);

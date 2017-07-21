@@ -16,6 +16,7 @@ import fi.micronova.tkk.xray.util.*;
 import fi.micronova.tkk.xray.measimport.*;
 import fi.micronova.tkk.xray.dialogs.*;
 import fi.micronova.tkk.xray.de.*;
+import fi.micronova.tkk.xray.xrdde.*;
 
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
@@ -107,6 +108,48 @@ public class XRDApp extends JFrame implements ChooserWrapper {
     private Properties props = new Properties();
 
     private AdvancedFitOptions opts = new AdvancedFitOptions();
+
+    private final XRDApp xrd;
+
+    private JComboBox<FitnessFunction> funcBox;
+    private SpinnerNumberModel pModel, firstAngleModel, lastAngleModel, thresholdModel;
+
+
+    public FittingErrorFunc func()
+    {
+        FitnessFunction func = (FitnessFunction)funcBox.getSelectedItem();
+        FittingErrorFunc func2;
+        double dBthreshold = (Double)thresholdModel.getNumber();
+        switch (func)
+        {
+          case relchi2:
+            func2 = new RelChi2FittingErrorFunc(Math.exp(Math.log(10)*dBthreshold/10));
+            break;
+          case logfitness:
+            func2 = new LogFittingErrorFunc((Integer)pModel.getNumber());
+            break;
+          case sqrtfitness:
+            func2 = new SqrtFittingErrorFunc((Integer)pModel.getNumber());
+            break;
+          case chi2:
+            func2 = new Chi2FittingErrorFunc();
+            break;
+          default:
+            throw new IllegalArgumentException();
+        }
+        return func2;
+    }
+    public GraphData gd()
+    {
+        return data;
+    }
+    public GraphData croppedGd()
+    {
+        return data.crop((Double)firstAngleModel.getNumber(),
+                         (Double)lastAngleModel.getNumber());
+    }
+
+
 
 
 
@@ -289,6 +332,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
 
     public XRDApp() {
         super("XRD");
+        this.xrd = this;
         data = new GraphData(null, null, null, false);
     }
 
@@ -482,7 +526,7 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         /* TODO ScrollbarUpdater */
         //layers.addListDataListener(new ScrollbarUpdater(layers, sliderPane));
         //layers.addListDataListener(new ScrollbarUpdater(layers, sliderPanel));
-        new ScrollbarUpdater(layers, sliderPanel);
+        new ScrollbarUpdater(this, layers, sliderPanel);
 
         layered = new JPanel();
         graph = new JPanel();
@@ -959,15 +1003,15 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         final JButton advancedButton = new JButton("Opts");
         final SpinnerNumberModel popSizeModel = new SpinnerNumberModel(settingInt("autofit.popsize", -10, -200, 2000),-200,2000,1);
         final SpinnerNumberModel iterationsModel = new SpinnerNumberModel(settingInt("autofit.iters", 500, 1, 10000),1,10000,1);
-        final SpinnerNumberModel pModel = new SpinnerNumberModel(settingInt("autofit.pNorm", 2, 1, 10),1,10,1);
+        pModel = new SpinnerNumberModel(settingInt("autofit.pNorm", 2, 1, 10),1,10,1);
         final SpinnerNumberModel autostopModel = new SpinnerNumberModel(settingInt("autofit.autostopFigures", 6, 2, 10),2,10,1);
-        final SpinnerNumberModel firstAngleModel = new SpinnerNumberModel(settingDouble("autofit.firstAngle", 0, 0, 90),0,90,0.01);
-        final SpinnerNumberModel lastAngleModel = new SpinnerNumberModel(settingDouble("autofit.lastAngle", 90, 0, 90),0,90,0.01);
-        final SpinnerNumberModel thresholdModel = new SpinnerNumberModel(settingDouble("autofit.thresRelF", 20, -500, 500),-500,500,0.1);
+        firstAngleModel = new SpinnerNumberModel(settingDouble("autofit.firstAngle", 0, 0, 90),0,90,0.01);
+        lastAngleModel = new SpinnerNumberModel(settingDouble("autofit.lastAngle", 90, 0, 90),0,90,0.01);
+        thresholdModel = new SpinnerNumberModel(settingDouble("autofit.thresRelF", 20, -500, 500),-500,500,0.1);
         final JComboBox<Algorithm> algoBox = new JComboBox<Algorithm>(Algorithm.values());
         final JCheckBox autostop = new JCheckBox("automatic fit stop with figures");
         algoBox.setSelectedItem(Algorithm.values()[settingInt("autofit.algorithm", 0, 0, Algorithm.values().length)]);
-        final JComboBox<FitnessFunction> funcBox = new JComboBox<FitnessFunction>(FitnessFunction.values());
+        funcBox = new JComboBox<FitnessFunction>(FitnessFunction.values());
         funcBox.setSelectedItem(FitnessFunction.values()[settingInt("autofit.fitnessFunc", 0, 0, FitnessFunction.values().length)]);
         /*
         final JCheckBox nonlinBox = new JCheckBox("Nonlinear fitness space estimation");
@@ -1023,10 +1067,10 @@ public class XRDApp extends JFrame implements ChooserWrapper {
                         }
                     };
                     Algorithm algo = (Algorithm)algoBox.getSelectedItem();
-                    f = new JavaFitter(fitLight, data, endTask, plotTask, errTask2, fitLayers,
+                    f = new JavaFitter(xrd, fitLight, data, endTask, plotTask, errTask2, fitLayers,
                                        (Integer)popSizeModel.getNumber(), (Integer)iterationsModel.getNumber(),
                                        (Double)firstAngleModel.getNumber(), (Double)lastAngleModel.getNumber(),
-                                       green, yellow, algo, (FitnessFunction)funcBox.getSelectedItem(), (Double)thresholdModel.getNumber(), (Integer)pModel.getNumber(), autostop.isSelected(), (Integer)autostopModel.getNumber(), opts);//, nonlinBox.isSelected());
+                                       green, yellow, algo, autostop.isSelected(), (Integer)autostopModel.getNumber(), opts);//, nonlinBox.isSelected());
                     startFitButton.setEnabled(false);
                     stopFitButton.setEnabled(true);
                     tabs.setTitleAt(2, "Automatic fit (*)");

@@ -38,14 +38,14 @@ public class SliderPanel extends JPanel {
         }
     };
 
-    public SliderPanel(Layer l) {
+    public SliderPanel(XRDApp xrd, LayerStack ls, Layer l) {
         super();
         GridBagConstraints c = new GridBagConstraints();
         setLayout(new GridBagLayout());
-        dUpdater = new SingleScrollbarUpdater(l.getThickness(), "d (nm)", 1e9, true);
-        pUpdater = new SingleScrollbarUpdater(l.getComposition(), "p", 1, true);
-        rUpdater = new SingleScrollbarUpdater(l.getRelaxation(), "r", 1, true);
-        whUpdater = new SingleScrollbarUpdater(l.getSuscFactor(), "wh", 1, true);
+        dUpdater = new SingleScrollbarUpdater(xrd, ls, l.getThickness(), "d (nm)", 1e9, true);
+        pUpdater = new SingleScrollbarUpdater(xrd, ls, l.getComposition(), "p", 1, true);
+        rUpdater = new SingleScrollbarUpdater(xrd, ls, l.getRelaxation(), "r", 1, true);
+        whUpdater = new SingleScrollbarUpdater(xrd, ls, l.getSuscFactor(), "wh", 1, true);
         dUpdater.addToGridBag(this);
         pUpdater.addToGridBag(this);
         rUpdater.addToGridBag(this);

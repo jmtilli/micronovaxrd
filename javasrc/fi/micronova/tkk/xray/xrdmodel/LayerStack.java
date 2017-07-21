@@ -503,6 +503,70 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
         this.sum.deepCopyFrom(sum);
     }
 
+    public class Pair {
+        public final LayerStack stack;
+        public final FitValue value;
+        public Pair(LayerStack stack, FitValue value)
+        {
+            this.stack = stack;
+            this.value = value;
+        }
+    };
+    public Pair deepCopy(FitValue val) {
+        LayerStack result = new LayerStack(this.lambda, this.table);
+        FitValue val2 = null;
+        Map<FitValue, Integer> fitValueNumbering = getFitValueNumbering();
+        Map<Integer, FitValue> newFitValues = new HashMap<Integer, FitValue>();
+        int size = layers.size();
+        for(int i=0; i<size; i++)
+        {
+            Layer l = layers.get(i);
+            Layer l2 = l.deepCopy(fitValueNumbering, newFitValues);
+            if (l.getThickness() == val)
+            {
+                val2 = l2.getThickness();
+            }
+            if (l.getComposition() == val)
+            {
+                val2 = l2.getComposition();
+            }
+            if (l.getRelaxation() == val)
+            {
+                val2 = l2.getRelaxation();
+            }
+            if (l.getSuscFactor() == val)
+            {
+                val2 = l2.getSuscFactor();
+            }
+            result.layers.add(l2);
+            result.layerAdded(l2);
+        }
+        result.stddev.deepCopyFrom(this.stddev);
+        result.offset.deepCopyFrom(this.offset);
+        result.prod.deepCopyFrom(this.prod);
+        result.sum.deepCopyFrom(this.sum);
+        if (this.stddev == val)
+        {
+            val2 = result.stddev; 
+        }
+        if (this.prod == val)
+        {
+            val2 = result.prod; 
+        }
+        if (this.offset == val)
+        {
+            val2 = result.offset; 
+        }
+        if (this.sum == val)
+        {
+            val2 = result.sum; 
+        }
+        return new Pair(result, val2);
+    }
+
+
+
+
     /** Deep copy.
      *
      * <p>
