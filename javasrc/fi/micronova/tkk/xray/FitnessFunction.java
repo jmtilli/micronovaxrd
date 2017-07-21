@@ -4,6 +4,7 @@ package fi.micronova.tkk.xray;
  * All the supported algorithms and their Octave and human-readable names.
  */
 public enum FitnessFunction {
+    relchi2transform("relchi2transformfitnessfunction","p-norm in MR/chi^2 space"),
     relchi2("relchi2fitnessfunction","Mixed relative / chi-squared"),
     logfitness("logfitnessfunction","p-norm in logarithmic space"),
     sqrtfitness("sqrtfitnessfunction","p-norm in sqrt-space"),
