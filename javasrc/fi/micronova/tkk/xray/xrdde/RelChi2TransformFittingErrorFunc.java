@@ -1,5 +1,4 @@
 package fi.micronova.tkk.xray.xrdde;
-
 public class RelChi2TransformFittingErrorFunc implements FittingErrorFunc {
   private double threshold;
   private double A;
@@ -27,38 +26,53 @@ public class RelChi2TransformFittingErrorFunc implements FittingErrorFunc {
       return A*Math.log(datapoint)+B;
     }
   }
-  private static double pnorm(double[] x, int p)
-  {
-    double sum = 0;
-    if (p <= 0)
-    {
-      throw new IllegalArgumentException();
-    }
-    for (int i=0; i<x.length; i++)
-    {
-      sum += Math.exp(Math.log(Math.abs(x[i]))*p);
-    }
-    sum = Math.exp(Math.log(sum)*1.0/p);
-    return sum;
-  }
   public double getError(double[] meas, double[] simul)
   {
-    double E = 0;
-    double[] x = new double[meas.length];
+    double sum = 0;
     int count = 0;
     if (meas.length != simul.length)
     {
       throw new IllegalArgumentException();
     }
-    for (int i=0; i<meas.length; i++)
+    if (p == 1)
     {
-      double a,b;
-      a = transform(meas[i]);
-      b = transform(simul[i]);
-      x[i] = a - b;
-      count++;
+      for (int i=0; i<meas.length; i++)
+      {
+        double a,b;
+        a = transform(meas[i]);
+        b = transform(simul[i]);
+        sum += Math.abs(a-b);
+        count++;
+      }
+      return sum / count;
     }
-    return pnorm(x, p) / Math.exp(Math.log(count)*1.0/p);
+    else if (p == 2)
+    {
+      for (int i=0; i<meas.length; i++)
+      {
+        double a,b,x;
+        a = transform(meas[i]);
+        b = transform(simul[i]);
+        x = a-b;
+        sum += x*x;
+        count++;
+      }
+      sum = Math.sqrt(sum);
+      return sum / Math.sqrt(count);
+    }
+    else
+    {
+      for (int i=0; i<meas.length; i++)
+      {
+        double a,b;
+        a = transform(meas[i]);
+        b = transform(simul[i]);
+        sum += Math.exp(Math.log(Math.abs(a-b))*p);
+        count++;
+      }
+      sum = Math.exp(Math.log(sum)*1.0/p);
+      return sum / Math.exp(Math.log(count)*1.0/p);
+    }
   }
   public static void main(String[] args)
   {
