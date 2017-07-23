@@ -1,8 +1,11 @@
 package fi.micronova.tkk.xray.xrdmodel;
 import fi.micronova.tkk.xray.util.*;
+import fi.micronova.tkk.xray.xrdde.*;
+import fi.micronova.tkk.xray.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.util.*;
+import java.util.concurrent.*;
 import java.io.*;
 import fi.iki.jmtilli.javafastcomplex.Complex;
 import fi.iki.jmtilli.javafastcomplex.ComplexBuffer;
@@ -563,6 +566,77 @@ public class LayerStack implements LayerListener, ValueListener, XMLRowable {
             val2 = result.sum; 
         }
         return new Pair(result, val2);
+    }
+
+    public void fittingErrorScan(final FittingErrorFunc func,
+                                 final FitValue val, final GraphData gd,
+                                 final double[] mids,
+                                 final double[] errs)
+    {
+        final LayerStack ls = this;
+        double min = val.getMin(), max = val.getMax();
+        int cpus = Runtime.getRuntime().availableProcessors();
+        ExecutorService exec =
+            new ThreadPoolExecutor(cpus, cpus, 1, TimeUnit.SECONDS,
+                                   new LinkedBlockingQueue<Runnable>());
+        try
+        {
+            if (mids.length != errs.length)
+            {
+                throw new IllegalArgumentException();
+            }
+            ArrayList<Callable<Void>> list = new ArrayList<Callable<Void>>();
+            for (int i = 0; i < mids.length; i++)
+            {
+                final int finalI = i;
+                final double mid = min + (max-min)/(mids.length-1) * i;
+                mids[i] = mid;
+                list.add(new Callable<Void>() {
+                    public Void call() throws Exception
+                    {
+                        LayerStack.Pair pair = ls.deepCopy(val);
+                        LayerStack ls = pair.stack;
+                        FitValue val = pair.value;
+                        val.setExpected(mid);
+                        GraphData gd2 = gd.simulate(ls);
+                        double err = func.getError(gd2.meas, gd2.simul);
+                        errs[finalI] = err;
+                        return null;
+                    }
+                });
+            }
+            for (;;)
+            {
+                try
+                {
+                    for (Future f: exec.invokeAll(list))
+                    {
+                      try
+                      {
+                          f.get();
+                      }
+                      catch(ExecutionException e)
+                      {
+                        // XXX: what to do?
+                        throw new RuntimeException(e);
+                      }
+                      catch(CancellationException e)
+                      {
+                        // XXX: what to do?
+                        throw new RuntimeException(e);
+                      }
+                    }
+                    return;
+                }
+                catch (InterruptedException ex)
+                {
+                }
+            }
+        }
+        finally
+        {
+            exec.shutdown();
+        }
     }
 
 
