@@ -252,7 +252,7 @@ public class JavaFitter implements FitterInterface {
                         String.format("%.2f", (end - start) / 1e9) +
                         " seconds and " + finalRound + " iterations" +
                         " to obtain fitting error value " +
-                        String.format(Locale.US,"%.4g",finalBestfit);
+                        String.format(Locale.US,"%.6g",finalBestfit);
                 }
                 if(plotTask != null)
                     plotTask.run(stackToReturn,"");
