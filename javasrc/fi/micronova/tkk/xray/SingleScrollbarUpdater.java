@@ -102,7 +102,7 @@ public class SingleScrollbarUpdater implements ValueListener {
                 val.setValues(val.getMin(),val.getExpected(),newMax,val.getEnabled());
             }
         });
-        this.errButton = new JButton("E");
+        this.errButton = new JButton("Err");
         this.errButton.setMargin(new Insets(3, 3, 3, 3));
         this.errButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
