@@ -767,6 +767,23 @@ public class PANImport {
         BufferedReader r = new BufferedReader(new InputStreamReader(is));
         return asciiImportReader(r);
     }
+    private static void grokByteOrderMark(BufferedInputStream bs) throws IOException
+    {
+        byte[] array = new byte[3];
+        int ch;
+        bs.mark(2048);
+        if (bs.read(array, 0, 3) != 3)
+        {
+            bs.reset();
+            return;
+        }
+        if (array[0] == (byte)0xef && array[1] == (byte)0xbb &&
+            array[2] == (byte)0xbf)
+        {
+            return;
+        }
+        bs.reset();
+    }
     private static void readWhiteSpace(BufferedInputStream bs) throws IOException
     {
         byte[] array = new byte[1024];
@@ -1149,6 +1166,7 @@ outer:
         {
             return UDFImport(bs);
         }
+        grokByteOrderMark(bs);
         readWhiteSpace(bs);
         bs.mark(16);
         ch = bs.read();
@@ -1187,7 +1205,7 @@ outer:
             }
             return asciiImportReader(r);
         }
-        if (ch == '<' || ch == 0xef)
+        if (ch == '<')
         {
             data = XRDMLImport(bs);
             if (data == null)
