@@ -15,7 +15,7 @@ public class XRDAboutDialog extends GenericAboutDialog {
     private static final String title = "About XRD";
     private static final String text =
 
-"Micronova XRD fitting software, version 1.0\n"+
+"Micronova XRD fitting software, version 1.1\n"+
 "\n"+
 "Copyright 2006-2014 Aalto University\n"+
 "Copyright 2006-2019 Juha-Matti Tilli\n"+
