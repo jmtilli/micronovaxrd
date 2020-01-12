@@ -381,6 +381,10 @@ public class XRDApp extends JFrame implements ChooserWrapper {
         new_alpha_0 = new double[bound2];
         System.arraycopy(meas, 0, new_meas, 0, bound2);
         System.arraycopy(alpha_0, 0, new_alpha_0, 0, bound2);
+        if (bound2 == 0)
+        {
+            return;
+        }
         data.newData(new_alpha_0, new_meas, null, false);
 
         p.draw();
