@@ -251,7 +251,8 @@ public class PANImport {
             scan = measurement.getNotNull("scan");
             axis = scan.getAttrStringNotNull("scanAxis");
             if (!axis.equals("Omega-2Theta") &&
-                !axis.equals("2Theta-Omega"))
+                !axis.equals("2Theta-Omega") &&
+                !axis.equals("Gonio"))
             {
                 throw new ImportException();
             }
